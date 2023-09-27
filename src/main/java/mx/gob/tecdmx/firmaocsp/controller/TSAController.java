@@ -3,9 +3,11 @@ package mx.gob.tecdmx.firmaocsp.controller;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import mx.gob.tecdmx.firmaocsp.dto.PayloadTSA;
@@ -15,7 +17,8 @@ import mx.gob.tecdmx.firmaocsp.dto.TsaDTO;
 @RequestMapping(path = "/api/tsa-tsp")
 public class TSAController {
 
-	@PostMapping("/")
+	@CrossOrigin()
+	@RequestMapping(method = RequestMethod.POST, path = "/", produces = "application/json")
     public TsaDTO uploadFile(@RequestBody PayloadTSA payload) {
 		
 		TsaDTO tsaDto = new TsaDTO();

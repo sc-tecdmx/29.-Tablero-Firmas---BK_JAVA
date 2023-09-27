@@ -5,9 +5,11 @@ import java.io.InputStream;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,8 +24,9 @@ import mx.gob.tecdmx.firmaocsp.utils.OcspValidationException;
 @RestController
 @RequestMapping(path = "/api/oscpi-verification")
 public class VerificationOCSPController {
-
-	@PostMapping("/")
+	
+	@CrossOrigin()
+	@RequestMapping(method = RequestMethod.POST, path = "/", produces = "application/json")
     public OCSPResponseDTO verifyOcspi(@RequestBody PayloadOCSP payload) {
 		OCSPResponseDTO ocspResponse = new OCSPResponseDTO();
         try {
@@ -93,7 +96,8 @@ public class VerificationOCSPController {
         return ocspResponse;
     }
 	
-	@PostMapping("/upload")
+	@CrossOrigin()
+	@RequestMapping(method = RequestMethod.POST, path = "/upload", produces = "application/json")
     public OCSPResponseDTO uploadFile(@RequestParam("file") MultipartFile file) {
 		OCSPResponseDTO ocspResponse = new OCSPResponseDTO();
         try {
