@@ -4,7 +4,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -19,7 +18,7 @@ public class TSAController {
 
 	@CrossOrigin()
 	@RequestMapping(method = RequestMethod.POST, path = "/", produces = "application/json")
-    public TsaDTO uploadFile(@RequestBody PayloadTSA payload) {
+    public TsaDTO medodoTSP(@RequestBody PayloadTSA payload) {
 		
 		TsaDTO tsaDto = new TsaDTO();
 		Date fechaHoraActual = new Date();

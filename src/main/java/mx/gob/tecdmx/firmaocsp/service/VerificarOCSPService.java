@@ -6,6 +6,7 @@ import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
@@ -14,6 +15,7 @@ import java.net.URL;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+
 
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.ocsp.BasicOCSPResp;
@@ -31,6 +33,7 @@ import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
 import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
+import org.bouncycastle.util.encoders.Base64;
 
 import mx.gob.tecdmx.firmaocsp.dto.OCSPResponseDTO;
 import mx.gob.tecdmx.firmaocsp.utils.OcspTimeoutException;
@@ -45,6 +48,25 @@ public class VerificarOCSPService {
 	    }
 	    return hexString.toString();
 	}
+	
+	public static String convertBasicOCSPRespToBase64(BasicOCSPResp basicResponse) {
+       
+		byte[] responseBytes;
+		try {
+			responseBytes = basicResponse.getEncoded();
+			// Convierte los bytes a una representación Base64
+	        String base64Response = new String(Base64.encode(responseBytes));
+
+	        // Imprime la representación en Base64
+	        System.out.println("Base64 Response: " + base64Response);
+	        return base64Response;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+return null;
+        
+    }
 	
 	
 	private static boolean checkOcspSignature(X509Certificate certificate, BasicOCSPResp basicResponse)
@@ -151,7 +173,9 @@ public class VerificarOCSPService {
 					.getResponseObject();
 			System.out.println(basicResponse.getCerts()[0].getSubject().toString());
 			
-			ocspResponseDTO.setBasicResponse(basicResponse.getResponses()[0].toString());
+			
+			ocspResponseDTO.setBasicResponse(convertBasicOCSPRespToBase64(
+					basicResponse));
 			
 			//issuerCert, x509Cert
 			try {

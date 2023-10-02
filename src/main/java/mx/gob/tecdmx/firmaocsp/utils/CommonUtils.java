@@ -123,7 +123,8 @@ public class CommonUtils {
 		
 		try {
             // Crea un flujo de entrada para leer el archivo .cer
-            InputStream inStream = new FileInputStream(certFilePath);
+            //InputStream inStream = new FileInputStream(certFilePath);
+            InputStream inStream = CommonUtils.class.getResourceAsStream(certFilePath);
 
             // Crea un objeto CertificateFactory para cargar el certificado
             CertificateFactory certFactory = CertificateFactory.getInstance("X.509", "BC");

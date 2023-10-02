@@ -1,0 +1,51 @@
+{
+    "idDocumento":"76gdbbf4567",/* -> Para el servicio de crear un documento no se debería de enviar a menos que sea un ID que seA 
+    manualmente*/
+    "tipoUsoCode":"COMUNICACION",/*Podría ser un catalogo??*/
+    "areaDestinoCode":"RH",/*Debería ser un catalogo*/
+    "areaCopiaCode":"RM",/*Debería ser un catalogo*/
+    "tipoDocumentoCode":"MINUTA",/*Minuta,Acuerdo, etc./ Debería ser un catalogo*/
+    "folio":"qaw123",/*folio y folioDocumento, son campos diferentes????*/
+    "folioDocumento":"doc-0123",/*folio y folioDocumento, son campos diferentes????*/
+    "numeroExpediente":"123/23",
+    "nombreExpediente":"informativo01",
+    "fechaDocumento":"2023/09/20",
+    "destinatario":"usuario1@tecdmx.gob.mx",/*Es una persona? y debería ser un campo llave / Este campo se repite o tiene un propósito 
+    distinto al de abajo???*/
+    "cargo":"programadora",/*Es el cargo del destinatario o de quien elaboró el docuemnto??? / Podría no agregarse pues el campo si se 
+    puede obtener de la BD */
+    "elaboro":"usuario4@tecdmx.gob.mx",/*Debería ser un campo llave, pero podría no llevarlo considerando que la persona que lo 
+    elabora tiene su sesión iniciada.*/
+    "asunto":"particular",/*Es el asunto del correo o una descripción del documento??*/
+    "contenido":"mucha informacion importante",/*Es una reseña del documento?? es el contenido del correo???*/
+    "documento":"",
+    "nota":"el trabajo es bueno", /*Antes notas./ Es solo una nota o pueden ser multiples notas que requiera una tabla transitiva??? 
+    /Es nota del doc o del correo*/
+    "firmantes":[
+       {
+        "correo":"usuario1@tecdmx.gob.mx",/*Antes 'nombreFirmante'*/
+        "accionCode":"FIRMAR",/*Antes 'firma', por seguridad debería ser un ID de catálogo: Firmar, Rubricar./Es el mismo campo que 
+        instrucción en destinatario??*/
+        "obligatorio":true,
+         "estado":true/*No se debe enviar en la petición, solo para la recuperación de un documento.
+          Se entiende que es la confirmación del campo acción??*/
+       }
+    ],
+    "destinatarios":[
+       {
+        "correo":"usuario1@tecdmx.gob.mx",/*Antes 'nombreDestinatario'*/
+        "accionCode":"REVISAR",/*Antes 'instruccion', por seguridad debería ser un codigo de catálogo: Revisar, Publicar, etc./*Es 
+        el mismo campo que firma en firmantes??*/
+        "obligatorio":true,/*No se contemplaba, pero puede ser pertinente agregar el campo*/
+      "estado":true/*No se debe enviar en la petición, solo para la recuperación de un documento.
+          Se entiende que es la confirmación del campo acción??*/
+       }
+    ],
+    "configuracion":{
+       "ordenFirma":"1234firmar",/*No entiendo bien el tipo de dato de este campo*/
+       "modoCaptura":true,/*No entiendo bien el tipo de dato de este campo*/
+       "generaNumeroOficio":"1234509876",/*No entiendo bien el tipo de dato de este campo*/
+       "fechaLimite":"2023/09/21",
+       "documento":"" /*Antes 'documentos' contiene el base64 de un documento*/
+    }
+ }
