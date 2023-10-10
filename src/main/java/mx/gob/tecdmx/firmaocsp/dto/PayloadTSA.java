@@ -3,6 +3,8 @@ package mx.gob.tecdmx.firmaocsp.dto;
 public class PayloadTSA {
 	String responseOCSP;
 	String certificado;
+	byte[] digest;
+	
 	public String getResponseOCSP() {
 		return responseOCSP;
 	}
@@ -14,6 +16,12 @@ public class PayloadTSA {
 	}
 	public void setCertificado(String certificado) {
 		this.certificado = certificado;
+	}
+	public byte[] getDigest() {
+		return digest;
+	}
+	public void setDigest(byte[] digest) {
+		this.digest = digest;
 	}
 	
 	
