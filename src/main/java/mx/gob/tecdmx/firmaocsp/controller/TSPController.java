@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import mx.gob.tecdmx.firmaocsp.dto.PayloadTSA;
 import mx.gob.tecdmx.firmaocsp.dto.TsaDTO;
-import mx.gob.tecdmx.firmaocsp.service.TCPService;
+import mx.gob.tecdmx.firmaocsp.service.TSPService;
 
 @RestController
 @RequestMapping(path = "/api/tsa-tsp")
@@ -23,7 +23,7 @@ public class TSPController {
 	@RequestMapping(method = RequestMethod.POST, path = "/", produces = "application/json")
     public TsaDTO medodoTSP(@RequestBody PayloadTSA payload) {
 		
-		TCPService tcpService = new TCPService();
+		TSPService tcpService = new TSPService();
 		try {
 			TimeStampResponse response = tcpService.getTimestampForPdf(payload.getDigest());
 			return tcpService.timeStampResponse(response);

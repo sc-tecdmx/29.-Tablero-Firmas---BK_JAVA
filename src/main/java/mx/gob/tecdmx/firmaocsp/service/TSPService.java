@@ -14,7 +14,7 @@ import org.json.JSONObject;
 
 import mx.gob.tecdmx.firmaocsp.dto.TsaDTO;
 
-public class TCPService {
+public class TSPService {
 	
 	private static final String TSA_URL = "http://firel.uncocefi.cjf.gob.mx/tsacjf/";
 	
