@@ -4,12 +4,6 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-#Otros directorios
-ca_production/
-test_cjf/
-test_fiel/
-test_intabi/
-
 ### STS ###
 .apt_generated
 .classpath
