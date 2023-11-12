@@ -25,19 +25,22 @@ public class RestControllerDocumento {
 	
 	@CrossOrigin()
 	@RequestMapping(method = RequestMethod.POST, path = "/firmar-documento", produces = "application/json")
-    public ResponseEntity<DTOResponse> verifyOcsp(@RequestBody PayloadFirma payload) {
+    public ResponseEntity<DTOResponse> firmarDocumento(@RequestBody PayloadFirma payload, HttpServletRequest request) {
 		DTOResponse res = new DTOResponse();
-		serviceDocumento.firmar(payload, res);
+		DTOResponseUserInfo userInfo = serviceSecurity.getUserInfo(request);
+		serviceDocumento.firmar(payload, res, userInfo);
 		return ResponseEntity.ok().header(null).body(res);
 	}
 	
-//	@CrossOrigin()
-//	@RequestMapping(method = RequestMethod.POST, path = "/crear-documento", produces = "application/json")
-//    public ResponseEntity<DTOResponse> createDocumento(@RequestBody PayloadDocumento payload) {
-//		DTOResponse res = new DTOResponse();
-//		serviceDocumento.createDocumento(payload, res);
-//		return ResponseEntity.ok().header(null).body(res);
-//	}
+	@CrossOrigin()
+	@RequestMapping(method = RequestMethod.GET, path = "/documentos-usuario", produces = "application/json")
+	public ResponseEntity<DTOResponse> documentosUsuario(HttpServletRequest request) {
+		DTOResponse res = new DTOResponse();
+		DTOResponseUserInfo userInfo = serviceSecurity.getUserInfo(request);
+		serviceDocumento.getDocumentosByUsuario(res, userInfo);
+		return ResponseEntity.ok().header(null).body(res);
+	}
+
 	
 	@CrossOrigin()
 	@RequestMapping(method = RequestMethod.POST, path = "/alta-documento", produces = "application/json")

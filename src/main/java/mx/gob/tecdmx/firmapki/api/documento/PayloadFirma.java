@@ -3,10 +3,10 @@ package mx.gob.tecdmx.firmapki.api.documento;
 public class PayloadFirma {
 	int idTransaccion;
     String hashDocumento;
-    int idFirmaAplicada;
-    String cadenaFirma;
-    String documentoFirmado;
-    
+    String codigoFirmaAplicada;
+    byte[] certificado;
+    byte[] cadenaFirma;
+    byte[] documento;
 	public int getIdTransaccion() {
 		return idTransaccion;
 	}
@@ -19,25 +19,29 @@ public class PayloadFirma {
 	public void setHashDocumento(String hashDocumento) {
 		this.hashDocumento = hashDocumento;
 	}
-	public int getIdFirmaAplicada() {
-		return idFirmaAplicada;
+	public String getCodigoFirmaAplicada() {
+		return codigoFirmaAplicada;
 	}
-	public void setIdFirmaAplicada(int idFirmaAplicada) {
-		this.idFirmaAplicada = idFirmaAplicada;
+	public void setCodigoFirmaAplicada(String codigoFirmaAplicada) {
+		this.codigoFirmaAplicada = codigoFirmaAplicada;
 	}
-	public String getCadenaFirma() {
+	public byte[] getCertificado() {
+		return certificado;
+	}
+	public void setCertificado(byte[] certificado) {
+		this.certificado = certificado;
+	}
+	public byte[] getCadenaFirma() {
 		return cadenaFirma;
 	}
-	public void setCadenaFirma(String cadenaFirma) {
+	public void setCadenaFirma(byte[] cadenaFirma) {
 		this.cadenaFirma = cadenaFirma;
 	}
-	public String getDocumentoFirmado() {
-		return documentoFirmado;
+	public byte[] getDocumento() {
+		return documento;
 	}
-	public void setDocumentoFirmado(String documentoFirmado) {
-		this.documentoFirmado = documentoFirmado;
+	public void setDocumento(byte[] documento) {
+		this.documento = documento;
 	}
     
-	
-
 }

@@ -8,6 +8,7 @@ public class IddocumentoIdnumeEmpleadoID implements Serializable {
 	 
     private int idDocumento;
     private int idNumEmpleado;
+    
 	public int getIdDocumento() {
 		return idDocumento;
 	}

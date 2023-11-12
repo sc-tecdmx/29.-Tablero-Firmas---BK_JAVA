@@ -1,5 +1,6 @@
 package mx.gob.tecdmx.firmapki.utils;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -138,5 +139,12 @@ public class CertificateUtils {
             e.printStackTrace();
         }
 	}
+	
+	public static void writePdfFile(byte[] signedPdf, String outputFilePath) throws IOException {
+        try (FileOutputStream fos = new FileOutputStream(outputFilePath)) {
+            fos.write(signedPdf);
+            fos.flush(); // Asegúrate de que todos los datos se escriban en el archivo.
+        }
+    }
 
 }

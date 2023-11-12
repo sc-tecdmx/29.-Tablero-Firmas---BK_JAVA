@@ -27,7 +27,7 @@ public class PkiX509AcAutorizadas {
 	String  url;
   
 	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="x509EmisorSerialParent", referencedColumnName="s_x509_emisor_serial")  
+	@JoinColumn(name="s_x509_emisor_serial_parent", referencedColumnName="s_x509_emisor_serial")  
 	PkiX509AcAutorizadas  x509EmisorSerialParent;
 
 	public String getId() {
