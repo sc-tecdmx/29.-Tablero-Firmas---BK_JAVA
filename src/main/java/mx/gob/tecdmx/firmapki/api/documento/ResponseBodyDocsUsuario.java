@@ -13,7 +13,7 @@ public class ResponseBodyDocsUsuario {
 	String tipo;
 	List<DTOEmpleado> firmantes;
 	List<DTOEmpleado> destinatarios;
-	List<String> documentosAdjuntos;
+	List<DTODocAdjunto> documentosAdjuntos;
 	public int getIdDocumento() {
 		return idDocumento;
 	}
@@ -68,10 +68,10 @@ public class ResponseBodyDocsUsuario {
 	public void setDestinatarios(List<DTOEmpleado> destinatarios) {
 		this.destinatarios = destinatarios;
 	}
-	public List<String> getDocumentosAdjuntos() {
+	public List<DTODocAdjunto> getDocumentosAdjuntos() {
 		return documentosAdjuntos;
 	}
-	public void setDocumentosAdjuntos(List<String> documentosAdjuntos) {
+	public void setDocumentosAdjuntos(List<DTODocAdjunto> documentosAdjuntos) {
 		this.documentosAdjuntos = documentosAdjuntos;
 	}
 	

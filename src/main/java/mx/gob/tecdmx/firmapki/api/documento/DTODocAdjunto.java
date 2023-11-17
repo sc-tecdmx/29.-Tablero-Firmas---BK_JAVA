@@ -4,6 +4,7 @@ public class DTODocAdjunto {
 
 	String fileType;
 	String docBase64;
+	String filePath;
 	
 	public String getFileType() {
 		return fileType;
@@ -16,6 +17,12 @@ public class DTODocAdjunto {
 	}
 	public void setDocBase64(String docBase64) {
 		this.docBase64 = docBase64;
+	}
+	public String getFilePath() {
+		return filePath;
+	}
+	public void setFilePath(String filePath) {
+		this.filePath = filePath;
 	}
 	
 	

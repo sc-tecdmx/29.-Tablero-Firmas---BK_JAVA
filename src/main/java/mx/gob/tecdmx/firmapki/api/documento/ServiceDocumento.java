@@ -530,13 +530,19 @@ public class ServiceDocumento {
 			}
 			docUsuario.setDestinatarios(destinatarios);
 
-			List<String> documentosAdjuntos = new ArrayList<String>();
+			List<DTODocAdjunto> documentosAdjuntos = new ArrayList<DTODocAdjunto>();
+			DTODocAdjunto docAdjuntoDto = null;
 			Optional<TabDocumentos> documento = tabDocumentosRepository.findById(docsUsuarioView.getIdDocumento());
 			if (documento.isPresent()) {
 				List<TabDocumentosAdjuntos> docAdjuntos = tabDocumentosAdjuntosRepository
 						.findByIdDocument(documento.get());
 				for (TabDocumentosAdjuntos docAdjunto : docAdjuntos) {
-					documentosAdjuntos.add(docAdjunto.getDocumentoPath());
+					docAdjuntoDto = new DTODocAdjunto();
+					docAdjuntoDto.setDocBase64(docAdjunto.getDocumentoBase64());
+					docAdjuntoDto.setFilePath(docAdjunto.getDocumentoPath());
+					docAdjuntoDto.setFileType(docAdjunto.getDocumentoFiletype());
+					
+					documentosAdjuntos.add(docAdjuntoDto);
 				}
 			}
 			docUsuario.setDocumentosAdjuntos(documentosAdjuntos);
