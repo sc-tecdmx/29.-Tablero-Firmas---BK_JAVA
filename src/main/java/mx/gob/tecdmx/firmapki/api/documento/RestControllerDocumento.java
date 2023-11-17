@@ -43,6 +43,15 @@ public class RestControllerDocumento {
 
 	
 	@CrossOrigin()
+	@RequestMapping(method = RequestMethod.POST, path = "/alta-documento-v2", produces = "application/json")
+    public ResponseEntity<DTOResponse> createDocumentov2(@RequestBody PayloadAltaDocumento payload, HttpServletRequest request) {
+		DTOResponse res = new DTOResponse();
+		DTOResponseUserInfo userInfo = serviceSecurity.getUserInfo(request);
+		serviceDocumento.altaDocumentov2(payload, res, userInfo);
+		return ResponseEntity.ok().header(null).body(res);
+	}
+	
+	@CrossOrigin()
 	@RequestMapping(method = RequestMethod.POST, path = "/alta-documento", produces = "application/json")
     public ResponseEntity<DTOResponse> createDocumento(@RequestBody PayloadAltaDocumento payload, HttpServletRequest request) {
 		DTOResponse res = new DTOResponse();

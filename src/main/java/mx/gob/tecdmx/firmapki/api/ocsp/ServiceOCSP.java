@@ -105,7 +105,7 @@ public class ServiceOCSP {
 					ocsResp.setOcspResponseDerB64(ocsp.getBasicResponse());
 			        String filename = evidenciasOcspPath+"/"+utils.formatDate(ocsp.getFechaUTC())+"_transaccion_"+payload.getIdTransaccion()+
 							"_ocsp_responseb64.txt";
-					utils.storeBase64ToFile(ocsp.getBasicResponse().getBytes(), filename);
+					utils.storeBase64ToFile(ocsp.getBasicResponse(), filename);
 					
 					ocsResp.setOcspResponsePath(filename);
 					ocsResp.setX509SerialResponder(certOCSP.getSerialnumber());

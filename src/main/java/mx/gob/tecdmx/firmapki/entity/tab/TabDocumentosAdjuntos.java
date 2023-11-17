@@ -34,6 +34,9 @@ public class TabDocumentosAdjuntos {
   
 	@Column(name = "documento_filetype")
 	String  documentoFiletype;
+	
+	@Column(name = "documento_base64")
+	String  documentoBase64;
   
 	@Column(name = "fecha_carga")
 	Date  fechaCarga;
@@ -84,6 +87,14 @@ public class TabDocumentosAdjuntos {
 
 	public void setFechaCarga(Date fechaCarga) {
 		this.fechaCarga = fechaCarga;
+	}
+
+	public String getDocumentoBase64() {
+		return documentoBase64;
+	}
+
+	public void setDocumentoBase64(String documentoBase64) {
+		this.documentoBase64 = documentoBase64;
 	}
 
 	

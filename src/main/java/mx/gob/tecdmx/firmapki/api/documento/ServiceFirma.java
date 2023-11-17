@@ -28,6 +28,7 @@ import com.itextpdf.text.pdf.PdfStamper;
 import com.itextpdf.text.pdf.PdfString;
 
 import mx.gob.tecdmx.firmapki.DTOResponseUserInfo;
+import mx.gob.tecdmx.firmapki.api.populate.CertUser;
 import mx.gob.tecdmx.firmapki.utils.CertificateUtils;
 
 @Service
@@ -57,6 +58,9 @@ public class ServiceFirma {
 	        CertificateFactory factory = CertificateFactory.getInstance("X.509");
 	        InputStream certStream = new ByteArrayInputStream(certificadoExterno);
 	        Certificate cert = factory.generateCertificate(certStream);
+	        
+	        InputStream inStream = new ByteArrayInputStream(certificadoExterno);
+			CertUser certUser = new CertUser(inStream);
 
 	        // Cargar el documento PDF
 	        PdfReader reader = new PdfReader(dataDoc);
@@ -68,7 +72,7 @@ public class ServiceFirma {
 	        // ... (tu código actual)
 	        PdfSignature signature = new PdfSignature(PdfName.ADOBE_PPKLITE, new PdfName("adbe.pkcs7.detached"));
             signature.setReason("Firma Digital");
-            signature.setLocation("Lima");
+            signature.setLocation("CIUDAD DE MEXICO");
             
             Date fechaFirma=new Date();
             Calendar calendar = Calendar.getInstance();
@@ -78,12 +82,11 @@ public class ServiceFirma {
             sap.setSignDate(calendar);
             sap.setCryptoDictionary(signature);
             
-            String firmado = "Firmado por ";
-            String razon = "Motivo: " + "Firma Digital";
-            String lugar = "Lugar: " + "Lima";
+            String firmado = "Firmado por: "+certUser.getNombreComun();
+            String noSerie = "No. Serie: " + certUser.getSerialnumber();
             SimpleDateFormat dateformatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss Z");
             String fecha = "Fecha: " + dateformatter.format(fechaFirma);
-            String firmaH = firmado + '\n' + razon + '\n' + lugar + '\n' + fecha;
+            String firmaH = firmado + '\n' + noSerie + '\n' + fecha;
             sap.setLayer2Text(firmaH);
             sap.setVisibleSignature(new Rectangle(100, 100, 350, 200), 1, null);
 

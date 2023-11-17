@@ -137,11 +137,11 @@ public class ServicePopulate {
 		CertificateUtils certUtils = new CertificateUtils();
 		PkiX509Registrados pkiX509r = new PkiX509Registrados();
 
-//		pkiX509r.setsX509SerialNumber(certUser.getSerialnumber());
-//		pkiX509r.setsX509DerB64(certUser.getDerBase64());
-//		pkiX509r.setsX509Sha256Cert(certUser.getCertSha256());
-//		pkiX509r.setsX509EmisorSerial(certUser.getEmisorSerial());
-//		pkiX509r.setsX509Rfc(certUser.getRfc());
+//		pkiX509r.setX509SerialNumber(certUser.getSerialnumber());
+//		pkiX509r.setX509DerB64(certUser.getDerBase64());
+//		pkiX509r.setX509Sha256Cert(certUser.getCertSha256());
+//		pkiX509r.setX509EmisorSerial(certUser.getEmisorSerial());
+//		pkiX509r.setX509Rfc(certUser.getRfc());
 //		pkiX509r.setsX509Curp(certUser.getCurp());
 //		
 //		String[] nombreParts = certUtils.extraerNombre(certUser.getNombreComun());

@@ -53,6 +53,8 @@ public class ServiceTransaccion {
 					res.setStatus("Fail");
 					res.setMessage("No se pudo crear el registro del certificado del usuario");
 					return res;
+				}else {
+					x509User = pkiX509RegistradosRepository.findById(certUser.getSerialnumber());
 				}
 			}
 			

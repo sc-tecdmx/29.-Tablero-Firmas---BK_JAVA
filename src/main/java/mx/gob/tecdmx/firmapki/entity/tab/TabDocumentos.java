@@ -39,7 +39,7 @@ public class TabDocumentos {
 	TabCatTipoDocumento idTipoDocumento;
   
 	@Column(name = "folio_documento")
-	String  folioDocumento;
+	Integer  folioDocumento;
   
 	@Column(name = "folio_especial")
 	String  folioEspecial;
@@ -108,11 +108,13 @@ public class TabDocumentos {
 		this.idTipoDocumento = idTipoDocumento;
 	}
 
-	public String getFolioDocumento() {
+	
+
+	public Integer getFolioDocumento() {
 		return folioDocumento;
 	}
 
-	public void setFolioDocumento(String folioDocumento) {
+	public void setFolioDocumento(Integer folioDocumento) {
 		this.folioDocumento = folioDocumento;
 	}
 

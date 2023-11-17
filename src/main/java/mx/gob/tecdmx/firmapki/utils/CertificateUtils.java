@@ -132,9 +132,10 @@ public class CertificateUtils {
 	    return hexString.toString();
 	}
 	
-	public void storeBase64ToFile(byte[] decodedBytes, String path) {
+	public void storeBase64ToFile(String pdfBase64, String path) {
 		try {
-            Files.write(Paths.get(path), decodedBytes, StandardOpenOption.CREATE);
+			byte[] data = Base64.getDecoder().decode(pdfBase64);
+            Files.write(Paths.get(path), data, StandardOpenOption.CREATE);
         } catch (IOException e) {
             e.printStackTrace();
         }

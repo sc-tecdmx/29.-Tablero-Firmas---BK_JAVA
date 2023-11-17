@@ -3,7 +3,7 @@ package mx.gob.tecdmx.firmapki.api.documento;
 public class DTODocAdjunto {
 
 	String fileType;
-	byte[] docBase64;
+	String docBase64;
 	
 	public String getFileType() {
 		return fileType;
@@ -11,11 +11,12 @@ public class DTODocAdjunto {
 	public void setFileType(String fileType) {
 		this.fileType = fileType;
 	}
-	public byte[] getDocBase64() {
+	public String getDocBase64() {
 		return docBase64;
 	}
-	public void setDocBase64(byte[] docBase64) {
+	public void setDocBase64(String docBase64) {
 		this.docBase64 = docBase64;
 	}
+	
 	
 }

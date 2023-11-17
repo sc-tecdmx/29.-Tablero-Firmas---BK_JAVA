@@ -37,7 +37,7 @@ public class ServiceTSP {
 		
 		String fileName = evidenciasTspPath+"/"+utils.formatDate(tsp.getFechaUTC())+"_transaccion_"+payload.getIdTransaccion()+
 				"_tsp_responseb64.txt";
-		utils.storeBase64ToFile(tsp.getTimeStampResponseBase64().getBytes(), fileName);
+		utils.storeBase64ToFile(tsp.getTimeStampResponseBase64(), fileName);
 		
 		pkiX509Tsp.setTspResponsePath(fileName);
 		pkiX509Tsp.setX509SerialStamper(tsp.getNumSerieTimeStamp());
