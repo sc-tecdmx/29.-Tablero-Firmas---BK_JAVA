@@ -65,6 +65,9 @@ public class TabDocumentos {
   
 	@Column(name = "s_asunto")
 	String  asunto;
+	
+	@Column(name = "s_notas")
+	String  notas;
   
 	@Column(name = "s_contenido")
 	String  contenido;
@@ -198,6 +201,12 @@ public class TabDocumentos {
 		this.hashDocumento = hashDocumento;
 	}
 
-	
-	
+	public String getNotas() {
+		return notas;
+	}
+
+	public void setNotas(String notas) {
+		this.notas = notas;
+	}
+
 }

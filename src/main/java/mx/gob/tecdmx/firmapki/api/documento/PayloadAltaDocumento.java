@@ -5,28 +5,24 @@ import java.util.List;
 
 public class PayloadAltaDocumento {
 	
-	String folio;
+	int folio;
 	String folioEspecial;
 	String numExpediente;
 	String tipoDestino;
 	String tipoDocumento;
 	String tipoPrioridad;
 	String asunto;
+	String notas;
 	String contenido;
 	Date fechaLimiteFirma;
-	List<String> configuraciones;
+	List<DTOConfiguracion> configuraciones;
 	List<String> notificaciones;
 	boolean  enOrden;
 	List<DTOFirmanteDestinatario> firmantes;
 	List<DTOFirmanteDestinatario> destinatarios;
 	List<DTODocAdjunto> documentosAdjuntos;
 	
-	public String getFolio() {
-		return folio;
-	}
-	public void setFolio(String folio) {
-		this.folio = folio;
-	}
+	
 	public String getFolioEspecial() {
 		return folioEspecial;
 	}
@@ -75,10 +71,17 @@ public class PayloadAltaDocumento {
 	public void setFechaLimiteFirma(Date fechaLimiteFirma) {
 		this.fechaLimiteFirma = fechaLimiteFirma;
 	}
-	public List<String> getConfiguraciones() {
+	public int getFolio() {
+		return folio;
+	}
+	public void setFolio(int folio) {
+		this.folio = folio;
+	}
+	
+	public List<DTOConfiguracion> getConfiguraciones() {
 		return configuraciones;
 	}
-	public void setConfiguraciones(List<String> configuraciones) {
+	public void setConfiguraciones(List<DTOConfiguracion> configuraciones) {
 		this.configuraciones = configuraciones;
 	}
 	public List<String> getNotificaciones() {
@@ -111,8 +114,12 @@ public class PayloadAltaDocumento {
 	public void setDocumentosAdjuntos(List<DTODocAdjunto> documentosAdjuntos) {
 		this.documentosAdjuntos = documentosAdjuntos;
 	}
-	
-	
+	public String getNotas() {
+		return notas;
+	}
+	public void setNotas(String notas) {
+		this.notas = notas;
+	}
 	
 	
 }

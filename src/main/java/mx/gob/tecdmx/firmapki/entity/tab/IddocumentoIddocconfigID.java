@@ -4,20 +4,22 @@ import java.io.Serializable;
 
 public class IddocumentoIddocconfigID implements Serializable {
 	
-    private TabDocumentos idDocumento;
-    private TabCatDocConfig idDocconfig;
-	public TabDocumentos getIdDocumento() {
+    private Integer idDocumento;
+    private Integer idDocConfig;
+    
+	public Integer getIdDocumento() {
 		return idDocumento;
 	}
-	public void setIdDocumento(TabDocumentos idDocumento) {
+	public void setIdDocumento(Integer idDocumento) {
 		this.idDocumento = idDocumento;
 	}
-	public TabCatDocConfig getIdDocconfig() {
-		return idDocconfig;
+	public Integer getIdDocConfig() {
+		return idDocConfig;
 	}
-	public void setIdDocconfig(TabCatDocConfig idDocconfig) {
-		this.idDocconfig = idDocconfig;
+	public void setIdDocConfig(Integer idDocConfig) {
+		this.idDocConfig = idDocConfig;
 	}
+	
     
     
     

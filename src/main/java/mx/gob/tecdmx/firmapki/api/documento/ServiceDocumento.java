@@ -19,11 +19,13 @@ import mx.gob.tecdmx.firmapki.entity.pki.PkiDocumentoFirmantes;
 import mx.gob.tecdmx.firmapki.entity.pki.PkiTransaccion;
 import mx.gob.tecdmx.firmapki.entity.seg.SegOrgUsuarios;
 import mx.gob.tecdmx.firmapki.entity.tab.TabCatDestinoDocumento;
+import mx.gob.tecdmx.firmapki.entity.tab.TabCatDocConfig;
 import mx.gob.tecdmx.firmapki.entity.tab.TabCatEtapaDocumento;
 import mx.gob.tecdmx.firmapki.entity.tab.TabCatInstDest;
 import mx.gob.tecdmx.firmapki.entity.tab.TabCatInstFirmantes;
 import mx.gob.tecdmx.firmapki.entity.tab.TabCatPrioridad;
 import mx.gob.tecdmx.firmapki.entity.tab.TabCatTipoDocumento;
+import mx.gob.tecdmx.firmapki.entity.tab.TabDocConfig;
 import mx.gob.tecdmx.firmapki.entity.tab.TabDocDestinatarios;
 import mx.gob.tecdmx.firmapki.entity.tab.TabDocsFirmantes;
 import mx.gob.tecdmx.firmapki.entity.tab.TabDocumentoWorkflow;
@@ -39,11 +41,13 @@ import mx.gob.tecdmx.firmapki.repository.pki.PkiDocumentoRepository;
 import mx.gob.tecdmx.firmapki.repository.pki.PkiTransaccionRepository;
 import mx.gob.tecdmx.firmapki.repository.seg.SegOrgUsuariosRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabCatDestinoDocumentoRepository;
+import mx.gob.tecdmx.firmapki.repository.tab.TabCatDocConfigRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabCatEtapaDocumentoRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabCatInstDestRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabCatInstFirmantesRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabCatPrioridadRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabCatTipoDocumentoRepository;
+import mx.gob.tecdmx.firmapki.repository.tab.TabDocConfigRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabDocDestinatariosRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabDocsFirmantesRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabDocumentoWorkflowRepository;
@@ -118,6 +122,12 @@ public class ServiceDocumento {
 	VistaTableroRepository vistaTableroRepository;
 
 	@Autowired
+	TabDocConfigRepository tabConfigDocumentoRepository;
+
+	@Autowired
+	TabCatDocConfigRepository tabCatConfigDocumentoRepository;
+
+	@Autowired
 	ServiceFirma serviceFirma;
 
 	@Value("${firma.document.pdf.path}")
@@ -167,14 +177,16 @@ public class ServiceDocumento {
 			res.setStatus("fail");
 			return res;
 		}
-
-		Optional<TabExpedientes> numExpediente = tabExpedientesRepository
-				.findByNumExpediente(payload.getNumExpediente());
-		if (!numExpediente.isPresent()) {
-			res.setMessage("No se puede encontrar el número de expediente");
-			res.setStatus("fail");
-			return res;
+		Optional<TabExpedientes> numExpediente = null;
+		if (payload.getNumExpediente() != null) {
+			numExpediente = tabExpedientesRepository.findByNumExpediente(payload.getNumExpediente());
+			if (!numExpediente.isPresent()) {
+				res.setMessage("No se puede encontrar el número de expediente");
+				res.setStatus("fail");
+				return res;
+			}
 		}
+
 		// Se buscan los catálogos que entran para verificar que existen
 		Optional<TabCatTipoDocumento> tipoDoc = tabCatTipoDocumentoRepository
 				.findByDescTipoDocumento(payload.getTipoDocumento());
@@ -183,23 +195,35 @@ public class ServiceDocumento {
 		Optional<TabCatPrioridad> tipoPrioridad = tabCatPrioridadRepository
 				.findByDescPrioridad(payload.getTipoPrioridad());
 		Optional<TabCatEtapaDocumento> etapaDoc = tabCatEtapaDocumentoRepository.findByDescetapa("Creado");
-		boolean validCatalogos = validateCatalogos(tipoDoc, tipoDest, tipoPrioridad, etapaDoc, res);
-		if (!validCatalogos) {
-			return res;
-		}
+		// descomentar estas lineas si estos catálogos son requeridos
+		/*
+		 * boolean validCatalogos = validateCatalogos(tipoDoc, tipoDest, tipoPrioridad,
+		 * etapaDoc, res); if (!validCatalogos) { return res; }
+		 */
 
 		// Se crea el registro en la tabla: tab_documentos
 		TabDocumentos documento = new TabDocumentos();
-		documento.setIdTipoDestino(tipoDest.get());
-		documento.setIdTipoDocumento(tipoDoc.get());
+		if (tipoDest.isPresent()) {
+			documento.setIdTipoDestino(tipoDest.get());
+		}
+		if (tipoDoc.isPresent()) {
+			documento.setIdTipoDocumento(tipoDoc.get());
+		}
+		if (tipoPrioridad.isPresent()) {
+			documento.setIdPrioridad(tipoPrioridad.get());
+		}
+
 //		documento.setFolioDocumento(payload.getFolio());
 		documento.setFolioEspecial(payload.getFolioEspecial());
 		documento.setCreacionDocumentoFecha(new Date());
 		documento.setIdNumEmpleadoCreador(empleado.get());
 		documento.setIdUsuarioCreador(usuario.get());
-		documento.setNumExpediente(numExpediente.get());
-		documento.setIdPrioridad(tipoPrioridad.get());
+		if (numExpediente != null) {
+			documento.setNumExpediente(numExpediente.get());
+		}
+
 		documento.setAsunto(payload.getAsunto());
+		documento.setNotas(payload.getNotas());
 		documento.setContenido(payload.getContenido());
 		documento.setFechaLimiteFirma(payload.getFechaLimiteFirma());
 		documento.setHashDocumento(null);
@@ -213,17 +237,37 @@ public class ServiceDocumento {
 			documentoStored = tabDocumentosRepository.save(documento);
 		} else {
 			documento.setChainIdDocument(docChain.get());
-			documento.setFolioDocumento(docChain.get().getId()+1);
+			documento.setFolioDocumento(docChain.get().getId() + 1);
 			documentoStored = tabDocumentosRepository.save(documento);
+		}
+
+		// guarda la configuracion
+
+		TabDocConfig docConfig = new TabDocConfig();
+		if (payload.getConfiguraciones().size() > 0) {
+			for (DTOConfiguracion configIndex : payload.getConfiguraciones()) {
+				if (configIndex.config) {
+					Optional<TabCatDocConfig> configExist = tabCatConfigDocumentoRepository
+							.findByAtributo(configIndex.getAtributo());
+					if (configExist.isPresent()) {
+						docConfig.setIdDocumento(documentoStored.getId());
+						docConfig.setIdDocConfig(configExist.get().getId());
+						tabConfigDocumentoRepository.save(docConfig); // guarda en la tabla de relacion doc y config
+					}
+				}
+
+			}
+
 		}
 
 		if (documentoStored != null) {
 			TabDocumentosAdjuntos docAdjunto = null;
 			// Se guardan los documentos adjuntos
+			int numDocumento = 1;
 			for (DTODocAdjunto docAdjuntoPayload : payload.getDocumentosAdjuntos()) {
 				String fileName = utils.formatDate(new Date()) + "_"
 						+ documentoStored.getIdTipoDocumento().getDescTipoDocumento() + "_" + documentoStored.getId()
-						+ ".pdf";
+						+"_"+numDocumento+ ".pdf";
 				utils.storeBase64ToFile(docAdjuntoPayload.getDocBase64(), documentPath + "/" + fileName);
 
 				docAdjunto = new TabDocumentosAdjuntos();
@@ -235,56 +279,61 @@ public class ServiceDocumento {
 				docAdjunto.setDocumentoBase64(docAdjuntoPayload.getDocBase64());
 
 				TabDocumentosAdjuntos docAdjuntoStored = tabDocumentosAdjuntosRepository.save(docAdjunto);
-
+				numDocumento ++;
 			}
 
 			// Se guardan los firmantes
-			for (DTOFirmanteDestinatario firmantePayload : payload.getFirmantes()) {
-				Optional<InstEmpleado> empleadoFirmante = instEmpleadoRepository
-						.findById(firmantePayload.getIdEmpleado());
-				if (!empleadoFirmante.isPresent()) {
-					res.setMessage("No se encontró el empleado firmante con Id" + firmantePayload.getIdEmpleado());
-					res.setStatus("fail");
-					return res;
-				}
-				Optional<TabCatInstFirmantes> instruccionFirmante = tabCatInstFirmantesRepository
-						.findByDescInstrFirmante(firmantePayload.getInstruccion());
-				if (!instruccionFirmante.isPresent()) {
-					res.setMessage(
-							"No se encontró la instrucción del firmante con Id" + firmantePayload.getIdEmpleado());
-					res.setStatus("fail");
-					return res;
-				}
+			if (payload.getFirmantes().size() > 0) {
+				for (DTOFirmanteDestinatario firmantePayload : payload.getFirmantes()) {
 
-				TabDocsFirmantes firmante = new TabDocsFirmantes();
-				firmante.setIdDocumento(documentoStored.getId());
-				firmante.setIdNumEmpleado(empleadoFirmante.get().getId());
-				firmante.setIdInstFirmante(instruccionFirmante.get());
-				tabDocsFirmantesRepository.save(firmante);
+					Optional<InstEmpleado> empleadoFirmante = instEmpleadoRepository
+							.findById(firmantePayload.getIdEmpleado());
+					if (!empleadoFirmante.isPresent()) {
+						res.setMessage("No se encontró el empleado firmante con Id" + firmantePayload.getIdEmpleado());
+						res.setStatus("fail");
+						return res;
+					}
+					Optional<TabCatInstFirmantes> instruccionFirmante = tabCatInstFirmantesRepository
+							.findByDescInstrFirmante(firmantePayload.getInstruccion());
+					if (!instruccionFirmante.isPresent()) {
+						res.setMessage(
+								"No se encontró la instrucción del firmante con Id" + firmantePayload.getIdEmpleado());
+						res.setStatus("fail");
+						return res;
+					}
+
+					TabDocsFirmantes firmante = new TabDocsFirmantes();
+					firmante.setIdDocumento(documentoStored.getId());
+					firmante.setIdNumEmpleado(empleadoFirmante.get().getId());
+					firmante.setIdInstFirmante(instruccionFirmante.get());
+					tabDocsFirmantesRepository.save(firmante);
+				}
 			}
 
-			for (DTOFirmanteDestinatario destinatarioPayload : payload.getDestinatarios()) {
-				Optional<InstEmpleado> empleadoDestinatario = instEmpleadoRepository
-						.findById(destinatarioPayload.getIdEmpleado());
-				if (!empleadoDestinatario.isPresent()) {
-					res.setMessage(
-							"No se encontró el empleado destinatario con Id" + destinatarioPayload.getIdEmpleado());
-					res.setStatus("fail");
-					return res;
+			if (payload.getDestinatarios().size() > 0) {
+				for (DTOFirmanteDestinatario destinatarioPayload : payload.getDestinatarios()) {
+					Optional<InstEmpleado> empleadoDestinatario = instEmpleadoRepository
+							.findById(destinatarioPayload.getIdEmpleado());
+					if (!empleadoDestinatario.isPresent()) {
+						res.setMessage(
+								"No se encontró el empleado destinatario con Id" + destinatarioPayload.getIdEmpleado());
+						res.setStatus("fail");
+						return res;
+					}
+					Optional<TabCatInstDest> instruccionDestinatario = tabCatInstDestRepository
+							.findByDescInsDest(destinatarioPayload.getInstruccion());
+					if (!instruccionDestinatario.isPresent()) {
+						res.setMessage("No se encontró la instrucción del destinatario con Id"
+								+ destinatarioPayload.getIdEmpleado());
+						res.setStatus("fail");
+						return res;
+					}
+					TabDocDestinatarios destinatario = new TabDocDestinatarios();
+					destinatario.setIdDocumento(documentoStored.getId());
+					destinatario.setIdNumEmpleado(empleadoDestinatario.get().getId());
+					destinatario.setIdnstDestinatario(instruccionDestinatario.get());
+					tabDocDestinatariosRepository.save(destinatario);
 				}
-				Optional<TabCatInstDest> instruccionDestinatario = tabCatInstDestRepository
-						.findByDescInsDest(destinatarioPayload.getInstruccion());
-				if (!instruccionDestinatario.isPresent()) {
-					res.setMessage("No se encontró la instrucción del destinatario con Id"
-							+ destinatarioPayload.getIdEmpleado());
-					res.setStatus("fail");
-					return res;
-				}
-				TabDocDestinatarios destinatario = new TabDocDestinatarios();
-				destinatario.setIdDocumento(documentoStored.getId());
-				destinatario.setIdNumEmpleado(empleadoDestinatario.get().getId());
-				destinatario.setIdnstDestinatario(instruccionDestinatario.get());
-				tabDocDestinatariosRepository.save(destinatario);
 			}
 
 			// Se guarda el wrokflow del documento
@@ -300,6 +349,7 @@ public class ServiceDocumento {
 
 		res.setMessage("Se ha guardado el documento satisfactoriamente");
 		res.setStatus("Success");
+		payload.setFolio(documentoStored.getFolioDocumento());
 		res.setData(payload);
 
 		return res;
@@ -429,8 +479,9 @@ public class ServiceDocumento {
 				firmante.setIdInstFirmante(instruccionFirmante.get());
 				tabDocsFirmantesRepository.save(firmante);
 
-				Optional<PkiCatTipoFirma> tipoFirma = pkiCatTipoFirmaRepository
-						.findByDescTipoFirma(firmantePayload.getTipoFirma());
+				String tipofirma = payload.getDocumentosAdjuntos().size() > 1 ? "Múltiple" : "Simple";
+
+				Optional<PkiCatTipoFirma> tipoFirma = pkiCatTipoFirmaRepository.findByDescTipoFirma(tipofirma);
 				if (!tipoFirma.isPresent()) {
 					res.setMessage(
 							"No se encontró el tipo de firma del firmante con Id" + firmantePayload.getIdEmpleado());
@@ -440,7 +491,7 @@ public class ServiceDocumento {
 
 				PkiDocumentoFirmantes documentoFirmantesStored = createPKIDocumentoFirmantes(
 						pkiDocumentoStored.getHashDocumento(), empleadoFirmante.get().getIdUsuario(), null,
-						empleadoFirmante.get(), firmantePayload.getSecuencia(), firmantePayload.getFechaLimite(), null,
+						empleadoFirmante.get(), firmantePayload.getSecuencia(), payload.getFechaLimiteFirma(), null,
 						tipoFirma.get(), null, null);
 
 			}
@@ -541,14 +592,14 @@ public class ServiceDocumento {
 					docAdjuntoDto.setDocBase64(docAdjunto.getDocumentoBase64());
 					docAdjuntoDto.setFilePath(docAdjunto.getDocumentoPath());
 					docAdjuntoDto.setFileType(docAdjunto.getDocumentoFiletype());
-					
+
 					documentosAdjuntos.add(docAdjuntoDto);
 				}
 			}
 			docUsuario.setDocumentosAdjuntos(documentosAdjuntos);
 
 			listDocsUsuario.add(docUsuario);
-			
+
 		}
 
 		res.setData(listDocsUsuario);

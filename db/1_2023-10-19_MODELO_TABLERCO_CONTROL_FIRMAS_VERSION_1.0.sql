@@ -55,6 +55,7 @@ CREATE TABLE `tab_documentos` (
   `n_num_expediente` int COMMENT 'El nombre se almacenará en la tabla tab_expedientes',
   `n_id_prioridad` int,
   `s_asunto` varchar(255),
+  `s_notas` varchar(1000),
   `s_contenido` varchar(2048),
   `d_fecha_limite_firma` datetime,
   `s_hash_documento` varchar(64) /*Debería eliminarse este registro*/

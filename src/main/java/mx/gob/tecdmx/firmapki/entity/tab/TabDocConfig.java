@@ -1,5 +1,6 @@
 package mx.gob.tecdmx.firmapki.entity.tab;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
@@ -12,31 +13,63 @@ import javax.persistence.Table;
 @IdClass(IddocumentoIddocconfigID.class)
 public class TabDocConfig {
 	@Id
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="n_id_documento", referencedColumnName="n_id_documento")
-	TabDocumentos  idDocumento;
+	@Column(name="n_id_documento")
+	Integer  idDocumento;
   
 	@Id
+	@Column(name="n_id_doc_config")
+	Integer  idDocConfig;
+	
+	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="n_id_doc_config", referencedColumnName="n_id_doc_config")
-	TabCatDocConfig  idDocconfig;
+	@JoinColumn(name="n_id_documento", referencedColumnName="n_id_documento", insertable = false, updatable = false)
+	TabDocumentos  documento;
+  
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name="n_id_doc_config", referencedColumnName="n_id_doc_config", insertable = false, updatable = false)
+	TabCatDocConfig  docConfig;
 
-	public TabDocumentos getIdDocumento() {
+
+	public Integer getIdDocumento() {
 		return idDocumento;
 	}
 
-	public void setIdDocumento(TabDocumentos idDocumento) {
+
+	public void setIdDocumento(Integer idDocumento) {
 		this.idDocumento = idDocumento;
 	}
 
-	public TabCatDocConfig getIdDocconfig() {
-		return idDocconfig;
+
+	public Integer getIdDocConfig() {
+		return idDocConfig;
 	}
 
-	public void setIdDocconfig(TabCatDocConfig idDocconfig) {
-		this.idDocconfig = idDocconfig;
+
+	public void setIdDocConfig(Integer idDocConfig) {
+		this.idDocConfig = idDocConfig;
 	}
 
-	
+
+	public TabDocumentos getDocumento() {
+		return documento;
+	}
+
+
+	public void setDocumento(TabDocumentos documento) {
+		this.documento = documento;
+	}
+
+
+	public TabCatDocConfig getDocConfig() {
+		return docConfig;
+	}
+
+
+	public void setDocConfig(TabCatDocConfig docConfig) {
+		this.docConfig = docConfig;
+	}
+
+
 	
 }
