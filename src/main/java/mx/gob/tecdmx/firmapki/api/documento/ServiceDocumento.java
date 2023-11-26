@@ -267,7 +267,7 @@ public class ServiceDocumento {
 			for (DTODocAdjunto docAdjuntoPayload : payload.getDocumentosAdjuntos()) {
 				String fileName = utils.formatDate(new Date()) + "_"
 						+ documentoStored.getIdTipoDocumento().getDescTipoDocumento() + "_" + documentoStored.getId()
-						+"_"+numDocumento+ ".pdf";
+						+ "_" + numDocumento + ".pdf";
 				utils.storeBase64ToFile(docAdjuntoPayload.getDocBase64(), documentPath + "/" + fileName);
 
 				docAdjunto = new TabDocumentosAdjuntos();
@@ -279,7 +279,7 @@ public class ServiceDocumento {
 				docAdjunto.setDocumentoBase64(docAdjuntoPayload.getDocBase64());
 
 				TabDocumentosAdjuntos docAdjuntoStored = tabDocumentosAdjuntosRepository.save(docAdjunto);
-				numDocumento ++;
+				numDocumento++;
 			}
 
 			// Se guardan los firmantes
@@ -309,6 +309,252 @@ public class ServiceDocumento {
 					tabDocsFirmantesRepository.save(firmante);
 				}
 			}
+
+			if (payload.getDestinatarios().size() > 0) {
+				for (DTOFirmanteDestinatario destinatarioPayload : payload.getDestinatarios()) {
+					Optional<InstEmpleado> empleadoDestinatario = instEmpleadoRepository
+							.findById(destinatarioPayload.getIdEmpleado());
+					if (!empleadoDestinatario.isPresent()) {
+						res.setMessage(
+								"No se encontró el empleado destinatario con Id" + destinatarioPayload.getIdEmpleado());
+						res.setStatus("fail");
+						return res;
+					}
+					Optional<TabCatInstDest> instruccionDestinatario = tabCatInstDestRepository
+							.findByDescInsDest(destinatarioPayload.getInstruccion());
+					if (!instruccionDestinatario.isPresent()) {
+						res.setMessage("No se encontró la instrucción del destinatario con Id"
+								+ destinatarioPayload.getIdEmpleado());
+						res.setStatus("fail");
+						return res;
+					}
+					TabDocDestinatarios destinatario = new TabDocDestinatarios();
+					destinatario.setIdDocumento(documentoStored.getId());
+					destinatario.setIdNumEmpleado(empleadoDestinatario.get().getId());
+					destinatario.setIdnstDestinatario(instruccionDestinatario.get());
+					tabDocDestinatariosRepository.save(destinatario);
+				}
+			}
+
+			// Se guarda el wrokflow del documento
+			TabDocumentoWorkflow docWorkflow = new TabDocumentoWorkflow();
+			docWorkflow.setIdEtapaDocumento(etapaDoc.get());
+			docWorkflow.setIdDocument(documentoStored);
+			docWorkflow.setUltActualizacion(new Date());
+			docWorkflow.setWorkflowFecha(new Date());
+			docWorkflow.setWorkflowIdNumEmpleado(empleado.get());
+
+			tabDocumentoWorkflowRepository.save(docWorkflow);
+		}
+
+		res.setMessage("Se ha guardado el documento satisfactoriamente");
+		res.setStatus("Success");
+		payload.setFolio(documentoStored.getFolioDocumento());
+		res.setData(payload);
+
+		return res;
+	}
+
+	public DTOResponse altaDocumentoFirmarAhora(PayloadAltaDocumento payload, DTOResponse res,
+			DTOResponseUserInfo userInfo) {
+		CertificateUtils utils = new CertificateUtils();
+		Optional<InstEmpleado> empleado = instEmpleadoRepository.findById(userInfo.getData().getIdEmpleado());
+		if (!empleado.isPresent()) {
+			res.setMessage("No se puede encontrar el empleado");
+			res.setStatus("fail");
+			return res;
+		}
+
+		Optional<SegOrgUsuarios> usuario = segOrgUsuariosRepository.findById(userInfo.getData().getIdUsuario());
+		if (!usuario.isPresent()) {
+			res.setMessage("No se puede encontrar el usuario");
+			res.setStatus("fail");
+			return res;
+		}
+		Optional<TabExpedientes> numExpediente = null;
+		if (payload.getNumExpediente() != null) {
+			numExpediente = tabExpedientesRepository.findByNumExpediente(payload.getNumExpediente());
+			if (!numExpediente.isPresent()) {
+				res.setMessage("No se puede encontrar el número de expediente");
+				res.setStatus("fail");
+				return res;
+			}
+		}
+
+		// Se buscan los catálogos que entran para verificar que existen
+		Optional<TabCatTipoDocumento> tipoDoc = tabCatTipoDocumentoRepository
+				.findByDescTipoDocumento(payload.getTipoDocumento());
+		Optional<TabCatDestinoDocumento> tipoDest = tabCatDestinoDocumentoRepository
+				.findByDescDestinoDocumento(payload.getTipoDestino());
+		Optional<TabCatPrioridad> tipoPrioridad = tabCatPrioridadRepository
+				.findByDescPrioridad(payload.getTipoPrioridad());
+		Optional<TabCatEtapaDocumento> etapaDoc = tabCatEtapaDocumentoRepository.findByDescetapa("Creado");
+		// descomentar estas lineas si estos catálogos son requeridos
+		/*
+		 * boolean validCatalogos = validateCatalogos(tipoDoc, tipoDest, tipoPrioridad,
+		 * etapaDoc, res); if (!validCatalogos) { return res; }
+		 */
+
+		// Se crea el registro en la tabla: tab_documentos
+		TabDocumentos documento = new TabDocumentos();
+		if (tipoDest.isPresent()) {
+			documento.setIdTipoDestino(tipoDest.get());
+		}
+		if (tipoDoc.isPresent()) {
+			documento.setIdTipoDocumento(tipoDoc.get());
+		}
+		if (tipoPrioridad.isPresent()) {
+			documento.setIdPrioridad(tipoPrioridad.get());
+		}
+
+//		documento.setFolioDocumento(payload.getFolio());
+		documento.setFolioEspecial(payload.getFolioEspecial());
+		documento.setCreacionDocumentoFecha(new Date());
+		documento.setIdNumEmpleadoCreador(empleado.get());
+		documento.setIdUsuarioCreador(usuario.get());
+		if (numExpediente != null) {
+			documento.setNumExpediente(numExpediente.get());
+		}
+
+		documento.setAsunto(payload.getAsunto());
+		documento.setNotas(payload.getNotas());
+		documento.setContenido(payload.getContenido());
+		documento.setFechaLimiteFirma(payload.getFechaLimiteFirma());
+		documento.setHashDocumento(null);
+		Optional<TabDocumentos> docChain = tabDocumentosRepository.findTopByOrderByIdDesc();
+
+		TabDocumentos documentoStored = null;
+		if (!docChain.isPresent()) {
+			documentoStored = tabDocumentosRepository.save(documento);
+			documento.setChainIdDocument(documentoStored);
+			documento.setFolioDocumento(documentoStored.getId());
+			documentoStored = tabDocumentosRepository.save(documento);
+		} else {
+			documento.setChainIdDocument(docChain.get());
+			documento.setFolioDocumento(docChain.get().getId() + 1);
+			documentoStored = tabDocumentosRepository.save(documento);
+		}
+
+		// guarda la configuracion
+
+		TabDocConfig docConfig = new TabDocConfig();
+		if (payload.getConfiguraciones().size() > 0) {
+			for (DTOConfiguracion configIndex : payload.getConfiguraciones()) {
+				if (configIndex.config) {
+					Optional<TabCatDocConfig> configExist = tabCatConfigDocumentoRepository
+							.findByAtributo(configIndex.getAtributo());
+					if (configExist.isPresent()) {
+						docConfig.setIdDocumento(documentoStored.getId());
+						docConfig.setIdDocConfig(configExist.get().getId());
+						tabConfigDocumentoRepository.save(docConfig); // guarda en la tabla de relacion doc y config
+					}
+				}
+
+			}
+
+		}
+		PkiDocumento pkiDocumentoStored = null;
+
+		if (documentoStored != null) {
+			TabDocumentosAdjuntos docAdjunto = null;
+			// Se guardan los documentos adjuntos
+			int numDocumento = 1;
+			for (DTODocAdjunto docAdjuntoPayload : payload.getDocumentosAdjuntos()) {
+				String fileName = utils.formatDate(new Date()) + "_"
+						+ documentoStored.getIdTipoDocumento().getDescTipoDocumento() + "_" + documentoStored.getId()
+						+ "_" + numDocumento + ".pdf";
+				utils.storeBase64ToFile(docAdjuntoPayload.getDocBase64(), documentPath + "/" + fileName);
+
+				docAdjunto = new TabDocumentosAdjuntos();
+				docAdjunto.setIdDocument(documentoStored);
+				docAdjunto.setDocumentoPath(documentPath + "/" + fileName);
+				docAdjunto.setDocumentoHash(utils.calcularSHA256(new String(docAdjuntoPayload.getDocBase64())));
+				docAdjunto.setDocumentoFiletype(docAdjuntoPayload.getFileType());
+				docAdjunto.setFechaCarga(new Date());
+				docAdjunto.setDocumentoBase64(docAdjuntoPayload.getDocBase64());
+
+				TabDocumentosAdjuntos docAdjuntoStored = tabDocumentosAdjuntosRepository.save(docAdjunto);
+
+				pkiDocumentoStored = createPKIDocumento(docAdjuntoStored.getDocumentoHash(), empleado.get(),
+						empleado.get(), null, documentoStored.getCreacionDocumentoFecha(), "Creado", false,
+						payload.isEnOrden());
+
+				numDocumento++;
+			}
+
+			// Se guardan los firmantes
+
+			DTOFirmanteDestinatario firmanteUsuario = new DTOFirmanteDestinatario();
+			firmanteUsuario.setIdEmpleado(userInfo.getData().getIdEmpleado());
+			firmanteUsuario.setInstruccion("Firma");
+			firmanteUsuario.setSecuencia(1);
+			List<DTOFirmanteDestinatario> firmantesNewList = new ArrayList<DTOFirmanteDestinatario>();
+
+			// Buscamos si el que creó el documento y firma, se asignó así mismo como
+			// firmante, si no lo agregamos
+			boolean isInFirmantes = false;
+			for (DTOFirmanteDestinatario firmantePayload : payload.getFirmantes()) {
+				if (firmantePayload.getIdEmpleado() == firmanteUsuario.getIdEmpleado()) {
+					isInFirmantes = true;
+				}
+			}
+			if (!isInFirmantes) {
+
+				firmantesNewList.add(firmanteUsuario);
+
+				for (DTOFirmanteDestinatario firmantePayload : payload.getFirmantes()) {
+					firmantePayload.setSecuencia(firmantePayload.getSecuencia() + 1);
+					firmantesNewList.add(firmantePayload);
+				}
+			} else {
+				firmantesNewList = payload.getFirmantes();
+			}
+
+			for (DTOFirmanteDestinatario firmantePayload : firmantesNewList) {
+
+				Optional<InstEmpleado> empleadoFirmante = instEmpleadoRepository
+						.findById(firmantePayload.getIdEmpleado());
+				if (!empleadoFirmante.isPresent()) {
+					res.setMessage("No se encontró el empleado firmante con Id" + firmantePayload.getIdEmpleado());
+					res.setStatus("fail");
+					return res;
+				}
+				Optional<TabCatInstFirmantes> instruccionFirmante = tabCatInstFirmantesRepository
+						.findByDescInstrFirmante(firmantePayload.getInstruccion());
+				if (!instruccionFirmante.isPresent()) {
+					res.setMessage(
+							"No se encontró la instrucción del firmante con Id" + firmantePayload.getIdEmpleado());
+					res.setStatus("fail");
+					return res;
+				}
+
+				TabDocsFirmantes firmante = new TabDocsFirmantes();
+				firmante.setIdDocumento(documentoStored.getId());
+				firmante.setIdNumEmpleado(empleadoFirmante.get().getId());
+				firmante.setIdInstFirmante(instruccionFirmante.get());
+				tabDocsFirmantesRepository.save(firmante);
+			}
+
+			String tipofirma = payload.getDocumentosAdjuntos().size() > 1 ? "Múltiple" : "Simple";
+
+			Optional<PkiCatTipoFirma> tipoFirma = pkiCatTipoFirmaRepository.findByDescTipoFirma(tipofirma);
+			if (!tipoFirma.isPresent()) {
+				res.setMessage("No se encontró el tipo de firma del firmante con Id" + firmanteUsuario.getIdEmpleado());
+				res.setStatus("fail");
+				return res;
+			}
+
+			Optional<InstEmpleado> empleadoFirmante = instEmpleadoRepository
+					.findById(userInfo.getData().getIdEmpleado());
+			if (!empleadoFirmante.isPresent()) {
+				res.setMessage("No se encontró el empleado firmante con Id" + userInfo.getData().getIdEmpleado());
+				res.setStatus("fail");
+				return res;
+			}
+
+			PkiDocumentoFirmantes documentoFirmantesStored = createPKIDocumentoFirmantes(
+					pkiDocumentoStored.getHashDocumento(), usuario.get(), null, empleadoFirmante.get(),
+					firmanteUsuario.getSecuencia(), payload.getFechaLimiteFirma(), null, tipoFirma.get(), null, null);
 
 			if (payload.getDestinatarios().size() > 0) {
 				for (DTOFirmanteDestinatario destinatarioPayload : payload.getDestinatarios()) {
