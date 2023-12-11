@@ -9,20 +9,20 @@ import java.io.InputStream;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Chunk;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
-import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.AcroFields;
@@ -40,16 +40,29 @@ import com.itextpdf.text.pdf.PdfString;
 
 import mx.gob.tecdmx.firmapki.DTOResponseUserInfo;
 import mx.gob.tecdmx.firmapki.api.populate.CertUser;
+import mx.gob.tecdmx.firmapki.entity.tab.TabDocumentosAdjuntos;
+import mx.gob.tecdmx.firmapki.repository.tab.TabDocumentosAdjuntosRepository;
 import mx.gob.tecdmx.firmapki.utils.CertificateUtils;
 
 @Service
 public class ServiceFirma {
 	
-	public void firma(byte[] documento, byte[] signature, byte[] certificate, String filePath, DTOResponseUserInfo userInfo) {
+	@Autowired
+	TabDocumentosAdjuntosRepository tabDocumentosAdjuntosRepository;
+	
+	public void firma(String hashDocumento, byte[] documento, byte[] signature, byte[] certificate, String filePath, DTOResponseUserInfo userInfo) {
 		CertificateUtils utils = new CertificateUtils();
 		try {
 			byte[] signedPdf = firmarPdfAvanzado(documento, signature, certificate, userInfo);
 			try {
+				String encoded = Base64.getEncoder().encodeToString(signedPdf);
+				Optional<TabDocumentosAdjuntos> doc = tabDocumentosAdjuntosRepository.findByDocumentoHash(hashDocumento);
+				if(doc.isPresent()) {
+					doc.get().setDocumentoBase64(encoded);
+					tabDocumentosAdjuntosRepository.save(doc.get());
+					 System.out.println("se actualizó el base64 del doc firmado.");
+				}
+				
 				utils.writePdfFile(signedPdf, filePath);
 		        System.out.println("PDF firmado guardado con éxito.");
 		    } catch (IOException e) {

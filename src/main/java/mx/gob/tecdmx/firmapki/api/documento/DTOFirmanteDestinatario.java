@@ -1,7 +1,5 @@
 package mx.gob.tecdmx.firmapki.api.documento;
 
-import java.util.Date;
-
 public class DTOFirmanteDestinatario {
 	int  secuencia;
 	int  idEmpleado;

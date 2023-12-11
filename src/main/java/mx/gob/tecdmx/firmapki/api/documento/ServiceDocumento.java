@@ -855,8 +855,6 @@ public class ServiceDocumento {
 	}
 
 	public DTOResponse firmar(PayloadFirma payload, DTOResponse res, DTOResponseUserInfo userInfo) {
-		CertificateUtils utils = new CertificateUtils();
-
 		ResponseBodyFirma responde = new ResponseBodyFirma();
 
 		HashDocumentoIdUsuarioIdTransaccionID idDocumentoFirmantes = new HashDocumentoIdUsuarioIdTransaccionID();
@@ -883,7 +881,7 @@ public class ServiceDocumento {
 				return res;
 			}
 
-			serviceFirma.firma(payload.getDocumento(), payload.getCadenaFirma(), payload.getCertificado(),
+			serviceFirma.firma(payload.getHashDocumento(), payload.getDocumento(), payload.getCadenaFirma(), payload.getCertificado(),
 					documentFirmadosPath + "/" + idDocumentoFirmantes.getHashDocumento() + "_"
 							+ idDocumentoFirmantes.getIdUsuario() + ".pdf",
 					userInfo);

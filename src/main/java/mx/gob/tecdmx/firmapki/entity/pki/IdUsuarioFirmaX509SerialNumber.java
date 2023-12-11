@@ -2,8 +2,6 @@ package mx.gob.tecdmx.firmapki.entity.pki;
 
 import java.io.Serializable;
 
-import mx.gob.tecdmx.firmapki.entity.seg.SegOrgUsuarios;
-
 public class IdUsuarioFirmaX509SerialNumber implements Serializable {
 	 
     private int idUsuarioFirma;

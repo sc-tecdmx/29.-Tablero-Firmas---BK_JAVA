@@ -2,8 +2,6 @@ package mx.gob.tecdmx.firmapki.entity.tab;
 
 import java.io.Serializable;
 
-import mx.gob.tecdmx.firmapki.entity.inst.InstEmpleado;
-
 public class IddocumentoIdnumeEmpleadoID implements Serializable {
 	 
     private int idDocumento;
