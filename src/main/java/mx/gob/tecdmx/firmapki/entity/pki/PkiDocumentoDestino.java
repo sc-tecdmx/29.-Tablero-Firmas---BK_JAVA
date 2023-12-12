@@ -18,16 +18,13 @@ import mx.gob.tecdmx.firmapki.entity.seg.SegOrgUsuarios;
 @IdClass(HashDocumentoIdUsuarioIdTransaccionID.class)
 public class PkiDocumentoDestino {
 	@Id
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="s_hash_documento", referencedColumnName="s_hash_documento")  
-	PkiDocumento  hashDocumento;
+	@Column(name="s_hash_documento")  
+	String hashDocumento;
 	
 	@Id
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="n_id_usuario", referencedColumnName="n_id_usuario")
-	SegOrgUsuarios  idUsuario;
+	@Column(name="n_id_usuario")
+	int idUsuario;
 	
-	@Id
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="n_id_transaccion", referencedColumnName="n_id_transaccion")
 	PkiTransaccion  idTransaccion;
@@ -52,20 +49,28 @@ public class PkiDocumentoDestino {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="id_firma_aplicada", referencedColumnName="id_firma_aplicada")
 	PkiCatFirmaAplicada  idFirmaAplicada;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name="s_hash_documento", referencedColumnName="s_hash_documento", insertable = false, updatable = false)
+	PkiDocumento documento;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name="n_id_usuario", referencedColumnName="n_id_usuario", insertable = false, updatable = false)
+	SegOrgUsuarios usuario;
 
-	public PkiDocumento getHashDocumento() {
+	public String getHashDocumento() {
 		return hashDocumento;
 	}
 
-	public void setHashDocumento(PkiDocumento hashDocumento) {
+	public void setHashDocumento(String hashDocumento) {
 		this.hashDocumento = hashDocumento;
 	}
 
-	public SegOrgUsuarios getIdUsuario() {
+	public int getIdUsuario() {
 		return idUsuario;
 	}
 
-	public void setIdUsuario(SegOrgUsuarios idUsuario) {
+	public void setIdUsuario(int idUsuario) {
 		this.idUsuario = idUsuario;
 	}
 
@@ -125,6 +130,20 @@ public class PkiDocumentoDestino {
 		this.idFirmaAplicada = idFirmaAplicada;
 	}
 
-	
+	public PkiDocumento getDocumento() {
+		return documento;
+	}
+
+	public void setDocumento(PkiDocumento documento) {
+		this.documento = documento;
+	}
+
+	public SegOrgUsuarios getUsuario() {
+		return usuario;
+	}
+
+	public void setUsuario(SegOrgUsuarios usuario) {
+		this.usuario = usuario;
+	}
 	
 }

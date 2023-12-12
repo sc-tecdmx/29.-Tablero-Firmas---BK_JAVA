@@ -59,7 +59,25 @@ public class RestControllerDocumento {
 		serviceDocumento.altaDocumentoFirmarAhora(payload, res, userInfo);
 		return ResponseEntity.ok().header(null).body(res);
 	}
+
 	
+	@CrossOrigin()
+	@RequestMapping(method = RequestMethod.POST, path = "/rechazar-documento", produces = "application/json")
+    public ResponseEntity<DTOResponse> rechazarDocumento(@RequestBody PayloadRechazarDocumento payload, HttpServletRequest request) {
+		DTOResponse res = new DTOResponse();
+		DTOResponseUserInfo userInfo = serviceSecurity.getUserInfo(request);
+		serviceDocumento.rechazarDocumento(payload, res, userInfo);
+		return ResponseEntity.ok().header(null).body(res);
+	}
+	
+	@CrossOrigin()
+	@RequestMapping(method = RequestMethod.POST, path = "/enviar-documento", produces = "application/json")
+    public ResponseEntity<DTOResponse> enviarDocumento(@RequestBody PayloadEnviarDocumento payload, HttpServletRequest request) {
+		DTOResponse res = new DTOResponse();
+		DTOResponseUserInfo userInfo = serviceSecurity.getUserInfo(request);
+		serviceDocumento.enviarDocumento(payload, res, userInfo);
+		return ResponseEntity.ok().header(null).body(res);
+	}
 	
 	@CrossOrigin()
 	@RequestMapping(method = RequestMethod.POST, path = "/alta-documento", produces = "application/json")
