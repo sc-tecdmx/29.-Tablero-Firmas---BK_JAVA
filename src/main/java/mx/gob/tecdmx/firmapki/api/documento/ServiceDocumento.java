@@ -1034,10 +1034,11 @@ public class ServiceDocumento {
 						// si no existe crea el registro en pkiDoc
 						PkiDocumento documentPkiNew = createPKIDocumento(docAdjunto.getDocumentoHash(),
 								documentoExist.get().getIdNumEmpleadoCreador(), empleado.get(), fchEnvio,
-								documentoExist.get().getCreacionDocumentoFecha(), null, false, true);
+								documentoExist.get().getCreacionDocumentoFecha(), "Enviado", false, true);
 						}else {
 						//si existe solo edito la fecha de envío
 						documentPkiExist.get().setFechaEnvio(fchEnvio);
+						documentPkiExist.get().setStatusDocumento("Enviado");
 						PkiDocumento documentPkiEdit = pkiDocumentoRepository.save(documentPkiExist.get());
 
 					}
