@@ -1,6 +1,7 @@
 package mx.gob.tecdmx.firmapki.api.documento;
 
 import java.util.ArrayList;
+import org.springframework.data.domain.Sort;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -801,7 +802,7 @@ public class ServiceDocumento {
 		// Busca todos los documentos en los que el usuario activo se encuentre
 		// involucrado
 		List<VistaTablero> listDocsByUsuario = vistaTableroRepository
-				.findByNumEmpleado(userInfo.getData().getIdEmpleado());
+				.findByNumEmpleado(userInfo.getData().getIdEmpleado(),Sort.by(Sort.Direction.DESC, "creacionDocumentoFecha"));
 		if (listDocsByUsuario.size() > 0) {
 			// si tiene documentos recorre la lista obtenida
 			for (VistaTablero docsUsuarioView : listDocsByUsuario) {

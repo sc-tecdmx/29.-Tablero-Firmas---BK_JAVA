@@ -7,8 +7,8 @@ import org.springframework.stereotype.Repository;
 
 import mx.gob.tecdmx.firmapki.entity.tab.IddocumentoTipoID;
 import mx.gob.tecdmx.firmapki.entity.tab.VistaTablero;
-
+import org.springframework.data.domain.Sort;
 @Repository
 public interface VistaTableroRepository  extends CrudRepository<VistaTablero, IddocumentoTipoID> {
-	List<VistaTablero> findByNumEmpleado(int idEmpleado);
+	List<VistaTablero> findByNumEmpleado(int idEmpleado, Sort sort);
 }
