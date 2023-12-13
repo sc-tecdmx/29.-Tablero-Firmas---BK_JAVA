@@ -14,6 +14,8 @@ public class ResponseBodyDocsUsuario {
 	List<DTOEmpleado> firmantes;
 	List<DTOEmpleado> destinatarios;
 	List<DTODocAdjunto> documentosAdjuntos;
+	Boolean statusFirma;
+	
 	public int getIdDocumento() {
 		return idDocumento;
 	}
@@ -74,7 +76,11 @@ public class ResponseBodyDocsUsuario {
 	public void setDocumentosAdjuntos(List<DTODocAdjunto> documentosAdjuntos) {
 		this.documentosAdjuntos = documentosAdjuntos;
 	}
+	public Boolean getStatusFirma() {
+		return statusFirma;
+	}
+	public void setStatusFirma(Boolean statusFirma) {
+		this.statusFirma = statusFirma;
+	}
 	
-	
-
 }

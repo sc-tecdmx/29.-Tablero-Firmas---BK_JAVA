@@ -797,70 +797,100 @@ public class ServiceDocumento {
 	public DTOResponse getDocumentosByUsuario(DTOResponse res, DTOResponseUserInfo userInfo) {
 		List<ResponseBodyDocsUsuario> listDocsUsuario = new ArrayList<ResponseBodyDocsUsuario>();
 		ResponseBodyDocsUsuario docUsuario = null;
+		boolean statusFirma = false;
+		// Busca todos los documentos en los que el usuario activo se encuentre
+		// involucrado
 		List<VistaTablero> listDocsByUsuario = vistaTableroRepository
 				.findByNumEmpleado(userInfo.getData().getIdEmpleado());
-		for (VistaTablero docsUsuarioView : listDocsByUsuario) {
-			docUsuario = new ResponseBodyDocsUsuario();
-			docUsuario.setIdDocumento(docsUsuarioView.getIdDocumento());
-			docUsuario.setFolioDocumento(docsUsuarioView.getFolioDocumento());
-			docUsuario.setEtapa(docsUsuarioView.getEtapa());
-			docUsuario.setPrioridad(docsUsuarioView.getPrioridad());
-			docUsuario.setCreacionDocumentoFecha(docsUsuarioView.getCreacionDocumentoFecha());
-			docUsuario.setAsunto(docsUsuarioView.getAsunto());
-			docUsuario.setTipo(docsUsuarioView.getTipo());
-
-			List<DTOEmpleado> firmantes = new ArrayList<DTOEmpleado>();
-			DTOEmpleado empleado = null;
-			List<TabDocsFirmantes> docFirmantes = tabDocsFirmantesRepository
-					.findByIdDocumento(docsUsuarioView.getIdDocumento());
-			for (TabDocsFirmantes docfirmante : docFirmantes) {
-				empleado = new DTOEmpleado();
-				empleado.setIdEmpleado(docfirmante.getIntEmpleado().getId());
-				empleado.setNombre(docfirmante.getIntEmpleado().getNombre());
-				empleado.setApellido1(docfirmante.getIntEmpleado().getApellido1());
-				empleado.setApellido2(docfirmante.getIntEmpleado().getApellido2());
-				firmantes.add(empleado);
-			}
-			docUsuario.setFirmantes(firmantes);
-
-			List<DTOEmpleado> destinatarios = new ArrayList<DTOEmpleado>();
-			DTOEmpleado empleadoDest = null;
-			List<TabDocDestinatarios> docDestinatarios = tabDocDestinatariosRepository
-					.findByIdDocumento(docsUsuarioView.getIdDocumento());
-			for (TabDocDestinatarios docDestinatario : docDestinatarios) {
-				empleadoDest = new DTOEmpleado();
-				empleadoDest.setIdEmpleado(docDestinatario.getIdNumEmpleado());
-				empleadoDest.setNombre(docDestinatario.getEmpleado().getNombre());
-				empleadoDest.setApellido1(docDestinatario.getEmpleado().getApellido1());
-				empleadoDest.setApellido2(docDestinatario.getEmpleado().getApellido2());
-				destinatarios.add(empleado);
-			}
-			docUsuario.setDestinatarios(destinatarios);
-
-			List<DTODocAdjunto> documentosAdjuntos = new ArrayList<DTODocAdjunto>();
-			DTODocAdjunto docAdjuntoDto = null;
-			Optional<TabDocumentos> documento = tabDocumentosRepository.findById(docsUsuarioView.getIdDocumento());
-			if (documento.isPresent()) {
-				List<TabDocumentosAdjuntos> docAdjuntos = tabDocumentosAdjuntosRepository
-						.findByIdDocument(documento.get());
-				for (TabDocumentosAdjuntos docAdjunto : docAdjuntos) {
-					docAdjuntoDto = new DTODocAdjunto();
-					docAdjuntoDto.setDocBase64(docAdjunto.getDocumentoBase64());
-					docAdjuntoDto.setFilePath(docAdjunto.getDocumentoPath());
-					docAdjuntoDto.setFileType(docAdjunto.getDocumentoFiletype());
-
-					documentosAdjuntos.add(docAdjuntoDto);
+		if (listDocsByUsuario.size() > 0) {
+			// si tiene documentos recorre la lista obtenida
+			for (VistaTablero docsUsuarioView : listDocsByUsuario) {
+				docUsuario = new ResponseBodyDocsUsuario();
+				docUsuario.setIdDocumento(docsUsuarioView.getIdDocumento());
+				docUsuario.setFolioDocumento(docsUsuarioView.getFolioDocumento());
+				docUsuario.setEtapa(docsUsuarioView.getEtapa());
+				docUsuario.setPrioridad(docsUsuarioView.getPrioridad());
+				docUsuario.setCreacionDocumentoFecha(docsUsuarioView.getCreacionDocumentoFecha());
+				docUsuario.setAsunto(docsUsuarioView.getAsunto());
+				docUsuario.setTipo(docsUsuarioView.getTipo());
+				// obtienen la lista de los firmantes
+				List<DTOEmpleado> firmantes = new ArrayList<DTOEmpleado>();
+				DTOEmpleado empleado = null;
+				List<TabDocsFirmantes> docFirmantes = tabDocsFirmantesRepository
+						.findByIdDocumento(docsUsuarioView.getIdDocumento());
+				for (TabDocsFirmantes docfirmante : docFirmantes) {
+					empleado = new DTOEmpleado();
+					empleado.setIdEmpleado(docfirmante.getIntEmpleado().getId());
+					empleado.setNombre(docfirmante.getIntEmpleado().getNombre());
+					empleado.setApellido1(docfirmante.getIntEmpleado().getApellido1());
+					empleado.setApellido2(docfirmante.getIntEmpleado().getApellido2());
+					firmantes.add(empleado);
 				}
+				docUsuario.setFirmantes(firmantes);
+				// obtiene la lista de destinatarios
+				List<DTOEmpleado> destinatarios = new ArrayList<DTOEmpleado>();
+				DTOEmpleado empleadoDest = null;
+				List<TabDocDestinatarios> docDestinatarios = tabDocDestinatariosRepository
+						.findByIdDocumento(docsUsuarioView.getIdDocumento());
+				for (TabDocDestinatarios docDestinatario : docDestinatarios) {
+					empleadoDest = new DTOEmpleado();
+					empleadoDest.setIdEmpleado(docDestinatario.getIdNumEmpleado());
+					empleadoDest.setNombre(docDestinatario.getEmpleado().getNombre());
+					empleadoDest.setApellido1(docDestinatario.getEmpleado().getApellido1());
+					empleadoDest.setApellido2(docDestinatario.getEmpleado().getApellido2());
+					destinatarios.add(empleadoDest);
+				}
+				docUsuario.setDestinatarios(destinatarios);
+				// obtiene la listya de documentos adjuntos
+				List<DTODocAdjunto> documentosAdjuntos = new ArrayList<DTODocAdjunto>();
+				DTODocAdjunto docAdjuntoDto = null;
+				Optional<TabDocumentos> documento = tabDocumentosRepository.findById(docsUsuarioView.getIdDocumento());
+				if (documento.isPresent()) {
+					List<TabDocumentosAdjuntos> docAdjuntos = tabDocumentosAdjuntosRepository
+							.findByIdDocument(documento.get());
+					for (TabDocumentosAdjuntos docAdjunto : docAdjuntos) {
+						docAdjuntoDto = new DTODocAdjunto();
+						docAdjuntoDto.setDocBase64(docAdjunto.getDocumentoBase64());
+						docAdjuntoDto.setFilePath(docAdjunto.getDocumentoPath());
+						docAdjuntoDto.setFileType(docAdjunto.getDocumentoFiletype());
+
+						documentosAdjuntos.add(docAdjuntoDto);
+
+						// aqui obtiene el estado de la firma , segun si es firmante o destinatario
+						HashDocumentoIdUsuarioIdTransaccionID idDocumento = new HashDocumentoIdUsuarioIdTransaccionID();
+						idDocumento.setHashDocumento(docAdjunto.getDocumentoHash());
+						idDocumento.setIdUsuario(userInfo.getData().getIdUsuario());
+						Optional<PkiDocumentoFirmantes> docUsuFirmante = pkiDocumentoFirmantesRepository
+								.findById(idDocumento);
+						Optional<PkiDocumentoDestino> docUsuDestinatario = pkiDocumentoDestRepository
+								.findById(idDocumento);
+						if (docUsuFirmante.isPresent()) {
+							if (docUsuFirmante.get().getIdFirmaAplicada() != null) {
+								statusFirma = true;
+							} 
+						}
+						if (docUsuDestinatario.isPresent()) {
+							if (docUsuDestinatario.get().getIdFirmaAplicada() != null) {
+								statusFirma = true;
+							}
+						}
+
+					}
+				}
+				docUsuario.setStatusFirma(statusFirma);
+				docUsuario.setDocumentosAdjuntos(documentosAdjuntos);
+
+				listDocsUsuario.add(docUsuario);
+
 			}
-			docUsuario.setDocumentosAdjuntos(documentosAdjuntos);
-
-			listDocsUsuario.add(docUsuario);
-
+			res.setData(listDocsUsuario);
+			res.setMessage("Se han encontrado resultados");
+			res.setStatus("Success");
+		} else {
+			res.setData(listDocsUsuario);
+			res.setMessage("No se han encontrado resultados");
+			res.setStatus("Success");
 		}
-
-		res.setData(listDocsUsuario);
-		res.setMessage("Se han encontrado resultados");
-		res.setStatus("Success");
 		return res;
 	}
 
