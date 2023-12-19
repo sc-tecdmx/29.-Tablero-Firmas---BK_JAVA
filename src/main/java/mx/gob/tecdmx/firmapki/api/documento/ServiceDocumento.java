@@ -1,13 +1,13 @@
 package mx.gob.tecdmx.firmapki.api.documento;
 
 import java.util.ArrayList;
-import org.springframework.data.domain.Sort;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import mx.gob.tecdmx.firmapki.DTOResponseUserInfo;
@@ -387,6 +387,12 @@ public class ServiceDocumento {
 				return res;
 			}
 		}
+		if (payload.getFirmantes().size() < 1) {
+			res.setMessage("No formas parte de los usuarios asignados como firmantes en el documento");
+			res.setStatus("fail");
+			return res;
+
+		}
 
 		// Se buscan los catálogos que entran para verificar que existen
 		Optional<TabCatTipoDocumento> tipoDoc = tabCatTipoDocumentoRepository
@@ -461,7 +467,6 @@ public class ServiceDocumento {
 
 		}
 		PkiDocumento pkiDocumentoStored = null;
-
 		if (documentoStored != null) {
 			TabDocumentosAdjuntos docAdjunto = null;
 			// Se guardan los documentos adjuntos
@@ -482,9 +487,12 @@ public class ServiceDocumento {
 
 				TabDocumentosAdjuntos docAdjuntoStored = tabDocumentosAdjuntosRepository.save(docAdjunto);
 
+				if (payload.getFirmantes().size() == 1) {
+					etapaDoc = tabCatEtapaDocumentoRepository.findByDescetapa("Terminado");
+				}
 				pkiDocumentoStored = createPKIDocumento(docAdjuntoStored.getDocumentoHash(), empleado.get(),
-						empleado.get(), null, documentoStored.getCreacionDocumentoFecha(), "En Firma", false,
-						payload.isEnOrden());
+						empleado.get(), null, documentoStored.getCreacionDocumentoFecha(),
+						etapaDoc.get().getDescetapa(), false, payload.isEnOrden());
 
 				numDocumento++;
 			}
@@ -801,8 +809,8 @@ public class ServiceDocumento {
 		boolean statusFirma = false;
 		// Busca todos los documentos en los que el usuario activo se encuentre
 		// involucrado
-		List<VistaTablero> listDocsByUsuario = vistaTableroRepository
-				.findByNumEmpleado(userInfo.getData().getIdEmpleado(),Sort.by(Sort.Direction.DESC, "creacionDocumentoFecha"));
+		List<VistaTablero> listDocsByUsuario = vistaTableroRepository.findByNumEmpleado(
+				userInfo.getData().getIdEmpleado(), Sort.by(Sort.Direction.DESC, "creacionDocumentoFecha"));
 		if (listDocsByUsuario.size() > 0) {
 			// si tiene documentos recorre la lista obtenida
 			for (VistaTablero docsUsuarioView : listDocsByUsuario) {
@@ -868,7 +876,7 @@ public class ServiceDocumento {
 						if (docUsuFirmante.isPresent()) {
 							if (docUsuFirmante.get().getIdFirmaAplicada() != null) {
 								statusFirma = true;
-							} 
+							}
 						}
 						if (docUsuDestinatario.isPresent()) {
 							if (docUsuDestinatario.get().getIdFirmaAplicada() != null) {
@@ -1030,7 +1038,27 @@ public class ServiceDocumento {
 
 				return res;
 			}
+			
 		}
+		boolean terminado = false;
+		//vuelvo a recorrer el array de docs adjuntos para poder extraer el hash de los documentos y 
+		//verificar en pki firmantes si ya tienen alguna accion
+		for(TabDocumentosAdjuntos tabDocAd : docsAdjuntos) {
+			Optional<PkiDocumentoFirmantes>docFirm = pkiDocumentoFirmantesRepository.findByHashDocumento(tabDocAd.getDocumentoHash());
+			if(docFirm.isPresent()) {
+				if(docFirm.get().getIdFirmaAplicada()!=null) {
+					terminado = true;
+				}else {
+					terminado = false;
+					break;
+				}
+			}
+			
+		}
+		if(terminado){
+			etapaDoc = tabCatEtapaDocumentoRepository.findByDescetapa("Terminado");
+		}
+		
 		// creamos registro en tabla workflow
 		TabDocumentoWorkflow docWorkflow = new TabDocumentoWorkflow();
 		docWorkflow.setIdEtapaDocumento(etapaDoc.get());
