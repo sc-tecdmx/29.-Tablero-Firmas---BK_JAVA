@@ -44,7 +44,7 @@ public class RestControllerPopulate {
 	@ResponseBody
 	public ResponseEntity<DTOResponse> saveCertUser(@RequestParam("certificado") MultipartFile certificate, String serialnumber, HttpServletResponse response, HttpServletRequest request) throws IOException {
 		DTOResponse res = new DTOResponse();
-		DTOResponseUserInfo userInfo = serviceSecurity.getUserInfo(request);
+		DTOResponseUserInfo userInfo = serviceSecurity.getUserInfo(request, res);
 		
 		x509Service.saveCertUser(certificate.getBytes(), serialnumber, res, userInfo);
 		return ResponseEntity.ok().header(null).body(res);

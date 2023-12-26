@@ -27,13 +27,16 @@ public class TabDocsFirmantes {
 	@JoinColumn(name="n_id_inst_firmante", referencedColumnName="n_id_inst_firmante")
 	TabCatInstFirmantes  idInstFirmante;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne()
 	@JoinColumn(name="n_id_documento", referencedColumnName="n_id_documento", insertable = false, updatable = false)
 	TabDocumentos  documento;
   
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne()
 	@JoinColumn(name="n_id_num_empleado", referencedColumnName="n_id_num_empleado", insertable = false, updatable = false)
 	InstEmpleado  intEmpleado;
+	
+	@Column(name="secuencia")
+	int secuencia;
 
 	public int getIdDocumento() {
 		return idDocumento;
@@ -73,6 +76,14 @@ public class TabDocsFirmantes {
 
 	public void setIntEmpleado(InstEmpleado intEmpleado) {
 		this.intEmpleado = intEmpleado;
+	}
+
+	public int getSecuencia() {
+		return secuencia;
+	}
+
+	public void setSecuencia(int secuencia) {
+		this.secuencia = secuencia;
 	}
 
 	

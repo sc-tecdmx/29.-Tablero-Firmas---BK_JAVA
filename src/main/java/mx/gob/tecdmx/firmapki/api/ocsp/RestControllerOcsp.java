@@ -22,7 +22,10 @@ public class RestControllerOcsp {
 	@RequestMapping(method = RequestMethod.POST, path = "/ocsp-validar", produces = "application/json")
     public ResponseEntity<DTOResponse> verifyOcsp(@RequestBody PayloadOCSP payload) {
 		DTOResponse res = new DTOResponse();
-		serviceOCSP.validateOCSP(payload, res);
+		boolean validated = serviceOCSP.validateOCSP(payload, res);
+		if(!validated) {
+			return ResponseEntity.ok().header(null).body(res); 
+		}
 		return ResponseEntity.ok().header(null).body(res);
 	}
 	

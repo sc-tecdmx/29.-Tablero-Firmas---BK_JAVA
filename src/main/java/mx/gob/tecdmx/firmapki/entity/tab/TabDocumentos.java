@@ -62,6 +62,9 @@ public class TabDocumentos {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="n_id_prioridad", referencedColumnName="n_id_prioridad")
 	TabCatPrioridad  idPrioridad;
+	
+	@Column(name = "n_en_orden")
+	int enOrden;
   
 	@Column(name = "s_asunto")
 	String  asunto;
@@ -209,4 +212,13 @@ public class TabDocumentos {
 		this.notas = notas;
 	}
 
+	public int getEnOrden() {
+		return enOrden;
+	}
+
+	public void setEnOrden(int enOrden) {
+		this.enOrden = enOrden;
+	}
+
+	
 }

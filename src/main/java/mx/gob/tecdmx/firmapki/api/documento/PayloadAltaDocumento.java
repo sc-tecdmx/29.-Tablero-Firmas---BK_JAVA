@@ -22,7 +22,7 @@ public class PayloadAltaDocumento {
 	List<DTOFirmanteDestinatario> destinatarios;
 	List<DTODocAdjunto> documentosAdjuntos;
 	
-	
+		
 	public String getFolioEspecial() {
 		return folioEspecial;
 	}

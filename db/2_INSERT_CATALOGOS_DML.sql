@@ -140,50 +140,6 @@ INSERT INTO inst_cat_sexo (id_sexo, sexo, sexo_desc) VALUES
 (1, 'H', 'Hombre'),
 (2, 'M', 'Mujer');
 
-INSERT INTO inst_u_adscripcion (n_id_u_adscripcion, s_desc_unidad, s_abrev_unidad) VALUES
-(1,'Pleno del Tribunal','PT'),
-(2,'Contraloría Interna','CI'),
-(3,'Comisión de Controversias Laborales y Administrativas','CCLyA'),
-(4,'Defensoría Pública Ciudadana de Procesos Democráticos','DEP'),
-(5,'Presidencia','PRES'),
-(6,'Ponencia del Magistrado Armando Hernández Cruz','PMA'),
-(7,'Ponencia del Magistrado Eduardo Arana Miraval','PME'),
-(8,'Ponencia del Magistrado Gustavo Anzaldo Hernández','PMG'),
-(9,'Ponencia de la Magistrada María del Carmen Carreón Castro','PMC'),
-(10,'Ponencia de la Magistrada Gabriela Eugenia del Valle Pérez','PMG'),
-(11,'Ponencia de la Magistrada Martha Alejandra Chávez Camarena','PMMACC'),
-(12,'Ponencia de la Magistrada Martha Leticia Mercado Ramírez','PMMLMR'),
-(13,'Ponencia del Magistrado Juan Carlos Sánchez León','PMJCSL'),
-(14,'Ponencia del Magistrado Armando Ambriz Hernández','PMAAH'),
-(15,'Ponencia de Magistratura Electoral Vacante','PMEV'),
-(16,'Secretaría General','SG'),
-(17,'Coordinación de Archivo','CA'),
-(18,'Secretaría Administrativa','SA'),
-(19,'Coordinación de Transparencia y Datos Personales','CTyDP'),
-(20,'Dirección General Jurídica','DGJ'),
-(21,'Coordinación de Comunicación Social y Relaciones Públicas','CCSyRP'),
-(22,'Unidad Especializada de Procedimientos Sancionadores','UEPS'),
-(23,'Coordinación de Difusión y Publicación','CDyP'),
-(24,'Coordinación de Vinculación y Relaciones Internacionales','CVyRI'),
-(25,'Coordinación de Derechos Humanos y Género','CDHyG'),
-(26,'Instituto de Formación y Capacitación','IFyC'),
-(27,'Unidad de Servicios Informáticos','USI'),
-(28,'Unidad de Estadística y Jurisprudencia','UEyJ');
-
-INSERT INTO inst_cat_areas (n_id_cat_area, n_id_u_adscripcion, s_desc_area, s_abrev_area, n_id_cat_area_padre) VALUES
-(1, 27, 'Servicios Informaticos', 'SI', NULL),
-(2, 27, 'Departamento de Desarrollo de Sistemas', 'DDS', 1),
-(3, 27, 'Departamento de Tecnologías Web y Multimedia', 'DTWyM', 1),
-(4, 27, 'Departamento de Infraestructura y Servicios de Cómputo', 'DIySC', 1);
-
-INSERT INTO tab_cat_tipo_documento(n_id_tipo_documento, n_id_cat_area, desc_tipo_documento)VALUES
-(1, 1, 'Acuerdo de radicación'),
-(2, 1, 'Acuerdo de recepción'),
-(3, 1, 'Acuerdo de turno'),
-(4, 1, 'Oficio'),
-(5, 1, 'Acuerdo plenario'),
-(6, 1, 'Minuta');
-
 INSERT INTO tab_cat_destino_documento(n_id_tipo_destino, desc_destino_documento)VALUES
 (1, 'Interno'),
 (2, 'Externo');
@@ -196,9 +152,9 @@ INSERT INTO tab_cat_doc_config(n_id_doc_config, s_atributo, s_valor)VALUES
 INSERT INTO tab_cat_etapa_documento(id_etapa_documento, s_desc_etapa)VALUES
 (1, 'Creado'),
 (2, 'Enviado'),
-(4, 'En Firma'),
-(5, 'Rechazado'),
-(6, 'Terminado');
+(3, 'En Firma'),
+(4, 'Rechazado'),
+(5, 'Terminado');
 
 INSERT INTO tab_cat_inst_dest(n_id_inst_dest, desc_inst_dest)VALUES
 (1, 'Atención'),

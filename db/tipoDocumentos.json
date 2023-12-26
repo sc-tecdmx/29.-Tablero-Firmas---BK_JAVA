@@ -1,0 +1,26 @@
+[
+    {
+        "tipoDocumento": "Acuerdo de radicación",
+        "codigoArea": "USI"
+    },
+    {
+        "tipoDocumento": "Acuerdo de recepción",
+        "codigoArea": "USI"
+    },
+    {
+        "tipoDocumento": "Acuerdo de turno",
+        "codigoArea": "USI"
+    },
+    {
+        "tipoDocumento": "Oficio",
+        "codigoArea": "USI"
+    },
+    {
+        "tipoDocumento": "Acuerdo plenario",
+        "codigoArea": "USI"
+    },
+    {
+        "tipoDocumento": "Minuta",
+        "codigoArea": "USI"
+    }
+]

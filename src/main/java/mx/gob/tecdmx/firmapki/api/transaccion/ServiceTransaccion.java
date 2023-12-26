@@ -35,7 +35,7 @@ public class ServiceTransaccion {
 	@Autowired
 	ServicePopulate servicePopulate;
 	
-	public DTOResponse getTransaccion(byte[] certData, String hashDocumento, DTOResponse res, DTOResponseUserInfo userInfo) {
+	public boolean getTransaccion(byte[] certData, String hashDocumento, DTOResponse res, DTOResponseUserInfo userInfo) {
 		
 		HashDocumentoIdUsuarioIdTransaccionID idDocumentoFirmantes = new HashDocumentoIdUsuarioIdTransaccionID();
 		idDocumentoFirmantes.setHashDocumento(hashDocumento);
@@ -48,14 +48,17 @@ public class ServiceTransaccion {
 			//Se guarda el certificado recuperado si aún no ha sido almacenado
 			Optional<PkiX509Registrados> x509User = pkiX509RegistradosRepository.findById(certUser.getSerialnumber());
 			if(!x509User.isPresent()) {
-				boolean isPopulated = servicePopulate.saveCertUser(certUser);
-				if(!isPopulated) {
-					res.setStatus("Fail");
-					res.setMessage("No se pudo crear el registro del certificado del usuario");
-					return res;
-				}else {
-					x509User = pkiX509RegistradosRepository.findById(certUser.getSerialnumber());
-				}
+//				boolean isPopulated = servicePopulate.saveCertUser(certUser);
+//				if(!isPopulated) {
+//					res.setStatus("Fail");
+//					res.setMessage("No se pudo crear el registro del certificado del usuario");
+//					return res;
+//				}else {
+//					x509User = pkiX509RegistradosRepository.findById(certUser.getSerialnumber());
+//				}
+				res.setMessage("Para poder firmar debes primero dar de alta este certificado");
+				res.setStatus("fail");
+				return false;
 			}
 			
 			PkiTransaccion pkiTrans = new PkiTransaccion();
@@ -86,19 +89,19 @@ public class ServiceTransaccion {
 			    res.setData(response);
 			    res.setStatus("Success");
 			    res.setMessage("Se ha creado una transacción satisfactoriamente");
+			    return true;
 			    // Verificar si se guardó correctamente
 			} catch (DataAccessException ex) {
 			    // Manejar la excepción, como registrar en un log
 				res.setStatus("Fail");
 				res.setMessage("Hubo un error al crear la transacción");
+				return false;
 			}
 		}else {
 			res.setData(null);
 		    res.setStatus("Fail");
 		    res.setMessage("No puedes crear una transacción ya que el documento no te fue asignado para firmar");
+		    return false;
 		}
-		
-		return res;
-		
 	}
 }

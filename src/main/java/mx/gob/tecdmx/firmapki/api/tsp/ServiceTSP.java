@@ -28,7 +28,7 @@ public class ServiceTSP {
 	@Autowired
 	PkiTransaccionRepository pkiTransaccionRepository;
 	
-	public DTOResponse validateTSP(PayloadTSP payload, DTOResponse res) {
+	public boolean validateTSP(PayloadTSP payload, DTOResponse res) {
 		CertificateUtils utils = new CertificateUtils();
 		Tsp tsp = new Tsp(tsaURL, payload.messageDigest);
 		PkiX509Tsp pkiX509Tsp = new PkiX509Tsp();
@@ -50,37 +50,52 @@ public class ServiceTSP {
 		if(transaccion.isPresent()) {
 			pkiX509Tsp.setX509SerialNumber(transaccion.get().getX509SerialNumber());
 			
-			Optional<PkiX509Tsp> lastTSP = pkiX509TspRepository.findTopByOrderByFechaResponseDesc();
-			if(lastTSP.isPresent()) {
-				pkiX509Tsp.setUuidTspBlock(lastTSP.get());
-				PkiX509TspGuardado = pkiX509TspRepository.save(pkiX509Tsp);
-			}else {
-				PkiX509TspGuardado = pkiX509TspRepository.save(pkiX509Tsp);
-				pkiX509Tsp.setUuidTspBlock(PkiX509TspGuardado);
-				PkiX509TspGuardado = pkiX509TspRepository.save(pkiX509Tsp);
-			}
-
-			transaccion.get().setIdTsp(PkiX509TspGuardado);
-			pkiTransaccionRepository.save(transaccion.get());
-			
-			ResponseBodyTSP responseBody = new ResponseBodyTSP();
-			responseBody.setFechaUTC(tsp.getFechaUTC());
-			responseBody.setNombreRespondedor(tsp.getNombreRespondedor());
-			responseBody.setEmisorRespondedor(tsp.getEmisorRespondedor());
-			responseBody.setSecuencia(tsp.getSecuencia());
-			responseBody.setDatosEstampillados(tsp.getDatosEstampillados());
-			
-			res.setData(responseBody);
-			res.setStatus("Success");
-		    res.setMessage("Se ha realizado la firma de tiempo satisfactoriamente");
-		    return res;
+			try {
+				Optional<PkiX509Tsp> lastTSP = pkiX509TspRepository.findTopByOrderByFechaResponseDesc();
+				if(lastTSP.isPresent()) {
+					pkiX509Tsp.setUuidTspBlock(lastTSP.get());
+					PkiX509TspGuardado = pkiX509TspRepository.save(pkiX509Tsp);
+				}else {
+					PkiX509TspGuardado = pkiX509TspRepository.save(pkiX509Tsp);
+					pkiX509Tsp.setUuidTspBlock(PkiX509TspGuardado);
+					PkiX509TspGuardado = pkiX509TspRepository.save(pkiX509Tsp);
+				}
+				
+				try {
+					transaccion.get().setIdTsp(PkiX509TspGuardado);
+					pkiTransaccionRepository.save(transaccion.get());
+					
+					ResponseBodyTSP responseBody = new ResponseBodyTSP();
+					responseBody.setFechaUTC(tsp.getFechaUTC());
+					responseBody.setNombreRespondedor(tsp.getNombreRespondedor());
+					responseBody.setEmisorRespondedor(tsp.getEmisorRespondedor());
+					responseBody.setSecuencia(tsp.getSecuencia());
+					responseBody.setDatosEstampillados(tsp.getDatosEstampillados());
+					
+					res.setData(responseBody);
+					res.setStatus("Success");
+				    res.setMessage("Se ha realizado la firma de tiempo satisfactoriamente");
+				    return true;
+				    
+				}catch(Exception e) {
+					res.setData(null);
+					res.setStatus("Failed");
+				    res.setMessage("Ocurrió un error al actualizar la información en la tabla de transacción");
+				    return false;
+				}
+				
+			}catch(Exception e) {
+				res.setData(null);
+				res.setStatus("Failed");
+			    res.setMessage("Ocurrió un error al almacenar la información en la tabla de TSP");
+			    return false;
+			}			
+		}else {
+			res.setData(null);
+			res.setStatus("Failed");
+		    res.setMessage("Ocurrió un error al almacenar la información, no se encontró el identificador de la transacción");
+		    return false;
 		}
-		res.setData(null);
-		res.setStatus("Failed");
-	    res.setMessage("Ocurrió un error al almacenar la información, no se encontró el identificador de la transacción");
-		
-	    
-		return res;
 	}
 
 }

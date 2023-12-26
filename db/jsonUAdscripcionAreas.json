@@ -1,0 +1,515 @@
+{
+    "area": "Pleno del Tribunal",
+    "isUnidadAdscripcion": true,
+    "abreviatura": "PT",
+    "areas": [
+        {
+            "area": "Contraloría Interna",
+            "isUnidadAdscripcion": true,
+            "abreviatura": "CI",
+            "areas": [
+                {
+                    "area": "Responsabilidades y Atención a Quejas",
+                    "isUnidadAdscripcion": false,
+                    "abreviatura": "RyAQ",
+                    "areas": [
+                        {
+                            "area": "Departamento de Responsabilidades",
+                            "isUnidadAdscripcion": false,
+                            "abreviatura": "DR",
+                            "areas": []
+                        },
+                        {
+                            "area": "Departamento de Quejas y Denuncias",
+                            "isUnidadAdscripcion": false,
+                            "abreviatura": "DQyD",
+                            "areas": []
+                        }
+                    ]
+                },
+                {
+                    "area": "Auditoría, Control y Evaluación",
+                    "isUnidadAdscripcion": false,
+                    "abreviatura": "ACyE",
+                    "areas": [
+                        {
+                            "area": "Departamento de Auditoría",
+                            "isUnidadAdscripcion": false,
+                            "abreviatura": "DA",
+                            "areas": []
+                        },
+                        {
+                            "area": "Departamento de Evaluación",
+                            "isUnidadAdscripcion": false,
+                            "abreviatura": "DdE",
+                            "areas": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "area": "Comisión de Controversias Laborales y Administrativas",
+            "isUnidadAdscripcion": true,
+            "abreviatura": "CCLyA",
+            "areas": []
+        },
+        {
+            "area": "Defensoría Pública de Participación Ciudadana y de Procesos Democráticos",
+            "isUnidadAdscripcion": true,
+            "abreviatura": "DPPCyPD",
+            "areas": [
+                {
+                    "area": "Asesoría, Gestión y Seguimiento",
+                    "isUnidadAdscripcion": false,
+                    "abreviatura": "AGyS",
+                    "areas": []
+                },
+                {
+                    "area": "Oficina de Defensoría de Derechos Político Electorales y de Enlace Ciudadano",
+                    "isUnidadAdscripcion": false,
+                    "abreviatura": "ODDPEyEC",
+                    "areas": []
+                }
+            ]
+        },
+        {
+            "area": "Ponencia del Magistrado Armando Ambriz Hernández",
+            "isUnidadAdscripcion": true,
+            "abreviatura": "PMAAH",
+            "areas": [
+                {
+                    "area": "Secretaría de Estudio y Cuenta Coordinación de Ponencia",
+                    "isUnidadAdscripcion": false,
+                    "abreviatura": "PMAAH_SECCP",
+                    "areas": []
+                }
+            ]
+        },
+        {
+            "area": "Ponencia de la Magistrada Martha Leticia Mercado Ramírez",
+            "isUnidadAdscripcion": true,
+            "abreviatura": "PMMLMR",
+            "areas": [
+                {
+                    "area": "Secretaría de Estudio y Cuenta Coordinación de Ponencia",
+                    "isUnidadAdscripcion": false,
+                    "abreviatura": "PMMLMR_SECCP",
+                    "areas": []
+                }
+            ]
+        },
+        {
+            "area": "Ponencia del Magistrado Juan Carlos Sánchez León",
+            "isUnidadAdscripcion": true,
+            "abreviatura": "PMJCSL",
+            "areas": [
+                {
+                    "area": "Secretaría de Estudio y Cuenta Coordinación de Ponencia",
+                    "isUnidadAdscripcion": false,
+                    "abreviatura": "PMJCSL_SECCP",
+                    "areas": []
+                }
+            ]
+        },
+        {
+            "area": "Ponencia de la Magistratura Electoral Vacante A",
+            "isUnidadAdscripcion": true,
+            "abreviatura": "PMEVA",
+            "areas": [
+                {
+                    "area": "Secretaría de Estudio y Cuenta",
+                    "isUnidadAdscripcion": false,
+                    "abreviatura": "PMEVA_SEC",
+                    "areas": []
+                }
+            ]
+        },
+        {
+            "area": "Ponencia de la Magistratura Electoral Vacante B",
+            "isUnidadAdscripcion": true,
+            "abreviatura": "PMEVB",
+            "areas": [
+                {
+                    "area": "Secretaría de Estudio y Cuenta",
+                    "isUnidadAdscripcion": false,
+                    "abreviatura": "PMEVB_SEC",
+                    "areas": []
+                }
+            ]
+        },
+        {
+            "area": "Presidencia",
+            "isUnidadAdscripcion": true,
+            "abreviatura": "PRES",
+            "areas": []
+        },
+        {
+            "area": "Secretaría General",
+            "isUnidadAdscripcion": true,
+            "abreviatura": "SG",
+            "areas": [
+                {
+                    "area": "Secretaría Técnica de la Secretaría General",
+                    "isUnidadAdscripcion": false,
+                    "abreviatura": "STSG",
+                    "areas": []
+                },
+                {
+                    "area": "Oficina de Actuarios",
+                    "isUnidadAdscripcion": false,
+                    "abreviatura": "OA",
+                    "areas": []
+                },
+                {
+                    "area": "Oficialía de Partes y Archivo Jurisdiccional",
+                    "isUnidadAdscripcion": false,
+                    "abreviatura": "OPyAJ",
+                    "areas": [
+                        {
+                            "area": "Departamento de Oficialía de Partes",
+                            "isUnidadAdscripcion": false,
+                            "abreviatura": "DOP",
+                            "areas": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "area": "Coordinación de Archivo",
+            "isUnidadAdscripcion": true,
+            "abreviatura": "CA",
+            "areas": [
+                {
+                    "area": "Archivos y Documentación",
+                    "isUnidadAdscripcion": false,
+                    "abreviatura": "AyD",
+                    "areas": [
+                        {
+                            "area": "Departamento de Archivos",
+                            "isUnidadAdscripcion": false,
+                            "abreviatura": "DepdA",
+                            "areas": []
+                        },
+                        {
+                            "area": "Departamento de Documentación",
+                            "isUnidadAdscripcion": false,
+                            "abreviatura": "DD",
+                            "areas": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "area": "Secretaría Administrativa",
+            "isUnidadAdscripcion": true,
+            "abreviatura": "SA",
+            "areas": [
+                {
+                    "area": "Departamento de Control y Seguimiento",
+                    "isUnidadAdscripcion": false,
+                    "abreviatura": "DCyS",
+                    "areas": []
+                },
+                {
+                    "area": "Recursos Humanos",
+                    "isUnidadAdscripcion": false,
+                    "abreviatura": "RRHH",
+                    "areas": [
+                        {
+                            "area": "Departamento de Registro y Control de Personal",
+                            "isUnidadAdscripcion": false,
+                            "abreviatura": "DRyCP",
+                            "areas": []
+                        },
+                        {
+                            "area": "Departamento de Prestaciones",
+                            "isUnidadAdscripcion": false,
+                            "abreviatura": "DP",
+                            "areas": []
+                        },
+                        {
+                            "area": "Departamento de Pagos a Personal",
+                            "isUnidadAdscripcion": false,
+                            "abreviatura": "DPP",
+                            "areas": []
+                        },
+                        {
+                            "area": "Departamento de Servicio Médico",
+                            "isUnidadAdscripcion": false,
+                            "abreviatura": "DSM",
+                            "areas": []
+                        }
+                    ]
+                },
+                {
+                    "area": "Planeación y Recursos Financieros",
+                    "isUnidadAdscripcion": false,
+                    "abreviatura": "PyRF",
+                    "areas": [
+                        {
+                            "area": "Departamento de Caja y Tesorería",
+                            "isUnidadAdscripcion": false,
+                            "abreviatura": "DCyT",
+                            "areas": []
+                        },
+                        {
+                            "area": "Contabilidad y Control",
+                            "isUnidadAdscripcion": false,
+                            "abreviatura": "CyC",
+                            "areas": []
+                        },
+                        {
+                            "area": "Planeación y Presupuesto",
+                            "isUnidadAdscripcion": false,
+                            "abreviatura": "PyP",
+                            "areas": []
+                        }
+                    ]
+                },
+                {
+                    "area": "Recursos Materiales y Servicios Generales",
+                    "isUnidadAdscripcion": false,
+                    "abreviatura": "RMySG",
+                    "areas": [
+                        {
+                            "area": "Recursos Materiales y Servicios",
+                            "isUnidadAdscripcion": false,
+                            "abreviatura": "RMyS",
+                            "areas": []
+                        },
+                        {
+                            "area": "Departamento de Adquisiciones",
+                            "isUnidadAdscripcion": false,
+                            "abreviatura": "DdA",
+                            "areas": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "area": "Coordinación de Transparencia y Datos Personales",
+            "isUnidadAdscripcion": true,
+            "abreviatura": "CTyDP",
+            "areas": [
+                {
+                    "area": "Transparencia y Acceso a la Información Pública",
+                    "isUnidadAdscripcion": false,
+                    "abreviatura": "TyAIP",
+                    "areas": [
+                        {
+                            "area": "Departamento de Administración de Datos Personales",
+                            "isUnidadAdscripcion": false,
+                            "abreviatura": "DADP",
+                            "areas": []
+                        },
+                        {
+                            "area": "Departamento de Transparencia",
+                            "isUnidadAdscripcion": false,
+                            "abreviatura": "DT",
+                            "areas": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "area": "Dirección General Jurídica",
+            "isUnidadAdscripcion": true,
+            "abreviatura": "DGJ",
+            "areas": [
+                {
+                    "area": "Contencioso y Consultivo",
+                    "isUnidadAdscripcion": false,
+                    "abreviatura": "CoyCo",
+                    "areas": [
+                        {
+                            "area": "Departamento de lo Contencioso",
+                            "isUnidadAdscripcion": false,
+                            "abreviatura": "DepdCoso",
+                            "areas": []
+                        },
+                        {
+                            "area": "Departamento de lo Consultivo",
+                            "isUnidadAdscripcion": false,
+                            "abreviatura": "DepdCovo",
+                            "areas": []
+                        }
+                    ]
+                },
+                {
+                    "area": "Contratos y Normatividad",
+                    "isUnidadAdscripcion": false,
+                    "abreviatura": "CyN",
+                    "areas": [
+                        {
+                            "area": "Departamento de Contratos y Normatividad",
+                            "isUnidadAdscripcion": false,
+                            "abreviatura": "DCyN",
+                            "areas": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "area": "Coordinación de Comunicación Social y Relaciones Públicas",
+            "isUnidadAdscripcion": true,
+            "abreviatura": "CCSyRP",
+            "areas": [
+                {
+                    "area": "Comunicación Social",
+                    "isUnidadAdscripcion": false,
+                    "abreviatura": "CS",
+                    "areas": [
+                        {
+                            "area": "Departamento de Comunicación Social",
+                            "isUnidadAdscripcion": false,
+                            "abreviatura": "DCS",
+                            "areas": []
+                        },
+                        {
+                            "area": "Departamento de Información",
+                            "isUnidadAdscripcion": false,
+                            "abreviatura": "DI",
+                            "areas": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "area": "Unidad Especializada de Procedimientos Sancionadores",
+            "isUnidadAdscripcion": true,
+            "abreviatura": "UEPS",
+            "areas": []
+        },
+        {
+            "area": "Coordinación de Difusión y Publicación",
+            "isUnidadAdscripcion": true,
+            "abreviatura": "CDyP",
+            "areas": [
+                {
+                    "area": "Difusión",
+                    "isUnidadAdscripcion": false,
+                    "abreviatura": "D",
+                    "areas": [
+                        {
+                            "area": "Departamento de Publicación",
+                            "isUnidadAdscripcion": false,
+                            "abreviatura": "DepPub",
+                            "areas": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "area": "Coordinación de Vinculación y Relaciones Internacionales",
+            "isUnidadAdscripcion": true,
+            "abreviatura": "CVyRI",
+            "areas": [
+                {
+                    "area": "Vinculación y Enlace",
+                    "isUnidadAdscripcion": false,
+                    "abreviatura": "VyE",
+                    "areas": []
+                }
+            ]
+        },
+        {
+            "area": "Coordinación de Derechos Humanos y Género",
+            "isUnidadAdscripcion": true,
+            "abreviatura": "CDHyG",
+            "areas": [
+                {
+                    "area": "Subdirección de Derechos Humanos y Género",
+                    "isUnidadAdscripcion": false,
+                    "abreviatura": "SDDHHyG",
+                    "areas": [
+                        {
+                            "area": "Departamento de Derechos Humanos y Género",
+                            "isUnidadAdscripcion": false,
+                            "abreviatura": "DDDHHyG",
+                            "areas": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "area": "Instituto de Formación y Capacitación",
+            "isUnidadAdscripcion": true,
+            "abreviatura": "IFyC",
+            "areas": [
+                {
+                    "area": "Departamento de Formación y Capacitación",
+                    "isUnidadAdscripcion": false,
+                    "abreviatura": "DFyC",
+                    "areas": []
+                }
+            ]
+        },
+        {
+            "area": "Unidad de Servicios Informáticos",
+            "isUnidadAdscripcion": true,
+            "abreviatura": "USI",
+            "areas": [
+                {
+                    "area": "Servicios Informaticos",
+                    "isUnidadAdscripcion": false,
+                    "abreviatura": "SI",
+                    "areas": [
+                        {
+                            "area": "Departamento de Desarrollo de Sistemas",
+                            "isUnidadAdscripcion": false,
+                            "abreviatura": "DDS",
+                            "areas": []
+                        },
+                        {
+                            "area": "Departamento de Tecnologías Web y Multimedia",
+                            "isUnidadAdscripcion": false,
+                            "abreviatura": "DTWyM",
+                            "areas": []
+                        },
+                        {
+                            "area": "Departamento de Infraestructura y Servicios de Cómputo",
+                            "isUnidadAdscripcion": false,
+                            "abreviatura": "DIySC",
+                            "areas": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "area": "Unidad de Estadística y Jurisprudencia",
+            "isUnidadAdscripcion": true,
+            "abreviatura": "UEyJ",
+            "areas": [
+                {
+                    "area": "Jurisprudencia",
+                    "isUnidadAdscripcion": false,
+                    "abreviatura": "J",
+                    "areas": []
+                },
+                {
+                    "area": "Estadística",
+                    "isUnidadAdscripcion": false,
+                    "abreviatura": "E",
+                    "areas": [
+                        {
+                            "area": "Departamento de Estadística",
+                            "isUnidadAdscripcion": false,
+                            "abreviatura": "DE",
+                            "areas": []
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

@@ -1,18 +1,27 @@
 Ejecutar los siguientes servicios, todo está en la carpeta de Postman Fill-data:
-- Seguridad/Sistema-Modulos-Menu => create-menu
-- Seguridad/Empleados => create-empleado
-- Seguridad/Autenticación => cambiar-contraseña
-- Seguridad/Autenticación => login
-- Probar servicios que devuelven info de usuario
-    - Seguridad/Autenticación/user-info
-    - Seguridad/Sistema-Modulos-Menu/get-menu-by-usuario
-- PKI/Poblar-datos/agregar-ac-autorizadas
-    - 1. Intermedio -> AC-Sat1106.crt
-    - 2. OCSP -> ocsp.ac5_sat.cer
 
-- PKI/Poblar-datos/agregar-cert-usuario --NOTA: Agregar el certificado con el token del usuario que le corresponde, si no se va a asociar incorrectamente.
+1. 1-fill-uadscripcion-areas
+2. 2-fill-tipodoc-by-area
+3. Lo siguiente:
+    - Seguridad/Sistema-Modulos-Menu => create-menu
+    - Seguridad/Usuarios/registro-usuario
+    - Seguridad/Autenticación => login
 
-- Tablero/Firma-e/alta-documento: --NOTA: Agregar con el token del Super Administrador.
+    Si se quiere crear un empleado/usuario que no existe en la BD:
+        - Seguridad/Empleados => create-empleado
+        - Seguridad/Autenticación => cambiar-contraseña
+        - Seguridad/Autenticación => login
+
+    - Probar servicios que devuelven info de usuario
+        - Seguridad/Autenticación/user-info
+        - Seguridad/Sistema-Modulos-Menu/get-menu-by-usuario
+    - PKI/Poblar-datos/agregar-ac-autorizadas
+        - 1. Intermedio -> AC-Sat1106.crt
+        - 2. OCSP -> ocsp.ac5_sat.cer
+        
+    - PKI/Poblar-datos/agregar-cert-usuario --NOTA: Agregar el certificado con el token del usuario que le corresponde, si no se va a asociar incorrectamente.
+
+    - Tablero/Firma-e/alta-documento: --NOTA: Agregar con el token del Super Administrador.
 
 /**------------------------------------------- */
 /**Consultas básicas para comprobar datos */

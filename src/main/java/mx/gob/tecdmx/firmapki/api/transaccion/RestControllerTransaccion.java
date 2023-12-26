@@ -30,8 +30,14 @@ public class RestControllerTransaccion {
 	@ResponseBody
 	public ResponseEntity<DTOResponse> getTransaccion(@RequestBody PayloadTransaccion payload, HttpServletRequest request){
 		DTOResponse res = new DTOResponse();
-		DTOResponseUserInfo userInfo = serviceSecurity.getUserInfo(request);
-		serviceTransaccion.getTransaccion(payload.getCertificado(), payload.getHashDocumento(), res, userInfo);
+		DTOResponseUserInfo userInfo = serviceSecurity.getUserInfo(request, res);
+		if(userInfo==null) {
+			return ResponseEntity.ok().header(null).body(res);
+		}
+		boolean getTransaccion = serviceTransaccion.getTransaccion(payload.getCertificado(), payload.getHashDocumento(), res, userInfo);
+		if(!getTransaccion) {
+			return ResponseEntity.ok().header(null).body(res);
+		}
 		return ResponseEntity.ok().header(null).body(res);
 	}
 

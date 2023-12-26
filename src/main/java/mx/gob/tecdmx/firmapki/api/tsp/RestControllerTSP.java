@@ -21,7 +21,10 @@ public class RestControllerTSP {
 	@RequestMapping(method = RequestMethod.POST, path = "/tsp-timestamp", produces = "application/json")
     public ResponseEntity<DTOResponse> verifyTSP(@RequestBody PayloadTSP payload) {
 		DTOResponse res = new DTOResponse();
-		serviceTSP.validateTSP(payload, res);
+		boolean validadoTSP = serviceTSP.validateTSP(payload, res);
+		if(!validadoTSP) {
+			return ResponseEntity.ok().header(null).body(res);
+		}
 		return ResponseEntity.ok().header(null).body(res);
 	}
 	

@@ -54,6 +54,7 @@ CREATE TABLE `tab_documentos` (
   `n_id_usuario_creador` int COMMENT 'Creador del documento.',
   `n_num_expediente` int COMMENT 'El nombre se almacenará en la tabla tab_expedientes',
   `n_id_prioridad` int,
+  `n_en_orden` int(1),
   `s_asunto` varchar(255),
   `s_notas` varchar(1000),
   `s_contenido` varchar(2048),
@@ -80,6 +81,7 @@ CREATE TABLE `tab_docs_firmantes` (
   `n_id_documento` int,
   `n_id_num_empleado` int,
   `n_id_inst_firmante` int,
+  `secuencia` int(2) COMMENT ' Posición de la secuencia',
   PRIMARY KEY (`n_id_documento`, `n_id_num_empleado`)
 );
 
@@ -485,6 +487,23 @@ CREATE TABLE `seg_log_usuario` (
   `bitacora` varchar(1024)
 );
 
+/*Actualización 5/dic-2023*/
+CREATE TABLE `tab_doc_grupos_firmas` (
+  `n_id_grupo_firmas` int PRIMARY KEY AUTO_INCREMENT,
+  `n_id_cat_area` int,
+  `c_tipo_grupo` varchar(20), /*FIRMANTE, DESTINATARIO*/
+  `s_nombre_gpo_firmante` varchar(30)
+);
+
+CREATE TABLE `tab_doc_grupo_firmas_personas` (
+  `n_id_grupo_personas` int,
+  `n_id_num_empleado` int,
+  `n_id_inst_firmante` int,
+  `n_id_inst_destinatario` int,
+  PRIMARY KEY (`n_id_grupo_personas`, `n_id_num_empleado`)
+);
+/*End actualización 5/dic-2023*/
+
 ALTER TABLE `tab_cat_tipo_documento` ADD FOREIGN KEY (`n_id_cat_area`) REFERENCES `inst_cat_areas` (`n_id_cat_area`);
 
 ALTER TABLE `tab_notificaciones` ADD FOREIGN KEY (`id_document`) REFERENCES `tab_documentos` (`n_id_documento`);
@@ -668,3 +687,11 @@ ALTER TABLE `seg_log_sistema` ADD FOREIGN KEY (`n_id_usuario_org`) REFERENCES `s
 ALTER TABLE `seg_log_sistema` ADD FOREIGN KEY (`n_id_usuario_jel`) REFERENCES `jel_seg_usuarios` (`n_id_usuario`);
 
 ALTER TABLE `seg_log_usuario` ADD FOREIGN KEY (`n_id_usuario`) REFERENCES `seg_org_usuarios` (`n_id_usuario`);
+/*Actualización 5/dic-2023*/
+ALTER TABLE `tab_doc_grupos_firmas` ADD FOREIGN KEY (`n_id_cat_area`) REFERENCES `inst_cat_areas` (`n_id_cat_area`);
+
+ALTER TABLE `tab_doc_grupo_firmas_personas` ADD FOREIGN KEY (`n_id_grupo_personas`) REFERENCES `tab_doc_grupos_firmas` (`n_id_grupo_firmas`);
+ALTER TABLE `tab_doc_grupo_firmas_personas` ADD FOREIGN KEY (`n_id_num_empleado`) REFERENCES `inst_empleado` (`n_id_num_empleado`);
+ALTER TABLE `tab_doc_grupo_firmas_personas` ADD FOREIGN KEY (`n_id_inst_firmante`) REFERENCES `tab_cat_inst_firmantes` (`n_id_inst_firmante`);
+ALTER TABLE `tab_doc_grupo_firmas_personas` ADD FOREIGN KEY (`n_id_inst_destinatario`) REFERENCES `tab_cat_inst_dest` (`n_id_inst_dest`);
+/*End actualización 5/dic-2023*/

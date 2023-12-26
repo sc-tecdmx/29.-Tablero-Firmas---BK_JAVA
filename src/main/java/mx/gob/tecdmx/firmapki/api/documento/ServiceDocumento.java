@@ -11,6 +11,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import mx.gob.tecdmx.firmapki.DTOResponseUserInfo;
+import mx.gob.tecdmx.firmapki.api.firma.ServiceFirmar;
+import mx.gob.tecdmx.firmapki.api.firma.ServiceFirmarAhora;
 import mx.gob.tecdmx.firmapki.entity.inst.InstEmpleado;
 import mx.gob.tecdmx.firmapki.entity.pki.HashDocumentoIdUsuarioIdTransaccionID;
 import mx.gob.tecdmx.firmapki.entity.pki.PkiCatFirmaAplicada;
@@ -61,6 +63,8 @@ import mx.gob.tecdmx.firmapki.repository.tab.TabExpedientesRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.VistaTableroRepository;
 import mx.gob.tecdmx.firmapki.utils.CertificateUtils;
 import mx.gob.tecdmx.firmapki.utils.DTOResponse;
+import mx.gob.tecdmx.firmapki.utils.enums.EnumPkiCatFirmaAplicada;
+import mx.gob.tecdmx.firmapki.utils.enums.EnumTabCatEtapaDocumento;
 
 @Service
 public class ServiceDocumento {
@@ -136,6 +140,12 @@ public class ServiceDocumento {
 
 	@Autowired
 	ServiceFirma serviceFirma;
+	
+	@Autowired
+	ServiceFirmar serviceFirmar;
+	
+	@Autowired
+	ServiceFirmarAhora serviceFirmarAhora;
 
 	@Value("${firma.document.pdf.path}")
 	private String documentPath;
@@ -361,6 +371,9 @@ public class ServiceDocumento {
 
 		return res;
 	}
+	
+
+
 
 	public DTOResponse altaDocumentoFirmarAhora(PayloadAltaDocumento payload, DTOResponse res,
 			DTOResponseUserInfo userInfo) {
@@ -489,7 +502,7 @@ public class ServiceDocumento {
 
 				if (payload.getFirmantes().size() == 1) {
 					etapaDoc = tabCatEtapaDocumentoRepository.findByDescetapa("Terminado");
-				}
+				} 
 				pkiDocumentoStored = createPKIDocumento(docAdjuntoStored.getDocumentoHash(), empleado.get(),
 						empleado.get(), null, documentoStored.getCreacionDocumentoFecha(),
 						etapaDoc.get().getDescetapa(), false, payload.isEnOrden());
@@ -903,75 +916,128 @@ public class ServiceDocumento {
 		return res;
 	}
 
-	public DTOResponse firmar(PayloadFirma payload, DTOResponse res, DTOResponseUserInfo userInfo) {
+	public boolean firmar(PayloadFirma payload, DTOResponse res, DTOResponseUserInfo userInfo) {
 		ResponseBodyFirma responde = new ResponseBodyFirma();
-
+		
+		//Sección de actualización de PKI documentos_firmantes
 		HashDocumentoIdUsuarioIdTransaccionID idDocumentoFirmantes = new HashDocumentoIdUsuarioIdTransaccionID();
 		idDocumentoFirmantes.setHashDocumento(payload.getHashDocumento());
 		idDocumentoFirmantes.setIdUsuario(userInfo.getData().getIdUsuario());
 
-		Optional<PkiDocumentoFirmantes> docFirmantes = pkiDocumentoFirmantesRepository.findById(idDocumentoFirmantes);
-		if (docFirmantes.isPresent()) {
-			// !!!IMPORTANTE: Modificar la BD y los mappings para mover el campo de
-			// ALGORITMO a documentos_firmantes, Revisar/SI/NO
-			Optional<PkiDocumento> documento = pkiDocumentoRepository.findById(payload.getHashDocumento());
-
-			if (documento.isPresent()) {
-				responde.setAlgortimo(documento.get().getAlgoritmo());
-				pkiDocumentoRepository.save(documento.get());
-			}
-			docFirmantes.get().setCadenaFirma(payload.getCadenaFirma().toString());
-			docFirmantes.get().setFechaFirma(new Date());
-
-			Optional<PkiCatFirmaAplicada> firmaAplicada = pkiCatFirmaAplicadaRepository
-					.findByDescFirmaAplicada("Firmado");
-			if (!firmaAplicada.isPresent()) {
-				res.setMessage("No se encontró el tipo de firma");
-				res.setStatus("fail");
-				return res;
-			}
-
-			serviceFirma.firma(payload.getHashDocumento(), payload.getDocumento(), payload.getCadenaFirma(),
-					payload.getCertificado(), documentFirmadosPath + "/" + idDocumentoFirmantes.getHashDocumento() + "_"
-							+ idDocumentoFirmantes.getIdUsuario() + ".pdf",
-					userInfo);
-
-			docFirmantes.get().setIdFirmaAplicada(firmaAplicada.get());
-			pkiDocumentoFirmantesRepository.save(docFirmantes.get());
-
-			Optional<TabCatEtapaDocumento> etapaDoc = tabCatEtapaDocumentoRepository.findByDescetapa("En Firma");
-
-			Optional<InstEmpleado> empleado = instEmpleadoRepository.findById(userInfo.getData().getIdEmpleado());
-			if (!empleado.isPresent()) {
-				res.setMessage("No se puede encontrar el empleado");
-				res.setStatus("fail");
-				return res;
-			}
-
-			Optional<TabDocumentosAdjuntos> docTabDocumento = tabDocumentosAdjuntosRepository
-					.findByDocumentoHash(documento.get().getHashDocumento());
-
-			// Se guarda el wrokflow del documento
-			TabDocumentoWorkflow docWorkflow = new TabDocumentoWorkflow();
-			docWorkflow.setIdEtapaDocumento(etapaDoc.get());
-			docWorkflow.setIdDocument(docTabDocumento.get().getIdDocument());
-			docWorkflow.setUltActualizacion(new Date());
-			docWorkflow.setWorkflowFecha(new Date());
-			docWorkflow.setWorkflowIdNumEmpleado(empleado.get());
-
-			tabDocumentoWorkflowRepository.save(docWorkflow);
-
-			res.setData(null);
-			res.setStatus("Succes");
-			res.setMessage("Documento firmado");
-
-		} else {
+		Optional<PkiDocumentoFirmantes> docFirmantesPki = pkiDocumentoFirmantesRepository.findById(idDocumentoFirmantes);
+		if (!docFirmantesPki.isPresent()) {
 			res.setData(null);
 			res.setStatus("Fail");
 			res.setMessage("No puedes firmar este documento, ya que no te fue asignado para firmar");
+			return false;
 		}
 
-		return res;
+		PkiCatFirmaAplicada firmaAplicada_firmado = serviceFirmarAhora.findFirmaAplicada(EnumPkiCatFirmaAplicada.FIRMADO.getOpcion(), res);
+		if(firmaAplicada_firmado==null) {
+			return false;
+		}
+
+		try {
+			docFirmantesPki.get().setCadenaFirma(payload.getCadenaFirma().toString());
+			docFirmantesPki.get().setFechaFirma(new Date());
+			docFirmantesPki.get().setIdFirmaAplicada(firmaAplicada_firmado);
+				
+			pkiDocumentoFirmantesRepository.save(docFirmantesPki.get());
+				
+		}catch(Exception e) {
+			res.setMessage("No se pudo actualizar la tabla documentos firmantes");
+			res.setStatus("fail");
+			return false;
+		}
+		
+		//Sección para agregar firma al documento pdf
+		String fileName = documentFirmadosPath + "/" + payload.getHashDocumento() + "_" + userInfo.getData().getIdUsuario() + ".pdf";
+		
+		serviceFirma.firma(payload.getHashDocumento(), payload.getDocumento(), payload.getCadenaFirma(),
+					payload.getCertificado(), fileName,
+					userInfo);
+		
+		try {
+			//sección para actualizar documento PKI
+			PkiDocumento documentoPki = docFirmantesPki.get().getDocumento();
+			
+			documentoPki.setAlgoritmo(encryptionAlgorithm);
+				//
+			
+			TabDocumentosAdjuntos documentoAdjuntoTab = serviceFirmar.getTabDocumentoAdjuntoByHash(payload.getHashDocumento(), res);
+			if(documentoAdjuntoTab==null) {
+				return false;
+			}
+			List<TabDocumentosAdjuntos> listaDocAdjuntosTab =  serviceFirmar.getTabDocumentosAdjuntos(documentoAdjuntoTab.getIdDocument());
+			List<TabDocsFirmantes> listaFirmantesTab =  serviceFirmar.getTabDocsFirmantes(documentoAdjuntoTab.getIdDocument().getId());
+			
+
+			for(TabDocumentosAdjuntos docAdjuntoTab : listaDocAdjuntosTab) {
+				boolean archivoCompleted = true;
+				for(TabDocsFirmantes firmanteTab : listaFirmantesTab) {
+					
+					Optional<PkiDocumentoFirmantes> docUsuFirmante = pkiDocumentoFirmantesRepository.
+							findByHashDocumentoAndIdNumEmpleadoAndIdFirmaAplicada(docAdjuntoTab.getDocumentoHash(), firmanteTab.getIntEmpleado(), firmaAplicada_firmado);
+					if(!docUsuFirmante.isPresent()) {
+						archivoCompleted = false;
+					}
+				}
+				if(archivoCompleted) {
+					documentoPki.setTerminado(1);
+				}
+			}
+
+//			int totalFaltantes = serviceFirmar.getNumFirmantesPendientesDeFirmarUnArchivoAdjunto(payload.getHashDocumento());
+//			if(totalFaltantes==0) {
+//				documentoPki.setTerminado(1);
+//			}
+				
+			pkiDocumentoRepository.save(documentoPki);
+			
+		}catch(Exception e) {
+			res.setMessage("No se pudo actualizar la información en la tabla documento PKI");
+			res.setStatus("fail");
+			return false;
+		}
+				
+		//Validamos si podemos dar por terminado el dcumento (No el archivo adjunto, más bien el tab documento)
+		//Obtenemos los elementos necesarios de la sección de la BD tablero para posterior
+		TabDocumentosAdjuntos documentoAdjuntoTab = serviceFirmar.getTabDocumentoAdjuntoByHash(payload.getHashDocumento(), res);
+		if(documentoAdjuntoTab==null) {
+			return false;
+		}
+		List<TabDocumentosAdjuntos> documentosAdjuntosTabList =  serviceFirmar.getTabDocumentosAdjuntos(documentoAdjuntoTab.getIdDocument());
+				
+		boolean allDocsFirmados = true;
+		PkiDocumento pkiDoc = null;
+		for(TabDocumentosAdjuntos docAdjunto : documentosAdjuntosTabList) {
+			pkiDoc = serviceFirmar.getDocumentoPKIByHash(docAdjunto.getDocumentoHash(), res);
+			if(pkiDoc.getTerminado()==0) {
+				allDocsFirmados = false;
+			}
+		}
+		
+		if(allDocsFirmados) {
+			TabCatEtapaDocumento etapaDoc_terminado = serviceFirmarAhora.findEtapaDocumento(EnumTabCatEtapaDocumento.TERMINADO.getOpcion(), res);
+			if (etapaDoc_terminado == null) {
+				return false;
+			}
+
+			TabDocumentoWorkflow workflowStored_Terminado = serviceFirmar.storeWorkFlow(
+					documentoAdjuntoTab.getIdDocument(), etapaDoc_terminado,
+					userInfo.getData().getEmpleado(), res);
+			if (workflowStored_Terminado == null) {
+				return false;
+			}
+		}
+		
+		responde.setAlgortimo(encryptionAlgorithm);
+		
+		res.setData(responde);
+		res.setStatus("Succes");
+		res.setMessage("Documento firmado");
+		return true;
+			
 	}
 
 	public DTOResponse rechazarDocumento(PayloadRechazarDocumento payload, DTOResponse res,
@@ -1038,27 +1104,29 @@ public class ServiceDocumento {
 
 				return res;
 			}
-			
+
 		}
 		boolean terminado = false;
-		//vuelvo a recorrer el array de docs adjuntos para poder extraer el hash de los documentos y 
-		//verificar en pki firmantes si ya tienen alguna accion
-		for(TabDocumentosAdjuntos tabDocAd : docsAdjuntos) {
-			Optional<PkiDocumentoFirmantes>docFirm = pkiDocumentoFirmantesRepository.findByHashDocumento(tabDocAd.getDocumentoHash());
-			if(docFirm.isPresent()) {
-				if(docFirm.get().getIdFirmaAplicada()!=null) {
+		// vuelvo a recorrer el array de docs adjuntos para poder extraer el hash de los
+		// documentos y
+		// verificar en pki firmantes si ya tienen alguna accion
+		for (TabDocumentosAdjuntos tabDocAd : docsAdjuntos) {
+			Optional<PkiDocumentoFirmantes> docFirm = pkiDocumentoFirmantesRepository
+					.findByHashDocumento(tabDocAd.getDocumentoHash());
+			if (docFirm.isPresent()) {
+				if (docFirm.get().getIdFirmaAplicada() != null) {
 					terminado = true;
-				}else {
+				} else {
 					terminado = false;
 					break;
 				}
 			}
-			
+
 		}
-		if(terminado){
+		if (terminado) {
 			etapaDoc = tabCatEtapaDocumentoRepository.findByDescetapa("Terminado");
 		}
-		
+
 		// creamos registro en tabla workflow
 		TabDocumentoWorkflow docWorkflow = new TabDocumentoWorkflow();
 		docWorkflow.setIdEtapaDocumento(etapaDoc.get());
