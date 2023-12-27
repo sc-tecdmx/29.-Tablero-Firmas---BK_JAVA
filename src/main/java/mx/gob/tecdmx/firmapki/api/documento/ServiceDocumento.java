@@ -875,6 +875,7 @@ public class ServiceDocumento {
 						docAdjuntoDto.setDocBase64(docAdjunto.getDocumentoBase64());
 						docAdjuntoDto.setFilePath(docAdjunto.getDocumentoPath());
 						docAdjuntoDto.setFileType(docAdjunto.getDocumentoFiletype());
+						docAdjuntoDto.setOriginalHash(docAdjunto.getDocumentoHash());
 
 						documentosAdjuntos.add(docAdjuntoDto);
 

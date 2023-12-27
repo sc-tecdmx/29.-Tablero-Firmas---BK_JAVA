@@ -981,7 +981,8 @@ public class ServiceFirmarAhora {
 			}
 			
 		}
-			
+		res.setMessage("Se ha firmado el documento satisfactoriamente ");
+		res.setStatus("Success");	
 		return true;
 
 	}
@@ -1037,6 +1038,14 @@ public class ServiceFirmarAhora {
 				userInfo.getData().getEmpleado(), res);
 		if (workflowStored_Creado == null) {
 			return false;
+		}
+		
+		try {
+		    // Espera por 2000 milisegundos (2 segundos)
+		    Thread.sleep(1000);
+		} catch (InterruptedException e) {
+		    // Manejar la excepción en caso de que el sleep sea interrumpido
+		    e.printStackTrace();
 		}
 		
 

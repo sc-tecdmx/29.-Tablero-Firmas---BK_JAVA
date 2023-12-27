@@ -5,6 +5,7 @@ public class DTODocAdjunto {
 	String fileType;
 	String docBase64;
 	String filePath;
+	String originalHash;
 	
 	public String getFileType() {
 		return fileType;
@@ -23,6 +24,12 @@ public class DTODocAdjunto {
 	}
 	public void setFilePath(String filePath) {
 		this.filePath = filePath;
+	}
+	public String getOriginalHash() {
+		return originalHash;
+	}
+	public void setOriginalHash(String originalHash) {
+		this.originalHash = originalHash;
 	}
 	
 	
