@@ -68,8 +68,7 @@ ORDER BY n_id_documento, empleado_id;
 
 
 CREATE VIEW vista_tablero AS
-
-SELECT 
+SELECT DISTINCT 
 	v1.n_id_documento, folio_documento, tced.s_desc_etapa, tcp.desc_prioridad as prioridad, creacion_documento_fecha, 
 	s_asunto, empleado_id as num_empleado, rol as tipo, ult_actualizacion, tdf.n_id_inst_firmante as n_id_inst
 FROM db_mappings.vista_part1 v1
@@ -86,4 +85,3 @@ WHERE NOT (
           AND docfirmantesPKI.n_id_num_empleado = v1.empleado_id
     )
 );
-
