@@ -22,67 +22,89 @@ public class RestControllerFirma {
 
 	@Autowired
 	ServiceSecurity serviceSecurity;
-	
-//	@Autowired
-//	ServiceFirma serviceFirma;
-	
+
+	// @Autowired
+	// ServiceFirma serviceFirma;
+
 	@Autowired
 	ServiceFirmarAhora serviceFirmarAhora;
-	
+
 	@CrossOrigin()
 	@RequestMapping(method = RequestMethod.POST, path = "/alta-documento-modo-firmar-ahora", produces = "application/json")
-    public ResponseEntity<DTOResponse> createDocumentoFirmarAhora(@RequestBody PayloadAltaDocumento payload, HttpServletRequest request) {
+	public ResponseEntity<DTOResponse> createDocumentoFirmarAhora(@RequestBody PayloadAltaDocumento payload,
+			HttpServletRequest request) {
 		DTOResponse res = new DTOResponse();
 		DTOResponseUserInfo userInfo = serviceSecurity.getUserInfo(request, res);
-		if(userInfo==null) {
+		if (userInfo == null) {
 			return ResponseEntity.ok().header(null).body(res);
 		}
 		DAOAltaDocumento documentoAlta = null;
 		boolean docAltafirmado = serviceFirmarAhora.altaDocAndfirmarAhora(payload, documentoAlta, res, userInfo);
-		if(docAltafirmado) {
+		if (docAltafirmado) {
 			res.setData(payload);
 		}
 		return ResponseEntity.ok().header(null).body(res);
 	}
-	
+
 	@CrossOrigin()
-	@RequestMapping(method = RequestMethod.POST, path = "/alta-documento-modo-captura", produces = "application/json")
-    public ResponseEntity<DTOResponse> createDocumentoCaptura(@RequestBody PayloadAltaDocumento payload, HttpServletRequest request) {
+	@RequestMapping(method = RequestMethod.POST, path = "/alta-documento-modo-firmar-escritorio", produces = "application/json")
+	public ResponseEntity<DTOResponse> createDocumentoFirmarAhoraEscritorio(@RequestBody PayloadAltaDocumento payload,
+			HttpServletRequest request) {
 		DTOResponse res = new DTOResponse();
 		DTOResponseUserInfo userInfo = serviceSecurity.getUserInfo(request, res);
-		if(userInfo==null) {
+		if (userInfo == null) {
+			return ResponseEntity.ok().header(null).body(res);
+		}
+		DAOAltaDocumento documentoAlta = null;
+		boolean docAltafirmado = serviceFirmarAhora.altaDocAndfirmarAhoraEscritorio(payload, documentoAlta, res,
+				userInfo);
+		if (docAltafirmado) {
+			res.setData(payload);
+		}
+		return ResponseEntity.ok().header(null).body(res);
+	}
+
+	@CrossOrigin()
+	@RequestMapping(method = RequestMethod.POST, path = "/alta-documento-modo-captura", produces = "application/json")
+	public ResponseEntity<DTOResponse> createDocumentoCaptura(@RequestBody PayloadAltaDocumento payload,
+			HttpServletRequest request) {
+		DTOResponse res = new DTOResponse();
+		DTOResponseUserInfo userInfo = serviceSecurity.getUserInfo(request, res);
+		if (userInfo == null) {
 			return ResponseEntity.ok().header(null).body(res);
 		}
 		DAOAltaDocumento documentoAlta = null;
 		boolean docAlta = serviceFirmarAhora.altaDocumentoModoCaptura(payload, documentoAlta, res, userInfo);
-		if(docAlta) {
+		if (docAlta) {
 			res.setData(payload);
 		}
 		return ResponseEntity.ok().header(null).body(res);
 	}
-	
+
 	@CrossOrigin()
 	@RequestMapping(method = RequestMethod.POST, path = "/go-to-firmar", produces = "application/json")
-    public ResponseEntity<DTOResponse> createDocumentoCaptura(@RequestBody PayloadFirmar payload, HttpServletRequest request) {
+	public ResponseEntity<DTOResponse> createDocumentoCaptura(@RequestBody PayloadFirmar payload,
+			HttpServletRequest request) {
 		DTOResponse res = new DTOResponse();
 		DTOResponseUserInfo userInfo = serviceSecurity.getUserInfo(request, res);
-		if(userInfo==null) {
+		if (userInfo == null) {
 			return ResponseEntity.ok().header(null).body(res);
 		}
 		boolean docFirmado = serviceFirmarAhora.gotoFirmar(payload.getIdDocumento(), userInfo, res);
-		if(docFirmado) {
+		if (docFirmado) {
 			res.setData(payload);
 		}
 		return ResponseEntity.ok().header(null).body(res);
 	}
-	
+
 	@CrossOrigin()
 	@RequestMapping(method = RequestMethod.POST, path = "/enviar-documento", produces = "application/json")
-    public ResponseEntity<DTOResponse> enviarDocumento(@RequestBody PayloadEnviarDocumento payload, HttpServletRequest request) {
+	public ResponseEntity<DTOResponse> enviarDocumento(@RequestBody PayloadEnviarDocumento payload,
+			HttpServletRequest request) {
 		DTOResponse res = new DTOResponse();
 		DTOResponseUserInfo userInfo = serviceSecurity.getUserInfo(request, res);
 		boolean enviado = serviceFirmarAhora.enviarDocumento(payload.getIdDocumento(), userInfo, res);
-		if(!enviado) {
+		if (!enviado) {
 			return ResponseEntity.ok().header(null).body(res);
 		}
 		return ResponseEntity.ok().header(null).body(res);

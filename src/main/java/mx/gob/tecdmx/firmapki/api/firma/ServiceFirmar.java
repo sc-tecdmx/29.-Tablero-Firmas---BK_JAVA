@@ -48,8 +48,8 @@ public class ServiceFirmar {
 	@Autowired
 	PkiDocumentoRepository pkiDocumentoRepository;
 
-//	@Autowired
-//	ServiceFirmarAhora serviceFirmarAhora;
+	// @Autowired
+	// ServiceFirmarAhora serviceFirmarAhora;
 
 	@Autowired
 	TabDocumentosRepository tabDocumentosRepository;
@@ -68,10 +68,10 @@ public class ServiceFirmar {
 
 	@Autowired
 	TabDocDestinatariosRepository tabDocDestinatariosRepository;
-	
+
 	@Autowired
 	TabDocumentoWorkflowRepository tabDocumentoWorkflowRepository;
-	
+
 	@Autowired
 	PkiDocumentoFirmantesRepository pkiDocumentoFirmantesRepository;
 
@@ -80,7 +80,7 @@ public class ServiceFirmar {
 
 	@Value("${firma.document.pdf.path}")
 	private String documentPath;
-	
+
 	CertificateUtils utils = null;
 
 	public boolean documentNotExistInDataBase(String docBase64, int pos, DTOResponse res) {
@@ -89,18 +89,21 @@ public class ServiceFirmar {
 			Optional<TabDocumentosAdjuntos> documentInDB = tabDocumentosAdjuntosRepository
 					.findByDocumentoHash(utils.calcularSHA256(new String(docBase64)));
 			if (documentInDB.isPresent()) {
-				res.setMessage("El archivo adjunto número "+pos+" que cargaste, ya existe en la BD, no se pueden duplicar documentos");
+				res.setMessage("El archivo adjunto número " + pos
+						+ " que cargaste, ya existe en la BD, no se pueden duplicar documentos");
 				res.setStatus("fail");
 				return false;
 			}
 			return true;
-		}catch(Exception e) {
-			res.setMessage("La BD está corrupta. Contiene dos o más archivos repetidos iguales al archivo adjunto número "+pos+" que cargaste");
+		} catch (Exception e) {
+			res.setMessage(
+					"La BD está corrupta. Contiene dos o más archivos repetidos iguales al archivo adjunto número "
+							+ pos + " que cargaste");
 			res.setStatus("fail");
 			return false;
 		}
 	}
-	
+
 	public PkiDocumento getDocumentoPKIByHash(String hashDocumento, DTOResponse res) {
 		Optional<PkiDocumento> documento = pkiDocumentoRepository.findById(hashDocumento);
 		if (!documento.isPresent()) {
@@ -115,52 +118,83 @@ public class ServiceFirmar {
 		String fileName = fecha + "_" + tipoDocumento + "_" + documentoId + "_" + numDocumento + ".pdf";
 		return fileName;
 	}
-	
+
 	public List<TabDocumentosAdjuntos> getTabDocumentosAdjuntos(TabDocumentos documento) {
 		return tabDocumentosAdjuntosRepository.findByIdDocument(documento);
 	}
-	
+
 	public TabDocumentosAdjuntos getTabDocumentoAdjuntoByHash(String hashDocumento, DTOResponse res) {
 		Optional<TabDocumentosAdjuntos> docTabDocumentoAdjunto = tabDocumentosAdjuntosRepository
 				.findByDocumentoHash(hashDocumento);
-		if(!docTabDocumentoAdjunto.isPresent()) {
-			res.setMessage("No se pudo encontrar el documento de la tabla de tablero que corresponde al archivo que se está firmando");
+		if (!docTabDocumentoAdjunto.isPresent()) {
+			res.setMessage(
+					"No se pudo encontrar el documento de la tabla de tablero que corresponde al archivo que se está firmando");
 			res.setStatus("fail");
 			return null;
 		}
 		return docTabDocumentoAdjunto.get();
 	}
-	
-	
-	public boolean updateDataEnviadoInPkiDocumentosAdjuntos(List<TabDocumentosAdjuntos> documentosAdjuntos, 
+
+	public boolean updateDataEnviadoInPkiDocumentosAdjuntos(List<TabDocumentosAdjuntos> documentosAdjuntos,
 			Date fechaEnvio, InstEmpleado empleadoEnvio, DTOResponse res) {
-		for(TabDocumentosAdjuntos docAdjunto : documentosAdjuntos) {
-			Optional<PkiDocumento> documentoPki = pkiDocumentoRepository.findByHashDocumento(docAdjunto.getDocumentoHash());
-			if(documentoPki.isPresent()) {
+		for (TabDocumentosAdjuntos docAdjunto : documentosAdjuntos) {
+			Optional<PkiDocumento> documentoPki = pkiDocumentoRepository
+					.findByHashDocumento(docAdjunto.getDocumentoHash());
+			if (documentoPki.isPresent()) {
 				documentoPki.get().setFechaEnvio(fechaEnvio);
 				documentoPki.get().setIdNumEmpleadoEnvio(empleadoEnvio);
 				pkiDocumentoRepository.save(documentoPki.get());
 			}
 		}
-//		res.setMessage("Hay inconsistencia entre los archivos adjuntos de la sección de tablero con la sección pki (datos faltantes)");
-//		res.setStatus("fail");
+		// res.setMessage("Hay inconsistencia entre los archivos adjuntos de la sección
+		// de tablero con la sección pki (datos faltantes)");
+		// res.setStatus("fail");
 		return true;
 	}
-	
+
 	public int getNumFirmantesPendientesDeFirmarUnArchivoAdjunto(String hashDocumento) {
-		List<PkiDocumentoFirmantes> faltantesFirmarArchivo = pkiDocumentoFirmantesRepository.findByHashDocumentoAndFechaFirmaAndIdFirmaAplicada(hashDocumento, null, null);
+		List<PkiDocumentoFirmantes> faltantesFirmarArchivo = pkiDocumentoFirmantesRepository
+				.findByHashDocumentoAndFechaFirmaAndIdFirmaAplicada(hashDocumento, null, null);
 		return faltantesFirmarArchivo.size();
 	}
-	
+
 	public boolean validateFirmanteHaFirmado(InstEmpleado empleado, PkiCatFirmaAplicada firmaAplicada) {
-		List<PkiDocumentoFirmantes> faltantesFirmarArchivo = pkiDocumentoFirmantesRepository.findByIdNumEmpleadoAndIdFirmaAplicada(
-				empleado, firmaAplicada);
-		if(faltantesFirmarArchivo.size()>0) {
+		List<PkiDocumentoFirmantes> faltantesFirmarArchivo = pkiDocumentoFirmantesRepository
+				.findByIdNumEmpleadoAndIdFirmaAplicada(
+						empleado, firmaAplicada);
+		if (faltantesFirmarArchivo.size() > 0) {
 			return true;
 		}
 		return false;
 	}
-	
+
+	public TabDocumentosAdjuntos storeDocumento(String escritorio, TabDocumentos documentoStored, String docBase64,
+			String fileType,
+			Integer numDocumento, DTOResponse res) {
+		utils = new CertificateUtils();
+
+		String fecha = utils.formatDate(new Date());
+		String fileName = buildFileName(fecha, escritorio,
+				documentoStored.getId(), numDocumento);
+
+		try {
+			TabDocumentosAdjuntos docAdjunto = new TabDocumentosAdjuntos();
+			docAdjunto.setIdDocument(documentoStored);
+			docAdjunto.setDocumentoPath(documentPath + "/" + fileName);
+			docAdjunto.setDocumentoHash(utils.calcularSHA256(new String(docBase64)));
+			docAdjunto.setDocumentoFiletype(fileType);
+			docAdjunto.setFechaCarga(new Date());
+			docAdjunto.setDocumentoBase64(docBase64);
+
+			TabDocumentosAdjuntos docAdjuntoStored = tabDocumentosAdjuntosRepository.save(docAdjunto);
+			return docAdjuntoStored;
+		} catch (Exception e) {
+			res.setMessage(e.toString());
+			res.setStatus("fail");
+			return null;
+		}
+
+	}
 
 	public TabDocumentosAdjuntos storeDocumento(TabDocumentos documentoStored, String docBase64, String fileType,
 			Integer numDocumento, DTOResponse res) {
@@ -188,25 +222,27 @@ public class ServiceFirmar {
 		}
 
 	}
-	
+
 	public String getSequenceWorkflow(TabDocumentos documento, DTOResponse res) {
-		List<TabDocumentoWorkflow> listWorkflow = tabDocumentoWorkflowRepository.findByIdDocumentOrderByWorkflowFecha(documento);
+		List<TabDocumentoWorkflow> listWorkflow = tabDocumentoWorkflowRepository
+				.findByIdDocumentOrderByWorkflowFecha(documento);
 		String etapaSequence = "";
-		for(TabDocumentoWorkflow workflow : listWorkflow) {
-			etapaSequence+="-"+workflow.getIdEtapaDocumento().getDescetapa();
+		for (TabDocumentoWorkflow workflow : listWorkflow) {
+			etapaSequence += "-" + workflow.getIdEtapaDocumento().getDescetapa();
 		}
-		etapaSequence = etapaSequence.replaceFirst("-","");
-		
-//		if(etapaSequence.equals(EnumTabCatEtapaDocumento.CREADO.getOpcion())) {
-//			return etapaSequence;
-//		}else {
-//			res.setMessage("No se puede firmar, ya que existen etapas del documento no contempladas, contacte a su administrador");
-//			res.setStatus("fail");
-//			return null;
-//		}
+		etapaSequence = etapaSequence.replaceFirst("-", "");
+
+		// if(etapaSequence.equals(EnumTabCatEtapaDocumento.CREADO.getOpcion())) {
+		// return etapaSequence;
+		// }else {
+		// res.setMessage("No se puede firmar, ya que existen etapas del documento no
+		// contempladas, contacte a su administrador");
+		// res.setStatus("fail");
+		// return null;
+		// }
 		return etapaSequence;
 	}
-	
+
 	public TabDocumentoWorkflow storeWorkFlow(TabDocumentos documentoStored, TabCatEtapaDocumento etapaDoc,
 			InstEmpleado empleado, DTOResponse res) {
 		try {
@@ -220,14 +256,14 @@ public class ServiceFirmar {
 
 			TabDocumentoWorkflow workflowStored = tabDocumentoWorkflowRepository.save(docWorkflow);
 			return workflowStored;
-			
-		}catch(Exception e) {
+
+		} catch (Exception e) {
 			res.setMessage("No se pudo guardar el workflow del documento");
 			res.setStatus("fail");
 			return null;
 		}
 	}
-	
+
 	public List<TabDocsFirmantes> getTabDocsFirmantes(int idTabDocumento) {
 		List<TabDocsFirmantes> listTabDocFirmantes = tabDocsFirmantesRepository.findByIdDocumento(idTabDocumento);
 		InstEmpleado empleado = listTabDocFirmantes.get(0).getIntEmpleado();
@@ -270,7 +306,7 @@ public class ServiceFirmar {
 	public TabDocConfig storeTabDocConfig(List<mx.gob.tecdmx.firmapki.api.documento.DTOConfiguracion> list,
 			TabDocumentos documentoStored, DTOResponse res) {
 		TabDocConfig docConfig = new TabDocConfig();
-		if (list.size() > 0) { 
+		if (list.size() > 0) {
 			for (mx.gob.tecdmx.firmapki.api.documento.DTOConfiguracion configIndex : list) {
 				if (!configIndex.isConfig()) {
 					Optional<TabCatDocConfig> configExist = tabCatConfigDocumentoRepository
@@ -291,8 +327,6 @@ public class ServiceFirmar {
 		return null;
 	}
 
-
-
 	public PkiDocumento createPKIDocumento(String docBase64, InstEmpleado empleadoCreador,
 			InstEmpleado empleadoEnvio, Date fechaEnvio, Date fechaCreacion, String statusDocumento,
 			boolean isTerminado, boolean isEnOrden, DTOResponse res) {
@@ -304,7 +338,8 @@ public class ServiceFirmar {
 			documento.setIdNumEmpleadoEnvio(empleadoEnvio);
 			documento.setFechaEnvio(fechaEnvio);
 			documento.setFechaCreacion(fechaCreacion);
-			documento.setStatusDocumento(statusDocumento);//Determiné tomar el dato de la tabla: tab_cat_etapa_documento
+			documento.setStatusDocumento(statusDocumento);// Determiné tomar el dato de la tabla:
+															// tab_cat_etapa_documento
 			documento.setTerminado(isTerminado ? 1 : 0);
 			documento.setOrden(isEnOrden ? 1 : 0);
 			PkiDocumento documentoSaved = pkiDocumentoRepository.save(documento);
@@ -315,29 +350,33 @@ public class ServiceFirmar {
 			return null;
 		}
 	}
-	
+
 	public PkiDocumentoFirmantes createPKIDocumentoFirmantes(String sha256, SegOrgUsuarios usuarioFirmante,
 			InstEmpleado empleadoFirmante, int secuencia, Date fechaLimite,
 			PkiCatTipoFirma tipoFirma, DTOResponse res) {
 
 		try {
 			utils = new CertificateUtils();
-			
+
 			HashDocumentoIdUsuarioIdTransaccionID idCompuesta = new HashDocumentoIdUsuarioIdTransaccionID();
 			idCompuesta.setHashDocumento(sha256);
 			idCompuesta.setIdUsuario(usuarioFirmante.getnIdUsuario());
-			
+
 			PkiDocumentoFirmantes firmantes = new PkiDocumentoFirmantes();
 			firmantes.setHashDocumento(sha256);
 			firmantes.setIdUsuario(usuarioFirmante.getnIdUsuario());
-//			firmantes.setTransaccion(transaccion);//La transacción se agrega en otra etapa, por eso aquí no se incluye
+			// firmantes.setTransaccion(transaccion);//La transacción se agrega en otra
+			// etapa, por eso aquí no se incluye
 			firmantes.setIdNumEmpleado(empleadoFirmante);
 			firmantes.setSecuencia(secuencia);
 			firmantes.setFechaLimite(fechaLimite);
-//			firmantes.setFechaFirma(fechaFirma);// Esta fecha se agrega en otra etapa, por eso aquí no se incluye
-			firmantes.setIdTipoFirma(tipoFirma);//Simple/Múltiple
-//			firmantes.setIdFirmaAplicada(firmaAplicada); // Este se agrega en otra etapa, por eso aquí no se incluye
-//			firmantes.setCadenaFirma(cadenaFirma); // Este se agrega en otra etapa, por eso aquí no se incluye
+			// firmantes.setFechaFirma(fechaFirma);// Esta fecha se agrega en otra etapa,
+			// por eso aquí no se incluye
+			firmantes.setIdTipoFirma(tipoFirma);// Simple/Múltiple
+			// firmantes.setIdFirmaAplicada(firmaAplicada); // Este se agrega en otra etapa,
+			// por eso aquí no se incluye
+			// firmantes.setCadenaFirma(cadenaFirma); // Este se agrega en otra etapa, por
+			// eso aquí no se incluye
 			pkiDocumentoFirmantesRepository.save(firmantes);
 			return firmantes;
 		} catch (Exception e) {
@@ -346,18 +385,16 @@ public class ServiceFirmar {
 			return null;
 		}
 	}
-	
-	
+
 	public TabDocumentos findTabDocumento(int idDocumento, DTOResponse res) {
 		Optional<TabDocumentos> documento = tabDocumentosRepository.findById(idDocumento);
-		if(!documento.isPresent()) {
-			res.setMessage("El documento con id: "+idDocumento+" no existe en la BD");
+		if (!documento.isPresent()) {
+			res.setMessage("El documento con id: " + idDocumento + " no existe en la BD");
 			res.setStatus("fail");
 			return null;
 		}
 		return documento.get();
 	}
-	
 
 	public TabDocumentos storeTabDocumento(TabCatDestinoDocumento tipoDestino, TabCatTipoDocumento tipoDocumento,
 			TabCatPrioridad prioridad, String folioEspecial, TabExpedientes numExpediente, String asunto, String notas,
@@ -375,7 +412,7 @@ public class ServiceFirmar {
 			documento.setIdNumEmpleadoCreador(userInfo.getData().getEmpleado());
 			documento.setIdUsuarioCreador(userInfo.getData().getUser());
 			documento.setNumExpediente(numExpediente);
-			documento.setEnOrden(isEnOrden?1:0);
+			documento.setEnOrden(isEnOrden ? 1 : 0);
 			documento.setAsunto(asunto);
 			documento.setNotas(notas);
 			documento.setContenido(contenido);
