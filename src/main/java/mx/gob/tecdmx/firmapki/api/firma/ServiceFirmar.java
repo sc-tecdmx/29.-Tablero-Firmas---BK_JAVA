@@ -167,6 +167,16 @@ public class ServiceFirmar {
 		}
 		return false;
 	}
+	
+	public boolean validateFirmanteHaFirmado2(String hashDoc, InstEmpleado empleado, PkiCatFirmaAplicada firmaAplicada) {
+		Optional<PkiDocumentoFirmantes> faltantesFirmarArchivo = pkiDocumentoFirmantesRepository
+				.findByHashDocumentoAndIdNumEmpleadoAndIdFirmaAplicada(hashDoc,
+						empleado, firmaAplicada);
+		if (faltantesFirmarArchivo.isPresent()) {
+			return true;
+		}
+		return false;
+	}
 
 	public TabDocumentosAdjuntos storeDocumento(String escritorio, TabDocumentos documentoStored, String docBase64,
 			String fileType,

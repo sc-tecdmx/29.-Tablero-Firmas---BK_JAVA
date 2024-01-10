@@ -13,7 +13,7 @@ CREATE TABLE `tab_cat_destino_documento` (
 CREATE TABLE `tab_cat_tipo_documento` (
   `n_id_tipo_documento` int PRIMARY KEY AUTO_INCREMENT,
   `n_id_cat_area` int,
-  `desc_tipo_documento` varchar(50)
+  `desc_tipo_documento` varchar(200)
 );
 
 CREATE TABLE `tab_cat_prioridad` (

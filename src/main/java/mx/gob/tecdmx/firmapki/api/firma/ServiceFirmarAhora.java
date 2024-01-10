@@ -836,7 +836,7 @@ public class ServiceFirmarAhora {
 
 				TabDocsFirmantes currentFirmante = null;
 				for (TabDocsFirmantes firmante : firmantes) {
-					boolean haFirmado = serviceFirmar.validateFirmanteHaFirmado(firmante.getIntEmpleado(),
+					boolean haFirmado = serviceFirmar.validateFirmanteHaFirmado2(documentosAdjuntos.get(0).getDocumentoHash(), firmante.getIntEmpleado(),
 							firmaAplicada);
 					if (!haFirmado) {
 						currentFirmante = firmante;
