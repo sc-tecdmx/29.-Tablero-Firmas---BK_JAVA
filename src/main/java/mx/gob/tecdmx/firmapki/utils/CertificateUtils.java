@@ -1,21 +1,30 @@
 package mx.gob.tecdmx.firmapki.utils;
 
+import java.io.ByteArrayInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Date;
 
 import javax.xml.bind.DatatypeConverter;
 
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x500.style.BCStyle;
+
 import com.google.gson.Gson;
 
+import mx.gob.tecdmx.firmapki.api.populate.DTOIssuerSubjectData;
 import mx.gob.tecdmx.firmapki.entity.pki.PkiUsuariosCert;
 import mx.gob.tecdmx.firmapki.entity.pki.PkiX509AcAutorizadas;
 import mx.gob.tecdmx.firmapki.entity.pki.PkiX509Registrados;
@@ -147,5 +156,114 @@ public class CertificateUtils {
             fos.flush(); // Asegúrate de que todos los datos se escriban en el archivo.
         }
     }
+	
+	public InputStream stringBase64ToInputStream(String base64String) {
+
+        // Convierte la cadena Base64 a bytes
+        byte[] decodedBytes = Base64.getDecoder().decode(base64String);
+
+        // Crea un InputStream a partir de los bytes decodificados
+        try (InputStream inputStream = new ByteArrayInputStream(decodedBytes)) {
+            // Ahora puedes usar el inputStream según tus necesidades
+            // Por ejemplo, leer bytes del inputStream
+            int data;
+            while ((data = inputStream.read()) != -1) {
+                //System.out.print((char) data);
+            }
+            return inputStream;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+	}
+	
+	public String convertCertToDer(X509Certificate certificado) {
+		byte[] derEncoded;
+		try {
+			derEncoded = certificado.getEncoded();
+			String base64String = Base64.getEncoder().encodeToString(derEncoded);
+			return base64String;
+		} catch (CertificateEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public static X509Certificate convertBase64ToCert(String base64String) {
+		// Decodifica la cadena Base64 a bytes
+        byte[] derEncoded = Base64.getDecoder().decode(base64String);
+
+        // Obtiene la fábrica de certificados X.509
+        CertificateFactory certificateFactory;
+		try {
+			certificateFactory = CertificateFactory.getInstance("X.509");
+			// Crea un InputStream a partir de los bytes decodificados
+	        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(derEncoded)) {
+	            // Lee el certificado desde el InputStream
+	            return (X509Certificate) certificateFactory.generateCertificate(inputStream);
+	        } catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (java.security.cert.CertificateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        return null;
+    }
+	
+	public static InputStream convertCertToInputStream(X509Certificate certificado) {
+        try {
+            // Obtiene la representación en bytes del certificado
+            byte[] derEncoded = certificado.getEncoded();
+
+            // Crea un InputStream a partir de los bytes
+            return new ByteArrayInputStream(derEncoded);
+        } catch (CertificateEncodingException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+	
+	public DTOIssuerSubjectData extractDataX500Name(X500Name xname) {
+		DTOIssuerSubjectData subjectDataDTO = new DTOIssuerSubjectData();
+		
+        if(xname.getRDNs(BCStyle.UnstructuredName).length>=1) {
+        	subjectDataDTO.setResponsable((xname.getRDNs(BCStyle.UnstructuredName)[0].getFirst().getValue().toString()).replace("responsable:", "").trim());
+        }
+        if(xname.getRDNs(BCStyle.UNIQUE_IDENTIFIER).length>=1) {
+        	subjectDataDTO.setSerialnumberIssuer(xname.getRDNs(BCStyle.UNIQUE_IDENTIFIER)[0].getFirst().getValue().toString());
+        }
+        if(xname.getRDNs(BCStyle.L).length>=1) {
+        	subjectDataDTO.setIssuer_l(xname.getRDNs(BCStyle.L)[0].getFirst().getValue().toString());
+        }
+        if(xname.getRDNs(BCStyle.ST).length>=1) {
+        	subjectDataDTO.setIssuer_s(xname.getRDNs(BCStyle.ST)[0].getFirst().getValue().toString());
+        }
+        if(xname.getRDNs(BCStyle.C).length>=1) {
+        	subjectDataDTO.setIssuer_c(xname.getRDNs(BCStyle.C)[0].getFirst().getValue().toString());
+        }
+        if(xname.getRDNs(BCStyle.POSTAL_CODE).length>=1) {
+        	subjectDataDTO.setIssuer_postalcode(xname.getRDNs(BCStyle.POSTAL_CODE)[0].getFirst().getValue().toString());
+        }
+        if(xname.getRDNs(BCStyle.STREET).length>=1) {
+        	subjectDataDTO.setIssuer_street(xname.getRDNs(BCStyle.STREET)[0].getFirst().getValue().toString());
+        }
+        if(xname.getRDNs(BCStyle.EmailAddress).length>=1) {
+        	subjectDataDTO.setIssuer_e(xname.getRDNs(BCStyle.EmailAddress)[0].getFirst().getValue().toString());
+        }
+        if(xname.getRDNs(BCStyle.OU).length>=1) {
+        	subjectDataDTO.setIssuer_ou(xname.getRDNs(BCStyle.OU)[0].getFirst().getValue().toString());
+        }
+        if(xname.getRDNs(BCStyle.O).length>=1) {
+        	subjectDataDTO.setIssuer_o(xname.getRDNs(BCStyle.O)[0].getFirst().getValue().toString());
+        }
+        if(xname.getRDNs(BCStyle.CN).length>=1) {
+        	subjectDataDTO.setIssuer_cn(xname.getRDNs(BCStyle.CN)[0].getFirst().getValue().toString());
+        }
+        
+        return subjectDataDTO;
+	}
 
 }

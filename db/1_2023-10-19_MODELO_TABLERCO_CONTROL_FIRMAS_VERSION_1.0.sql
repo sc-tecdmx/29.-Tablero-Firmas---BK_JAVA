@@ -124,19 +124,19 @@ CREATE TABLE `tab_doc_config` (
 );
 
 CREATE TABLE `pki_x509_ac_autorizadas` (
-  `s_x509_emisor_serial` varchar(48) PRIMARY KEY,
+  `s_x509_emisor_serial` varchar(60) PRIMARY KEY,
   `s_x509_ac_der_b64` varchar(5125),
   `s_x509_emisor_autoridad` varchar(256),
   `s_tipo_certificado` varchar(10) COMMENT 'Tipo de certificado (OCSP, INTERMEDIO, RAIZ)',
   `s_url` varchar(255),
-  `s_x509_emisor_serial_parent` varchar(48)
+  `s_x509_emisor_serial_parent` varchar(60)
 );
 
 CREATE TABLE `pki_x509_registrados` (
-  `s_x509_serial_number` varchar(48) PRIMARY KEY,
+  `s_x509_serial_number` varchar(60) PRIMARY KEY,
   `s_x509_der_b64` varchar(5125),
   `s_x509_sha256_cert` varchar(64),
-  `s_x509_emisor_serial` varchar(48),
+  `s_x509_emisor_serial` varchar(60),
   `s_x509_subject` varchar(512),
   `s_x509_rfc` varchar(13),
   `s_x509_curp` varchar(18),
@@ -151,7 +151,7 @@ CREATE TABLE `pki_x509_registrados` (
 
 CREATE TABLE `pki_usuarios_cert` (
   `n_id_usuario_firma` int,
-  `s_x509_serial_number` varchar(48),
+  `s_x509_serial_number` varchar(60),
   `s_curp` varchar(20),
   `s_rfc` varchar(14),
   `s_sha256_registro` varchar(64),
@@ -161,7 +161,7 @@ CREATE TABLE `pki_usuarios_cert` (
 CREATE TABLE `pki_log_usuarios_cert` (
   `id_log_usuarios_cert` int PRIMARY KEY AUTO_INCREMENT,
   `s_curp` varchar(20),
-  `s_x509_serial_number` varchar(48),
+  `s_x509_serial_number` varchar(60),
   `s_bitacora` varchar(1024),
   `s_sha256_registro` varchar(64)
 );
@@ -169,7 +169,7 @@ CREATE TABLE `pki_log_usuarios_cert` (
 CREATE TABLE `pki_transaccion` (
   `n_id_transaccion` int PRIMARY KEY AUTO_INCREMENT,
   `s_request_uuid_filehash` varchar(32),
-  `s_x509_serial_number` varchar(48) NOT NULL,
+  `s_x509_serial_number` varchar(60) NOT NULL,
   `s_uuid_ocsp` varchar(36),
   `s_uuid_tsp` varchar(36),
   `s_cadena_firma` varchar(512),
@@ -234,10 +234,10 @@ CREATE TABLE `pki_cat_instruccion_doc` (
 
 CREATE TABLE `pki_x509_ocsp` (
   `s_uuid_ocsp` varchar(36) PRIMARY KEY,
-  `s_x509_serial_number` varchar(48),
+  `s_x509_serial_number` varchar(60),
   `s_ocsp_response_der_b64` varchar(4096),
   `s_ocsp_response_path` varchar(255),
-  `s_x509_serial_responder` varchar(48),
+  `s_x509_serial_responder` varchar(60),
   `d_fecha_response` datetime,
   `s_ocsp_indicador` varchar(8),
   `s_uuid_ocsp_block` varchar(36)
@@ -245,10 +245,10 @@ CREATE TABLE `pki_x509_ocsp` (
 
 CREATE TABLE `pki_x509_tsp` (
   `s_uuid_tsp` varchar(36) PRIMARY KEY,
-  `s_x509_serial_number` varchar(48),
+  `s_x509_serial_number` varchar(60),
   `s_tsp_response_der_b64` varchar(5125),
   `s_tsp_response_path` varchar(255),
-  `s_x509_serial_stamper` varchar(48),
+  `s_x509_serial_stamper` varchar(60),
   `d_fecha_response` datetime,
   `s_tsp_indicador` varchar(8),
   `s_uuid_tsp_block` varchar(36)

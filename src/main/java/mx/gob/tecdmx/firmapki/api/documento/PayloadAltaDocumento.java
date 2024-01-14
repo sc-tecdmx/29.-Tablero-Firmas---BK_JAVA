@@ -9,7 +9,7 @@ public class PayloadAltaDocumento {
 	String folioEspecial;
 	String numExpediente;
 	String tipoDestino;
-	String tipoDocumento;
+	Integer tipoDocumento;
 	String tipoPrioridad;
 	String asunto;
 	String notas;
@@ -41,10 +41,11 @@ public class PayloadAltaDocumento {
 	public void setTipoDestino(String tipoDestino) {
 		this.tipoDestino = tipoDestino;
 	}
-	public String getTipoDocumento() {
+	
+	public Integer getTipoDocumento() {
 		return tipoDocumento;
 	}
-	public void setTipoDocumento(String tipoDocumento) {
+	public void setTipoDocumento(Integer tipoDocumento) {
 		this.tipoDocumento = tipoDocumento;
 	}
 	public String getTipoPrioridad() {

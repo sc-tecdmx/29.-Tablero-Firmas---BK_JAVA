@@ -49,5 +49,16 @@ public class RestControllerPopulate {
 		x509Service.saveCertUser(certificate.getBytes(), serialnumber, res, userInfo);
 		return ResponseEntity.ok().header(null).body(res);
 	}
+	
+	@CrossOrigin()
+	@RequestMapping(method = RequestMethod.POST, path = "/agregar-certificado", produces = "application/json")
+	@ResponseBody
+	public ResponseEntity<DTOResponse> addCertificate(@RequestParam("certificado") MultipartFile certificate, String tipoCertificado, HttpServletResponse response, HttpServletRequest request) throws IOException {
+		DTOResponse res = new DTOResponse();
+		DTOResponseUserInfo userInfo = serviceSecurity.getUserInfo(request, res);
+		
+		x509Service.addCertificate(certificate.getBytes(), tipoCertificado, res, userInfo);
+		return ResponseEntity.ok().header(null).body(res);
+	}
 
 }

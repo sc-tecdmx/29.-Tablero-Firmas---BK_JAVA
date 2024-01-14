@@ -25,6 +25,9 @@ public class CertCA {
 	String nombreComunAutoridad;
 	String url;
 	
+	DTOIssuerSubjectData subjectData;
+	DTOIssuerSubjectData issuerData;
+	
 	public CertCA(String derBase64) {
 		super();
 		this.certificate =  convertDerToCert(derBase64);
@@ -55,14 +58,23 @@ public class CertCA {
 		this.certificate = certificate;
 	}
 	
+	
+	
 	public void filllData() {
+		CertificateUtils certUtils = new CertificateUtils();
+		
 		X500Name subjectDN = new X500Name(this.certificate.getSubjectX500Principal().getName());
+		X500Name issuerDN = new X500Name(this.certificate.getIssuerX500Principal().getName());
 		
 		//Se obtienen campos específicos del DN
         RDN nombreComun_CN = subjectDN.getRDNs(BCStyle.CN)[0];
         
-        this.serialnumber = this.certificate.getSerialNumber().toString();
-        CertificateUtils certUtils = new CertificateUtils();
+        
+        this.serialnumber = this.certificate.getSerialNumber().toString();        
+        this.subjectData = certUtils.extractDataX500Name(subjectDN);
+
+        this.issuerData = certUtils.extractDataX500Name(issuerDN);;
+        
         String cerBase64 = convertCertToDer(this.certificate);
         this.derBase64 = cerBase64;
         this.nombreComunAutoridad = nombreComun_CN.getFirst().getValue().toString();
@@ -156,4 +168,21 @@ public class CertCA {
 		this.url = url;
 	}
 
+	public DTOIssuerSubjectData getSubjectData() {
+		return subjectData;
+	}
+
+	public void setSubjectData(DTOIssuerSubjectData subjectData) {
+		this.subjectData = subjectData;
+	}
+
+	public DTOIssuerSubjectData getIssuerData() {
+		return issuerData;
+	}
+
+	public void setIssuerData(DTOIssuerSubjectData issuerData) {
+		this.issuerData = issuerData;
+	}
+	
+	
 }

@@ -1,11 +1,15 @@
 package mx.gob.tecdmx.firmapki.api.populate;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Base64;
 import java.util.Date;
+
+import javax.security.cert.CertificateException;
 
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -27,6 +31,7 @@ public class CertUser {
 	Date fechaRevocacion;
 	String nombreComun;
     String correoElectronico;
+    DTOIssuerSubjectData issuerData;
     
     
 	public CertUser(InputStream inpStream) {
@@ -57,8 +62,13 @@ public class CertUser {
 		X500Name subjectDN = new X500Name(this.certificate.getSubjectX500Principal().getName());
 		X500Name issuerDN = new X500Name(this.certificate.getIssuerX500Principal().getName());
 		
-		//Se obtiene la info requerida del issuer
-		RDN serialnumberIssuer = issuerDN.getRDNs()[1];
+
+        
+        RDN serialnumberIssuer = issuerDN.getRDNs()[1];
+        		
+        CertificateUtils certUtils = new CertificateUtils();
+		
+        this.issuerData = certUtils.extractDataX500Name(issuerDN);
 		
 		//Se obtienen campos específicos del DN
         RDN nombreComun_CN = subjectDN.getRDNs(BCStyle.CN)[0];
@@ -78,25 +88,13 @@ public class CertUser {
         this.fechaRegistro = fhRegistroDate;
         this.fechaRevocacion = fhRevocacionDate;
         
-        CertificateUtils certUtils = new CertificateUtils();
-        String cerBase64 = convertCertToDer(this.certificate);
+        String cerBase64 = certUtils.convertCertToDer(this.certificate);
         this.derBase64 = cerBase64;
         this.certSha256 = certUtils.calcularSHA256(cerBase64);
         this.emisorSerial = serialnumberIssuer.getFirst().getValue().toString();
 	}
 	
-	public String convertCertToDer(X509Certificate certificado) {
-		byte[] derEncoded;
-		try {
-			derEncoded = certificado.getEncoded();
-			String base64String = Base64.getEncoder().encodeToString(derEncoded);
-			return base64String;
-		} catch (CertificateEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-	}
+	
 	
 	public InputStream getInpStream() {
 		return inpStream;
@@ -193,4 +191,13 @@ public class CertUser {
 	public void setCorreoElectronico(String correoElectronico) {
 		this.correoElectronico = correoElectronico;
 	}
+
+	public DTOIssuerSubjectData getIssuerData() {
+		return issuerData;
+	}
+
+	public void setIssuerData(DTOIssuerSubjectData issuerData) {
+		this.issuerData = issuerData;
+	}
+	
 }

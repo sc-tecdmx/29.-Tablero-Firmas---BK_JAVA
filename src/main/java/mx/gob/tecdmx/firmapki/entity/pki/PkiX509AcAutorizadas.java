@@ -25,6 +25,9 @@ public class PkiX509AcAutorizadas {
 	
 	@Column(name = "s_url")
 	String  url;
+	
+	@Column(name = "s_x509_emisor_serial_parent", insertable = false, updatable = false)
+	String  idParent;
   
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="s_x509_emisor_serial_parent", referencedColumnName="s_x509_emisor_serial")  
@@ -78,6 +81,15 @@ public class PkiX509AcAutorizadas {
 		this.x509EmisorSerialParent = x509EmisorSerialParent;
 	}
 
+	public String getIdParent() {
+		return idParent;
+	}
+
+	public void setIdParent(String idParent) {
+		this.idParent = idParent;
+	}
+
+	
 	
 	
 }

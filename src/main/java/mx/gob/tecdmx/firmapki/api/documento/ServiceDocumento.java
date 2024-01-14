@@ -206,7 +206,7 @@ public class ServiceDocumento {
 
 		// Se buscan los catálogos que entran para verificar que existen
 		Optional<TabCatTipoDocumento> tipoDoc = tabCatTipoDocumentoRepository
-				.findByDescTipoDocumento(payload.getTipoDocumento());
+				.findById(payload.getTipoDocumento());
 		Optional<TabCatDestinoDocumento> tipoDest = tabCatDestinoDocumentoRepository
 				.findByDescDestinoDocumento(payload.getTipoDestino());
 		Optional<TabCatPrioridad> tipoPrioridad = tabCatPrioridadRepository
@@ -406,7 +406,7 @@ public class ServiceDocumento {
 
 		// Se buscan los catálogos que entran para verificar que existen
 		Optional<TabCatTipoDocumento> tipoDoc = tabCatTipoDocumentoRepository
-				.findByDescTipoDocumento(payload.getTipoDocumento());
+				.findById(payload.getTipoDocumento());
 		Optional<TabCatDestinoDocumento> tipoDest = tabCatDestinoDocumentoRepository
 				.findByDescDestinoDocumento(payload.getTipoDestino());
 		Optional<TabCatPrioridad> tipoPrioridad = tabCatPrioridadRepository
@@ -663,7 +663,7 @@ public class ServiceDocumento {
 
 		// Se buscan los catálogos que entran para verificar que existen
 		Optional<TabCatTipoDocumento> tipoDoc = tabCatTipoDocumentoRepository
-				.findByDescTipoDocumento(payload.getTipoDocumento());
+				.findById(payload.getTipoDocumento());
 		Optional<TabCatDestinoDocumento> tipoDest = tabCatDestinoDocumentoRepository
 				.findByDescDestinoDocumento(payload.getTipoDestino());
 		Optional<TabCatPrioridad> tipoPrioridad = tabCatPrioridadRepository

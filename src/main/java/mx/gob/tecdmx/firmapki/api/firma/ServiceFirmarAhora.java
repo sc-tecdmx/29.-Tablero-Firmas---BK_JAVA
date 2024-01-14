@@ -117,9 +117,12 @@ public class ServiceFirmarAhora {
 		return null;
 	}
 
-	public TabCatTipoDocumento findTipoDocumento(String tipoDoc, DAOAltaDocumento documentoAlta, DTOResponse res) {
-		if (tipoDoc != null) {
-			Optional<TabCatTipoDocumento> tipoDocOpt = tabCatTipoDocumentoRepository.findByDescTipoDocumento(tipoDoc);
+	public TabCatTipoDocumento findTipoDocumento(Integer tipoDoc, DAOAltaDocumento documentoAlta, DTOResponse res) {
+		if (tipoDoc >0) {
+			//Optional<TabCatTipoDocumento> tipoDocOpt = tabCatTipoDocumentoRepository.findByDescTipoDocumento(tipoDoc);
+			Optional<TabCatTipoDocumento> tipoDocOpt = tabCatTipoDocumentoRepository.findById(tipoDoc);
+			
+			
 			if (tipoDocOpt.isPresent()) {
 				documentoAlta.setTipoDoc(tipoDocOpt.get());
 				return tipoDocOpt.get();
@@ -200,7 +203,7 @@ public class ServiceFirmarAhora {
 		return firmaAplicada.get();
 	}
 
-	public boolean validateCatalogos(String numExpedienteInp, String tipoDocumentoInp, String tipoDestinoInp,
+	public boolean validateCatalogos(String numExpedienteInp, Integer tipoDocumentoInp, String tipoDestinoInp,
 			String tipoPrioridadInp, DAOAltaDocumento documentoAlta, DTOResponse res) {
 
 		TabExpedientes numExpediente = findNumExpediente(numExpedienteInp, documentoAlta, res);
