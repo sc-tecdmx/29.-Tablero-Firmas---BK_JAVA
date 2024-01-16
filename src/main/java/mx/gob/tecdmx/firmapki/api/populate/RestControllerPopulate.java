@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -53,11 +54,11 @@ public class RestControllerPopulate {
 	@CrossOrigin()
 	@RequestMapping(method = RequestMethod.POST, path = "/agregar-certificado", produces = "application/json")
 	@ResponseBody
-	public ResponseEntity<DTOResponse> addCertificate(@RequestParam("certificado") MultipartFile certificate, String tipoCertificado, HttpServletResponse response, HttpServletRequest request) throws IOException {
+	public ResponseEntity<DTOResponse> addCertificate(@RequestBody PayloadAgregarCertificado payload, HttpServletResponse response, HttpServletRequest request) throws IOException {
 		DTOResponse res = new DTOResponse();
 		DTOResponseUserInfo userInfo = serviceSecurity.getUserInfo(request, res);
 		
-		x509Service.addCertificate(certificate.getBytes(), tipoCertificado, res, userInfo);
+		x509Service.addCertificate(payload.getCertificate(), payload.getTipoCertificado(), res, userInfo);
 		return ResponseEntity.ok().header(null).body(res);
 	}
 
