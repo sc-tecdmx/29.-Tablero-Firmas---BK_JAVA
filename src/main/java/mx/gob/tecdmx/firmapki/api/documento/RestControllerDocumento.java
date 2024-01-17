@@ -173,4 +173,14 @@ public class RestControllerDocumento {
 		return ResponseEntity.ok().header(null).body(res);
 	}
 
+	@CrossOrigin()
+	@RequestMapping(method = RequestMethod.GET, path = "/numero-serie", produces = "application/json")
+	public ResponseEntity<DTOResponse> getNumeroSerieUser(HttpServletRequest request) {
+		DTOResponse res = new DTOResponse();
+		DTOResponseUserInfo userInfo = serviceSecurity.getUserInfo(request, res);
+		serviceDocumento.getUserSerial(userInfo, res);
+		return ResponseEntity.ok().header(null).body(res);
+	}
+
 }
+	

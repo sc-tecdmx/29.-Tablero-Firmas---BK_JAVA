@@ -22,6 +22,7 @@ import mx.gob.tecdmx.firmapki.entity.pki.PkiDocumento;
 import mx.gob.tecdmx.firmapki.entity.pki.PkiDocumentoDestino;
 import mx.gob.tecdmx.firmapki.entity.pki.PkiDocumentoFirmantes;
 import mx.gob.tecdmx.firmapki.entity.pki.PkiTransaccion;
+import mx.gob.tecdmx.firmapki.entity.pki.PkiUsuariosCert;
 import mx.gob.tecdmx.firmapki.entity.seg.SegOrgUsuarios;
 import mx.gob.tecdmx.firmapki.entity.tab.TabCatDestinoDocumento;
 import mx.gob.tecdmx.firmapki.entity.tab.TabCatDocConfig;
@@ -45,6 +46,7 @@ import mx.gob.tecdmx.firmapki.repository.pki.PkiDocumentoDestinoRepository;
 import mx.gob.tecdmx.firmapki.repository.pki.PkiDocumentoFirmantesRepository;
 import mx.gob.tecdmx.firmapki.repository.pki.PkiDocumentoRepository;
 import mx.gob.tecdmx.firmapki.repository.pki.PkiTransaccionRepository;
+import mx.gob.tecdmx.firmapki.repository.pki.PkiUsuariosCertRepository;
 import mx.gob.tecdmx.firmapki.repository.seg.SegOrgUsuariosRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabCatDestinoDocumentoRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabCatDocConfigRepository;
@@ -139,6 +141,9 @@ public class ServiceDocumento {
 	TabCatDocConfigRepository tabCatConfigDocumentoRepository;
 
 	@Autowired
+	PkiUsuariosCertRepository pkiUsuariosCertRepository;
+
+	@Autowired
 	ServiceFirma serviceFirma;
 
 	@Autowired
@@ -155,6 +160,23 @@ public class ServiceDocumento {
 
 	@Value("${firma.document.encryption}")
 	private String encryptionAlgorithm;
+
+	public DTOResponse getUserSerial(DTOResponseUserInfo userInfo, DTOResponse res) {
+		List<PkiUsuariosCert> pkiUsuariosCert = pkiUsuariosCertRepository.findByUsuario(userInfo.getData().getUser());
+		if(pkiUsuariosCert.size()>0) {
+			List<String> numSerieList = new ArrayList<String>();
+			for(PkiUsuariosCert pkiUC : pkiUsuariosCert) {
+				numSerieList.add(pkiUC.getX509SerialNumber());
+			}
+			res.setData(numSerieList);
+			res.setMessage("Se ha obtenido el número de serie de manera satisfactoria");
+			res.setStatus("Success");
+			return res;
+		}
+		res.setMessage("No se ha podido obtener el usuario y su número de serie");
+		res.setStatus("fail");
+		return res;
+	}
 
 	public boolean validateCatalogos(Optional<TabCatTipoDocumento> tipoDoc, Optional<TabCatDestinoDocumento> tipoDest,
 			Optional<TabCatPrioridad> tipoPrioridad, Optional<TabCatEtapaDocumento> etapaDoc, DTOResponse res) {
