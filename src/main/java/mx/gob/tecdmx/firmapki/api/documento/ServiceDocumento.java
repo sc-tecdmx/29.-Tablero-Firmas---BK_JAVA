@@ -162,7 +162,7 @@ public class ServiceDocumento {
 	private String encryptionAlgorithm;
 
 	public DTOResponse getUserSerial(DTOResponseUserInfo userInfo, DTOResponse res) {
-		List<PkiUsuariosCert> pkiUsuariosCert = pkiUsuariosCertRepository.findByUsuario(userInfo.getData().getUser());
+		List<PkiUsuariosCert> pkiUsuariosCert = pkiUsuariosCertRepository.findByIdUsuarioFirma(userInfo.getData().getIdUsuario());
 		if(pkiUsuariosCert.size()>0) {
 			List<String> numSerieList = new ArrayList<String>();
 			for(PkiUsuariosCert pkiUC : pkiUsuariosCert) {

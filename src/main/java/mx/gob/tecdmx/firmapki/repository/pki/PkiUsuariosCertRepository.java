@@ -13,5 +13,6 @@ import mx.gob.tecdmx.firmapki.entity.seg.SegOrgUsuarios;
 public interface PkiUsuariosCertRepository extends CrudRepository<PkiUsuariosCert, Integer> {
   Optional<PkiUsuariosCert> findByX509SerialNumber(String serialNumber);
   List<PkiUsuariosCert> findByUsuario(SegOrgUsuarios usuario);
+  List<PkiUsuariosCert> findByIdUsuarioFirma(Integer idUsuario);
 	
 }
