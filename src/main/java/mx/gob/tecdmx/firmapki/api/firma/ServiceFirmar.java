@@ -16,6 +16,7 @@ import mx.gob.tecdmx.firmapki.entity.pki.PkiCatTipoFirma;
 import mx.gob.tecdmx.firmapki.entity.pki.PkiDocumento;
 import mx.gob.tecdmx.firmapki.entity.pki.PkiDocumentoFirmantes;
 import mx.gob.tecdmx.firmapki.entity.seg.SegOrgUsuarios;
+import mx.gob.tecdmx.firmapki.entity.tab.IddocumentoIddocconfigID;
 import mx.gob.tecdmx.firmapki.entity.tab.TabCatDestinoDocumento;
 import mx.gob.tecdmx.firmapki.entity.tab.TabCatDocConfig;
 import mx.gob.tecdmx.firmapki.entity.tab.TabCatEtapaDocumento;
@@ -53,6 +54,9 @@ public class ServiceFirmar {
 
 	@Autowired
 	TabDocumentosRepository tabDocumentosRepository;
+	
+	@Autowired
+	TabDocConfigRepository tabDocConfigRepository;
 
 	@Autowired
 	TabCatDocConfigRepository tabCatConfigDocumentoRepository;
@@ -232,6 +236,32 @@ public class ServiceFirmar {
 		}
 
 	}
+	public TabDocumentosAdjuntos editedDocumento(int idDocumento, TabDocumentos documentoStored, String docBase64, String fileType,
+			Integer numDocumento, DTOResponse res) {
+		utils = new CertificateUtils();
+
+		String fecha = utils.formatDate(new Date());
+		String fileName = buildFileName(fecha, documentoStored.getIdTipoDocumento().getDescTipoDocumento(),
+				documentoStored.getId(), numDocumento);
+
+		try {
+			TabDocumentosAdjuntos docAdjunto = new TabDocumentosAdjuntos();
+			docAdjunto.setIdDocument(documentoStored);
+			docAdjunto.setDocumentoPath(documentPath + "/" + fileName);
+			docAdjunto.setDocumentoHash(utils.calcularSHA256(new String(docBase64)));
+			docAdjunto.setDocumentoFiletype(fileType);
+			docAdjunto.setFechaCarga(new Date());
+			docAdjunto.setDocumentoBase64(docBase64);
+
+			TabDocumentosAdjuntos docAdjuntoStored = tabDocumentosAdjuntosRepository.save(docAdjunto);
+			return docAdjuntoStored;
+		} catch (Exception e) {
+			res.setMessage(e.toString());
+			res.setStatus("fail");
+			return null;
+		}
+
+	}
 
 	public String getSequenceWorkflow(TabDocumentos documento, DTOResponse res) {
 		List<TabDocumentoWorkflow> listWorkflow = tabDocumentoWorkflowRepository
@@ -336,6 +366,7 @@ public class ServiceFirmar {
 		res.setStatus("fail");
 		return null;
 	}
+	
 
 	public PkiDocumento createPKIDocumento(String docBase64, InstEmpleado empleadoCreador,
 			InstEmpleado empleadoEnvio, Date fechaEnvio, Date fechaCreacion, String statusDocumento,
@@ -359,6 +390,19 @@ public class ServiceFirmar {
 			res.setStatus("fail");
 			return null;
 		}
+	}
+	
+	public boolean firmanteExistInPKIDocumentoFirmantes(String sha256, SegOrgUsuarios usuarioFirmante) {
+		
+		HashDocumentoIdUsuarioIdTransaccionID idCompuesta = new HashDocumentoIdUsuarioIdTransaccionID();
+		idCompuesta.setHashDocumento(sha256);
+		idCompuesta.setIdUsuario(usuarioFirmante.getnIdUsuario());
+		
+		Optional<PkiDocumentoFirmantes> docFirmanteExist =  pkiDocumentoFirmantesRepository.findById(idCompuesta);
+		if(docFirmanteExist.isPresent()) {
+			return true;
+		}
+		return false;
 	}
 
 	public PkiDocumentoFirmantes createPKIDocumentoFirmantes(String sha256, SegOrgUsuarios usuarioFirmante,
@@ -449,5 +493,35 @@ public class ServiceFirmar {
 		}
 
 	}
+	
+	public TabDocumentos editTabDocumento(TabDocumentos documento, TabCatDestinoDocumento tipoDestino, TabCatTipoDocumento tipoDocumento,
+			TabCatPrioridad prioridad, String folioEspecial, TabExpedientes numExpediente, String asunto, String notas,
+			String contenido, Date fechaLimiteFirma, boolean isEnOrden, DTOResponseUserInfo userInfo, DTOResponse res) {
+
+		try {
+			documento.setIdTipoDestino(tipoDestino);
+			documento.setIdTipoDocumento(tipoDocumento);
+			documento.setIdPrioridad(prioridad);
+
+			documento.setFolioEspecial(folioEspecial);
+			documento.setNumExpediente(numExpediente);
+			documento.setEnOrden(isEnOrden ? 1 : 0);
+			documento.setAsunto(asunto);
+			documento.setNotas(notas);
+			documento.setContenido(contenido);
+			documento.setFechaLimiteFirma(fechaLimiteFirma);
+			documento.setHashDocumento(null);// Quitar de la base de datos este campo
+
+			TabDocumentos documentoEdited = tabDocumentosRepository.save(documento);
+			
+			return documentoEdited;
+		} catch (Exception e) {
+			res.setMessage("" + e);
+			res.setStatus("fail");
+			return null;
+		}
+
+	}
+
 
 }

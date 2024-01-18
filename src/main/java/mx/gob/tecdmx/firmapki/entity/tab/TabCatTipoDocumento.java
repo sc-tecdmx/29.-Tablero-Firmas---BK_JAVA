@@ -20,7 +20,7 @@ public class TabCatTipoDocumento {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
 	@Column(name = "n_id_tipo_documento", unique = true, nullable = false)
-	int  id;
+	Integer id;
   
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="n_id_cat_area", referencedColumnName="n_id_cat_area")
@@ -33,7 +33,7 @@ public class TabCatTipoDocumento {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
