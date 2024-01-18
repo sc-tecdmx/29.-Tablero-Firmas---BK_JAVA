@@ -149,7 +149,7 @@ public class RestControllerDocumento {
 	}
 	
 	@CrossOrigin()
-	@RequestMapping(method = RequestMethod.PUT, path = "/editar-documento", produces = "application/json")
+	@RequestMapping(method = RequestMethod.PUT, path = "/editar-documento/{idDocumento}", produces = "application/json")
 	public ResponseEntity<DTOResponse> editarDocumento(@PathVariable("idDocumento") int idDocumento,
 			@RequestBody PayloadAltaDocumento payload,
 			HttpServletRequest request) {

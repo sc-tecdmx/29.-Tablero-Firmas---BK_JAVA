@@ -62,10 +62,10 @@ public class ServiceFirmarAhora {
 
 	@Autowired
 	TabExpedientesRepository tabExpedientesRepository;
-	
+
 	@Autowired
 	TabCatDocConfigRepository tabCatDocConfigRepository;
-	
+
 	@Autowired
 	TabDocConfigRepository tabConfigDocumentoRepository;
 
@@ -101,10 +101,10 @@ public class ServiceFirmarAhora {
 
 	@Autowired
 	TabDocumentosAdjuntosRepository tabDocumentosAdjuntosRepository;
-	
+
 	@Autowired
 	TabDocsFirmantesRepository tabDocsFirmantesRepository;
-	
+
 	@Autowired
 	TabDocDestinatariosRepository tabDocDestinatariosRepository;
 
@@ -556,27 +556,6 @@ public class ServiceFirmarAhora {
 		return true;
 	}
 
-	public boolean editedDocumentosAdjuntos(List<DTODocAdjunto> documentosAdjuntos,
-			TabDocumentos documentoStored, DTOResponse res, DTOResponseUserInfo userInfo) {
-		
-		//elimina primero los documentos existentes
-		List<TabDocumentosAdjuntos> docsExistentes = tabDocumentosAdjuntosRepository.findByIdDocument(documentoStored);
-		for (TabDocumentosAdjuntos docAdjunto : docsExistentes) {
-			tabDocumentosAdjuntosRepository.delete(docAdjunto);
-		}
-
-		Integer numDocumento = 1;
-		for (DTODocAdjunto docAdjuntoPayload : documentosAdjuntos) {
-			TabDocumentosAdjuntos docAdjuntoStored = serviceFirmar.storeDocumento(documentoStored,
-					docAdjuntoPayload.getDocBase64(), docAdjuntoPayload.getFileType(), numDocumento, res);
-			if (docAdjuntoStored == null) {
-				return false;
-			}
-			numDocumento++;
-		}
-		return true;
-	}
-
 	public boolean storePkiDocumento(List<TabDocumentosAdjuntos> documentosAdjuntos, String status, boolean isEnOrden,
 			InstEmpleado empleadoCreador, InstEmpleado empleadoEnvio, Date fechaCreacion, Date fechaEnvio,
 			DTOResponse res) {
@@ -601,7 +580,8 @@ public class ServiceFirmarAhora {
 				Optional<InstEmpleado> empleado = instEmpleadoRepository.findById(currentFirmante.getIdNumEmpleado());
 				SegOrgUsuarios usuario = empleado.get().getIdUsuario();
 				int idUsuario = usuario.getnIdUsuario();
-				if(!serviceFirmar.firmanteExistInPKIDocumentoFirmantes(docAdjunto.getDocumentoHash(), empleado.get().getIdUsuario())) {
+				if (!serviceFirmar.firmanteExistInPKIDocumentoFirmantes(docAdjunto.getDocumentoHash(),
+						empleado.get().getIdUsuario())) {
 					PkiDocumentoFirmantes documentoFirmantesStored = serviceFirmar.createPKIDocumentoFirmantes(
 							docAdjunto.getDocumentoHash(), empleado.get().getIdUsuario(), empleado.get(),
 							currentFirmante.getSecuencia(), documentoStored.getFechaLimiteFirma(), tipoFirma, res);
@@ -609,7 +589,7 @@ public class ServiceFirmarAhora {
 					if (documentoFirmantesStored == null) {
 						return false;
 					}
-				}				
+				}
 			}
 
 		}
@@ -649,14 +629,15 @@ public class ServiceFirmarAhora {
 		}
 		return true;
 	}
-	
+
 	public boolean editedFirmantes(TabDocumentos documentoStored, DAOAltaDocumento documentoAlta, DTOResponse res) {
-		
-		 List<TabDocsFirmantes> firmantesExistentes = tabDocsFirmantesRepository.findByIdDocumento(documentoStored.getId());
-		 for (TabDocsFirmantes firmante: firmantesExistentes) {
-			 tabDocsFirmantesRepository.delete(firmante);
-			}
-		
+
+		List<TabDocsFirmantes> firmantesExistentes = tabDocsFirmantesRepository
+				.findByIdDocumento(documentoStored.getId());
+		for (TabDocsFirmantes firmante : firmantesExistentes) {
+			tabDocsFirmantesRepository.delete(firmante);
+		}
+
 		Collections.sort(documentoAlta.getFirmantes(),
 				(o1, o2) -> Integer.compare(o1.getSecuencia(), o2.getSecuencia()));
 
@@ -683,14 +664,15 @@ public class ServiceFirmarAhora {
 		}
 		return true;
 	}
-	
+
 	public boolean editedDestinatarios(TabDocumentos documentoStored, DAOAltaDocumento documentoAlta, DTOResponse res) {
 
-		List<TabDocDestinatarios> destinatariosExistentes = tabDocDestinatariosRepository.findByIdDocumento(documentoStored.getId());
-		 for (TabDocDestinatarios destinatario: destinatariosExistentes) {
-			 tabDocDestinatariosRepository.delete(destinatario);
-			}
-		
+		List<TabDocDestinatarios> destinatariosExistentes = tabDocDestinatariosRepository
+				.findByIdDocumento(documentoStored.getId());
+		for (TabDocDestinatarios destinatario : destinatariosExistentes) {
+			tabDocDestinatariosRepository.delete(destinatario);
+		}
+
 		for (DAOFirmanteDestinatario destinatario : documentoAlta.getDestinatarios()) {
 
 			TabDocDestinatarios destinatarioStored = serviceFirmar.storeDestinatario(documentoStored,
@@ -869,11 +851,16 @@ public class ServiceFirmarAhora {
 			return false;
 		}
 
-		if (etapaSequence.equals(
-				EnumTabCatEtapaDocumento.CREADO.getOpcion()) || 
-				etapaSequence.equals(EnumTabCatEtapaDocumento.CREADO.getOpcion() + "-" + EnumTabCatEtapaDocumento.EN_FIRMA.getOpcion()) || 
-				etapaSequence.equals(EnumTabCatEtapaDocumento.CREADO.getOpcion() + "-" + EnumTabCatEtapaDocumento.ENVIADO.getOpcion() + "-" + EnumTabCatEtapaDocumento.EN_FIRMA.getOpcion()) || 
-				etapaSequence.equals(EnumTabCatEtapaDocumento.CREADO.getOpcion() + "-" + EnumTabCatEtapaDocumento.EN_FIRMA.getOpcion() + "-" + EnumTabCatEtapaDocumento.ENVIADO.getOpcion() + "-"+ EnumTabCatEtapaDocumento.EN_FIRMA.getOpcion())) {
+		if (etapaSequence.equals(EnumTabCatEtapaDocumento.CREADO.getOpcion())
+				|| etapaSequence.equals(EnumTabCatEtapaDocumento.CREADO.getOpcion() + "-"
+						+ EnumTabCatEtapaDocumento.EN_FIRMA.getOpcion())
+				|| etapaSequence.equals(
+						EnumTabCatEtapaDocumento.CREADO.getOpcion() + "-" + EnumTabCatEtapaDocumento.ENVIADO.getOpcion()
+								+ "-" + EnumTabCatEtapaDocumento.EN_FIRMA.getOpcion())
+				|| etapaSequence.equals(EnumTabCatEtapaDocumento.CREADO.getOpcion() + "-"
+						+ EnumTabCatEtapaDocumento.EN_FIRMA.getOpcion() + "-"
+						+ EnumTabCatEtapaDocumento.ENVIADO.getOpcion() + "-"
+						+ EnumTabCatEtapaDocumento.EN_FIRMA.getOpcion())) {
 			return true;
 		} else {
 			res.setMessage(
@@ -1378,17 +1365,18 @@ public class ServiceFirmarAhora {
 
 		return true;
 	}
-	
-	public boolean validateCatalogEditDocument(List<DTOConfiguracion> configuraciones, List<TabCatDocConfig> listConfig) {	
-		for(DTOConfiguracion configDTO : configuraciones) {
+
+	public boolean validateCatalogEditDocument(List<DTOConfiguracion> configuraciones,
+			List<TabCatDocConfig> listConfig) {
+		for (DTOConfiguracion configDTO : configuraciones) {
 			Optional<TabCatDocConfig> config = tabCatDocConfigRepository.findByAtributo(configDTO.getAtributo());
-			if(config.isPresent()) {
+			if (config.isPresent()) {
 				listConfig.add(config.get());
-			}else {
+			} else {
 				return false;
 			}
 		}
-		return true;	
+		return true;
 	}
 
 	public boolean editarDocumento(int idDocumento, PayloadAltaDocumento payload, DAOAltaDocumento documentoAlta,
@@ -1403,7 +1391,7 @@ public class ServiceFirmarAhora {
 			res.setData(payload);
 			return false;
 		}
-		
+
 		List<TabCatDocConfig> listConfig = new ArrayList<TabCatDocConfig>();
 		boolean validCatalog = validateCatalogEditDocument(payload.getConfiguraciones(), listConfig);
 
@@ -1413,23 +1401,29 @@ public class ServiceFirmarAhora {
 			res.setData(payload);
 			return false;
 		}
-		
+
 		List<TabDocConfig> tabDocConfList = tabConfigDocumentoRepository.findByIdDocumento(idDocumento);
-		for(TabDocConfig tabDocConf : tabDocConfList) {
+		for (TabDocConfig tabDocConf : tabDocConfList) {
 			tabConfigDocumentoRepository.delete(tabDocConf);
 		}
 
 		TabDocConfig docConfig = null;
-		for(TabCatDocConfig configCatalogo : listConfig) {
+		for (TabCatDocConfig configCatalogo : listConfig) {
 			docConfig = new TabDocConfig();
 			docConfig.setIdDocumento(idDocumento);
 			docConfig.setIdDocConfig(configCatalogo.getId());
 			tabConfigDocumentoRepository.save(docConfig);
 		}
-		
+
 		// Le asignamos los datos básicos
 		documentoAlta = new DAOAltaDocumento(payload.getFolioEspecial(), payload.getAsunto(), payload.getNotas(),
 				payload.getContenido(), payload.getFechaLimiteFirma(), payload.isEnOrden());
+
+		// Elimina primero los docs adjuntos existentes
+		List<TabDocumentosAdjuntos> docsExistentes = tabDocumentosAdjuntosRepository.findByIdDocument(documentExist.get());
+		for (TabDocumentosAdjuntos docAdjunto : docsExistentes) {
+			tabDocumentosAdjuntosRepository.delete(docAdjunto);
+		}
 
 		// valida los datos que sean correctos
 		boolean dataValid = validateDataModoCaptura(payload, documentoAlta, userInfo, res);
@@ -1447,9 +1441,8 @@ public class ServiceFirmarAhora {
 			return false;
 		}
 
-
-		boolean isDocAdjuntosStored = editedDocumentosAdjuntos(payload.getDocumentosAdjuntos(),
-				documentoEdited, res, userInfo);
+		boolean isDocAdjuntosStored = storeDocumentosAdjuntos(payload.getDocumentosAdjuntos(), documentoEdited, res,
+				userInfo);
 		if (!isDocAdjuntosStored) {
 			return false;
 		}
@@ -1477,6 +1470,7 @@ public class ServiceFirmarAhora {
 
 		res.setMessage("Se ha actualizado el documento satisfactoriamente");
 		res.setStatus("Success");
+		payload.setFolio(documentoEdited.getFolioDocumento());
 		res.setData(payload);
 
 		return true;
