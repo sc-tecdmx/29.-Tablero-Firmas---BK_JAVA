@@ -161,6 +161,7 @@ public class ServiceDocumento {
 	@Value("${firma.document.encryption}")
 	private String encryptionAlgorithm;
 
+	
 	public DTOResponse getUserSerial(DTOResponseUserInfo userInfo, DTOResponse res) {
 		List<PkiUsuariosCert> pkiUsuariosCert = pkiUsuariosCertRepository.findByUsuario(userInfo.getData().getUser());
 		if(pkiUsuariosCert.size()>0) {
@@ -1085,7 +1086,7 @@ public class ServiceDocumento {
 				.findById(idDocumentoFirmantes);
 		if (!docFirmantesPki.isPresent()) {
 			res.setData(null);
-			res.setStatus("Fail");
+			res.setStatus("fail");
 			res.setMessage("No puedes firmar este documento, ya que no te fue asignado para firmar");
 			return false;
 		}
@@ -1268,7 +1269,7 @@ public class ServiceDocumento {
 				}
 			} else {
 				res.setData(null);
-				res.setStatus("Fail");
+				res.setStatus("fail");
 				res.setMessage("La Accion del usuario no fué reconocida");
 
 				return res;
@@ -1402,13 +1403,13 @@ public class ServiceDocumento {
 
 			} else {
 				res.setData(null);
-				res.setStatus("Fail");
+				res.setStatus("fail");
 				res.setMessage("No puedes enviar este documento, ya que no eres quien lo creó");
 				return res;
 			}
 		}
 		res.setData(null);
-		res.setStatus("Fail");
+		res.setStatus("fail");
 		res.setMessage("No puedes enviar este documento, ya que no existe");
 		return res;
 		// TODO Auto-generated method stub
