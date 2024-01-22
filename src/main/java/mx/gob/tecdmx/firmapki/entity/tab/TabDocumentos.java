@@ -45,7 +45,7 @@ public class TabDocumentos {
 	String  folioEspecial;
   
 	@Column(name = "visible")
-	int  visible;
+	boolean  visible;
 
 	@Column(name = "creacion_documento_fecha")
 	Date  creacionDocumentoFecha;
@@ -221,13 +221,15 @@ public class TabDocumentos {
 		this.enOrden = enOrden;
 	}
 
-	public int isVisible() {
+	public boolean getVisible() {
 		return visible;
 	}
 
-	public void setVisible(int visible) {
+	public void setVisible(boolean visible) {
 		this.visible = visible;
 	}
+
+
 
 	
 }

@@ -1493,7 +1493,7 @@ public class ServiceFirmarAhora {
 					//verifica la etapa del documento 00''||
 					if(docWorkflowList.get(0).getIdEtapaDocumento().getDescetapa().equals(EnumTabCatEtapaDocumento.CREADO.getOpcion())) {
 						if	(documentExist.isPresent()) {
-							documentExist.get().setVisible(0);
+							documentExist.get().setVisible(false);
 							tabDocumentoRepository.save(documentExist.get());
 							res.setMessage("Se ha eliminado el documento");
 							res.setStatus("Success");

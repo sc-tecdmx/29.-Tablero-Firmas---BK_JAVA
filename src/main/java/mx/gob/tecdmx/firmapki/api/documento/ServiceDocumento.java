@@ -258,7 +258,7 @@ public class ServiceDocumento {
 		documento.setCreacionDocumentoFecha(new Date());
 		documento.setIdNumEmpleadoCreador(empleado.get());
 		documento.setIdUsuarioCreador(usuario.get());
-		documento.setVisible(1);
+		documento.setVisible(true);
 		if (numExpediente != null) {
 			documento.setNumExpediente(numExpediente.get());
 		}
