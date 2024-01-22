@@ -472,6 +472,7 @@ public class ServiceFirmar {
 			documento.setContenido(contenido);
 			documento.setFechaLimiteFirma(fechaLimiteFirma);
 			documento.setHashDocumento(null);// Quitar de la base de datos este campo
+			documento.setVisible(1);
 			Optional<TabDocumentos> docChain = tabDocumentosRepository.findTopByOrderByIdDesc();
 
 			TabDocumentos documentoStored = null;
