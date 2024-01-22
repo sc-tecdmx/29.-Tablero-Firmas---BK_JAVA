@@ -49,6 +49,7 @@ import mx.gob.tecdmx.firmapki.repository.tab.TabCatTipoDocumentoRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabDocConfigRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabDocDestinatariosRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabDocsFirmantesRepository;
+import mx.gob.tecdmx.firmapki.repository.tab.TabDocumentoWorkflowRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabDocumentosAdjuntosRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabDocumentosRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabExpedientesRepository;
@@ -107,6 +108,9 @@ public class ServiceFirmarAhora {
 
 	@Autowired
 	TabDocDestinatariosRepository tabDocDestinatariosRepository;
+	
+	@Autowired
+	TabDocumentoWorkflowRepository  tabDocumentoWorkflowRepository;
 
 	@Autowired
 	ServiceFirmar serviceFirmar;
@@ -1419,12 +1423,15 @@ public class ServiceFirmarAhora {
 		documentoAlta = new DAOAltaDocumento(payload.getFolioEspecial(), payload.getAsunto(), payload.getNotas(),
 				payload.getContenido(), payload.getFechaLimiteFirma(), payload.isEnOrden());
 
-		// Elimina primero los docs adjuntos existentes
-		List<TabDocumentosAdjuntos> docsExistentes = tabDocumentosAdjuntosRepository.findByIdDocument(documentExist.get());
-		for (TabDocumentosAdjuntos docAdjunto : docsExistentes) {
-			tabDocumentosAdjuntosRepository.delete(docAdjunto);
+		List<TabDocumentoWorkflow> docWorkflowList = tabDocumentoWorkflowRepository.findByIdDocumentOrderByWorkflowFecha(documentExist.get());
+		if(docWorkflowList.get(0).getIdEtapaDocumento().getDescetapa().equals(EnumTabCatEtapaDocumento.CREADO.getOpcion())) {
+			// Elimina primero los docs adjuntos existentes solo para cuando se encuentre en etapa creado// esto no lo hace para docs cargados en app de escritorio
+			List<TabDocumentosAdjuntos> docsExistentes = tabDocumentosAdjuntosRepository.findByIdDocument(documentExist.get());
+			for (TabDocumentosAdjuntos docAdjunto : docsExistentes) {
+				tabDocumentosAdjuntosRepository.delete(docAdjunto);
+			}
 		}
-
+		
 		// valida los datos que sean correctos
 		boolean dataValid = validateDataModoCaptura(payload, documentoAlta, userInfo, res);
 		if (!dataValid) {
@@ -1440,13 +1447,15 @@ public class ServiceFirmarAhora {
 		if (documentoEdited == null) {
 			return false;
 		}
-
-		boolean isDocAdjuntosStored = storeDocumentosAdjuntos(payload.getDocumentosAdjuntos(), documentoEdited, res,
-				userInfo);
-		if (!isDocAdjuntosStored) {
-			return false;
+		//esto no lo hace para docs cargados en app de escritorio
+		if(docWorkflowList.get(0).getIdEtapaDocumento().getDescetapa().equals(EnumTabCatEtapaDocumento.CREADO.getOpcion())) {
+			boolean isDocAdjuntosStored = storeDocumentosAdjuntos(payload.getDocumentosAdjuntos(), documentoEdited, res,
+					userInfo);
+			if (!isDocAdjuntosStored) {
+				return false;
+			}
 		}
-
+		
 		boolean isfirmantesStored = editedFirmantes(documentoEdited, documentoAlta, res);
 		if (!isfirmantesStored) {
 			return false;
@@ -1474,6 +1483,33 @@ public class ServiceFirmarAhora {
 		res.setData(payload);
 
 		return true;
+	}
+
+	public DTOResponse eliminarDocumento(int idDocumento, DTOResponse res, DTOResponseUserInfo userInfo) {
+		// busca el documento a eliminar
+				Optional<TabDocumentos> documentExist = tabDocumentoRepository.findById(idDocumento);
+				if(userInfo.getData().getIdEmpleado()==(documentExist.get().getIdNumEmpleadoCreador().getId())) {
+					List<TabDocumentoWorkflow> docWorkflowList = tabDocumentoWorkflowRepository.findByIdDocumentOrderByWorkflowFecha(documentExist.get());
+					//verifica la etapa del documento 00''||
+					if(docWorkflowList.get(0).getIdEtapaDocumento().getDescetapa().equals(EnumTabCatEtapaDocumento.CREADO.getOpcion())) {
+						if	(documentExist.isPresent()) {
+							documentExist.get().setVisible(0);
+							tabDocumentoRepository.save(documentExist.get());
+							res.setMessage("Se ha eliminado el documento");
+							res.setStatus("Success");
+							return res;
+						}
+						res.setMessage("No se pudo realizar la operación");
+						res.setStatus("fail");
+						return res;
+						
+					}
+					
+				}
+				res.setMessage("No cuentas con permisos para realizar la operación");
+				res.setStatus("fail");
+				return res;
+		
 	}
 
 }

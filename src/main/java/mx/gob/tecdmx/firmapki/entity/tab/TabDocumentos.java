@@ -44,6 +44,9 @@ public class TabDocumentos {
 	@Column(name = "folio_especial")
 	String  folioEspecial;
   
+	@Column(name = "visible")
+	int  visible;
+
 	@Column(name = "creacion_documento_fecha")
 	Date  creacionDocumentoFecha;
   
@@ -113,8 +116,6 @@ public class TabDocumentos {
 	public void setIdTipoDocumento(TabCatTipoDocumento idTipoDocumento) {
 		this.idTipoDocumento = idTipoDocumento;
 	}
-
-	
 
 	public Integer getFolioDocumento() {
 		return folioDocumento;
@@ -218,6 +219,14 @@ public class TabDocumentos {
 
 	public void setEnOrden(int enOrden) {
 		this.enOrden = enOrden;
+	}
+
+	public int isVisible() {
+		return visible;
+	}
+
+	public void setVisible(int visible) {
+		this.visible = visible;
 	}
 
 	

@@ -11,4 +11,5 @@ import org.springframework.data.domain.Sort;
 @Repository
 public interface VistaTableroRepository  extends CrudRepository<VistaTablero, IddocumentoTipoID> {
 	List<VistaTablero> findByNumEmpleado(int idEmpleado, Sort sort);
+	List<VistaTablero> findByNumEmpleadoAndVisible(int idEmpleado,int visible, Sort sort);
 }

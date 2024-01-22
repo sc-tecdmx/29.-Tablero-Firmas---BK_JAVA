@@ -4,6 +4,7 @@ SELECT
     d.n_id_documento,
     d.folio_documento,
     d.n_id_prioridad,
+    d.visible,
     d.creacion_documento_fecha,
     d.s_asunto,
     w.ult_actualizacion,
@@ -30,6 +31,7 @@ SELECT
     d.n_id_documento,
     d.folio_documento,
     d.n_id_prioridad,
+    d.visible,
     d.creacion_documento_fecha,
     d.s_asunto,
     w.ult_actualizacion,
@@ -50,6 +52,7 @@ SELECT
     d.n_id_documento,
     d.folio_documento,
     d.n_id_prioridad,
+    d.visible,
     d.creacion_documento_fecha,
     d.s_asunto,
     w.ult_actualizacion,
@@ -69,7 +72,7 @@ ORDER BY n_id_documento, empleado_id;
 
 CREATE VIEW vista_tablero AS
 SELECT DISTINCT 
-	v1.n_id_documento, folio_documento, tced.s_desc_etapa, tcp.desc_prioridad as prioridad, creacion_documento_fecha, 
+	v1.n_id_documento, v1.visible, folio_documento, tced.s_desc_etapa, tcp.desc_prioridad as prioridad, creacion_documento_fecha, 
 	s_asunto, empleado_id as num_empleado, rol as tipo, ult_actualizacion, tdf.n_id_inst_firmante as n_id_inst
 FROM db_mappings.vista_part1 v1
 JOIN tab_cat_etapa_documento tced on tced.id_etapa_documento = v1.id_etapa_documento 
@@ -84,4 +87,4 @@ WHERE NOT (
         WHERE docadjuntosTAB.id_document = v1.n_id_documento
           AND docfirmantesPKI.n_id_num_empleado = v1.empleado_id
     )
-);
+) AND v1.visible = 1;

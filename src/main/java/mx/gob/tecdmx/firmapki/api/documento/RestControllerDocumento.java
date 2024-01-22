@@ -165,6 +165,18 @@ public class RestControllerDocumento {
 		}
 		return ResponseEntity.ok().header(null).body(res);
 	}
+	
+	@CrossOrigin()
+	@RequestMapping(method = RequestMethod.DELETE, path = "/eliminar-documento/{idDocumento}", produces = "application/json")
+	public ResponseEntity<DTOResponse> editarDocumento(@PathVariable("idDocumento") int idDocumento,HttpServletRequest request) {
+		DTOResponse res = new DTOResponse();
+		DTOResponseUserInfo userInfo = serviceSecurity.getUserInfo(request, res);
+		if (userInfo == null) { 
+			return ResponseEntity.ok().header(null).body(res);
+		}
+		serviceFirmarAhora.eliminarDocumento(idDocumento, res, userInfo);
+		return ResponseEntity.ok().header(null).body(res);
+	}
 
 	@CrossOrigin()
 	@RequestMapping(method = RequestMethod.POST, path = "/alta-documento", produces = "application/json")

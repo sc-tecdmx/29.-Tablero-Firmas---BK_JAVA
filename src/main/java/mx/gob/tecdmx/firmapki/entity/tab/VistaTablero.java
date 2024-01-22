@@ -39,6 +39,9 @@ public class VistaTablero {
 	@Column(name = "num_empleado")
 	private int numEmpleado;
 	
+	@Column(name = "visible")
+	private int visible;
+	
 	@Column(name = "n_id_inst")
 	private int idInstruccion;
 
@@ -112,6 +115,14 @@ public class VistaTablero {
 
 	public void setIdInstruccion(int idInstruccion) {
 		this.idInstruccion = idInstruccion;
+	}
+
+	public int getVisible() {
+		return visible;
+	}
+
+	public void setVisible(int visible) {
+		this.visible = visible;
 	}
 
 	
