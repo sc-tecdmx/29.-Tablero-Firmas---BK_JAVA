@@ -59,7 +59,8 @@ CREATE TABLE `tab_documentos` (
   `s_notas` varchar(1000),
   `s_contenido` varchar(2048),
   `d_fecha_limite_firma` datetime,
-  `s_hash_documento` varchar(64) /*Debería eliminarse este registro*/
+  `s_hash_documento` varchar(64), /*Debería eliminarse este registro*/
+  `visible` tinyint(1) NOT NULL DEFAULT '1'
 );
 
 CREATE TABLE `tab_documentos_adjuntos` (
@@ -308,7 +309,8 @@ CREATE TABLE `inst_empleado_puesto` (
   `n_id_cat_area` int,
   `n_id_puesto` int,
   `fecha_alta` date,
-  `fecha_conclusion` date
+  `fecha_conclusion` date,
+  `activo` tinyint(1) NOT NULL DEFAULT '1',
 );
 
 CREATE TABLE `inst_empleado` (
@@ -324,7 +326,8 @@ CREATE TABLE `inst_empleado` (
   `curp` varchar(18),
   `rfc` varchar(13),
   `path_fotografia` varchar(256),
-  `n_id_usuario` int
+  `n_id_usuario` int,
+  `activo` tinyint(1) NOT NULL DEFAULT '1',
 );
 
 CREATE TABLE `inst_log_empleado` (

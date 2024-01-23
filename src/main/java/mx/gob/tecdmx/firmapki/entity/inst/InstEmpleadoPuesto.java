@@ -40,6 +40,9 @@ public class InstEmpleadoPuesto {
   
 	@Column(name = "fecha_conclusion")
 	Date  fechaConclusion;
+	
+	@Column(name = "activo")
+	boolean  activo;
 
 	public int getId() {
 		return id;
@@ -89,6 +92,12 @@ public class InstEmpleadoPuesto {
 		this.fechaConclusion = fechaConclusion;
 	}
 
-	
+	public boolean isActivo() {
+		return activo;
+	}
+
+	public void setActivo(boolean activo) {
+		this.activo = activo;
+	}
 	
 }

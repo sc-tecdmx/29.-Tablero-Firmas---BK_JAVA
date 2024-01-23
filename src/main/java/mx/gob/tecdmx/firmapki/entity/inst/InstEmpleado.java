@@ -47,6 +47,9 @@ public class InstEmpleado {
   
 	@Column(name = "rfc")
 	String  rfc;
+	
+	@Column(name = "activo")
+	boolean  activo;
   
 	@Column(name = "path_fotografia")
 	String  pathFotografia;
@@ -162,7 +165,13 @@ public class InstEmpleado {
 	public void setIdUsuario(SegOrgUsuarios idUsuario) {
 		this.idUsuario = idUsuario;
 	}
-	
-	
+
+	public boolean isActivo() {
+		return activo;
+	}
+
+	public void setActivo(boolean activo) {
+		this.activo = activo;
+	}
 
 }
