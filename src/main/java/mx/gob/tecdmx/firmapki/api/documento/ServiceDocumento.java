@@ -1248,6 +1248,7 @@ public class ServiceDocumento {
 					docFirmantes.get().setCadenaFirma(null);
 					docFirmantes.get().setFechaFirma(new Date());
 					docFirmantes.get().setIdFirmaAplicada(firmaAplicada.get());
+					docFirmantes.get().setDescripcion(payload.getDescripcion());
 					pkiDocumentoFirmantesRepository.save(docFirmantes.get());
 
 				}
@@ -1265,6 +1266,7 @@ public class ServiceDocumento {
 					// actualiza el registro del destinatario con el rechazo de la firma
 					docDestinos.get().setFechaLectura(new Date());
 					docDestinos.get().setIdFirmaAplicada(firmaAplicada.get());
+					docDestinos.get().setDescripcion(payload.getDescripcion());
 					pkiDocumentoDestRepository.save(docDestinos.get());
 
 				}

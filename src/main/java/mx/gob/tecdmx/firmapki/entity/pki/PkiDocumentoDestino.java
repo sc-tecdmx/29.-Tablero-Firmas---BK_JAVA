@@ -45,6 +45,9 @@ public class PkiDocumentoDestino {
   
 	@Column(name = "fecha_acuse")
 	Date  fechaAcuse;
+	
+	@Column(name="s_descripcion")  
+	String descripcion;
   
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="id_firma_aplicada", referencedColumnName="id_firma_aplicada")
@@ -145,5 +148,14 @@ public class PkiDocumentoDestino {
 	public void setUsuario(SegOrgUsuarios usuario) {
 		this.usuario = usuario;
 	}
+
+	public String getDescripcion() {
+		return descripcion;
+	}
+
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
+	}
+	
 	
 }

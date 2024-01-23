@@ -4,6 +4,7 @@ public class PayloadRechazarDocumento {
 	int idDocumento;
     String codigoFirmaAplicada;
     String tipoUsuario;
+    String descripcion;
   
 	public int getIdDocumento() {
 		return idDocumento;
@@ -23,7 +24,10 @@ public class PayloadRechazarDocumento {
 	public void setTipoUsuario(String tipoUsuario) {
 		this.tipoUsuario = tipoUsuario;
 	}
-	
-    
-    
+	public String getDescripcion() {
+		return descripcion;
+	}
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
+	}
 }

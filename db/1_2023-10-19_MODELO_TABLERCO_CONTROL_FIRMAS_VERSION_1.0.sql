@@ -202,6 +202,7 @@ CREATE TABLE `pki_documento_firmantes` (
   `id_tipo_firma` int,
   `id_firma_aplicada` int,
   `s_cadena_firma` varchar(1000) COMMENT 'Greys, confirmar para que se requiere este campo',
+  `s_descripcion` varchar(1000) DEFAULT NULL,
   PRIMARY KEY (`s_hash_documento`, `n_id_usuario`)
 );
 
@@ -225,6 +226,7 @@ CREATE TABLE `pki_documento_destinos` (
   `fecha_lectura` datetime,
   `fecha_acuse` datetime,
   `id_firma_aplicada` int,
+  `s_descripcion` varchar(1000) DEFAULT NULL,
   PRIMARY KEY (`s_hash_documento`, `n_id_usuario`, `n_id_transaccion`)
 );
 
