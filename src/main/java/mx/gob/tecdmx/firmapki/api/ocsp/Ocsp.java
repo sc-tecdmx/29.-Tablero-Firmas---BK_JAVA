@@ -143,7 +143,7 @@ public class Ocsp {
 
 				if (certStatus instanceof RevokedStatus) {
 					RevokedStatus revokedStatus = (RevokedStatus) certStatus;
-					this.message = "(REVOKED) - Reason: " + revokedStatus.getRevocationReason()+" Date: " + revokedStatus.getRevocationTime();
+					this.message = "El certificado está revocado (REVOKED)";
 					this.indicador = "REVOKED";
 					throw new OcspValidationException(revokedStatus.getRevocationReason(),
 							revokedStatus.getRevocationTime());
