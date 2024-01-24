@@ -375,20 +375,23 @@ public class ServiceFirmar {
 	public TabDocConfig storeTabDocConfig(List<mx.gob.tecdmx.firmapki.api.documento.DTOConfiguracion> list,
 			TabDocumentos documentoStored, DTOResponse res) {
 		TabDocConfig docConfig = new TabDocConfig();
+		TabDocConfig docConfigStored = null;
 		if (list.size() > 0) {
 			for (mx.gob.tecdmx.firmapki.api.documento.DTOConfiguracion configIndex : list) {
-				if (!configIndex.isConfig()) {
+				if (configIndex.isConfig()) {
 					Optional<TabCatDocConfig> configExist = tabCatConfigDocumentoRepository
 							.findByAtributo(configIndex.getAtributo());
 					if (configExist.isPresent()) {
 						docConfig.setIdDocumento(documentoStored.getId());
 						docConfig.setIdDocConfig(configExist.get().getId());
 						// guarda en la tabla de relacion doc y config
-						TabDocConfig docConfigStored = tabConfigDocumentoRepository.save(docConfig);
-						return docConfigStored;
+						
+						docConfigStored = tabConfigDocumentoRepository.save(docConfig);
+						
 					}
 				}
 			}
+			return docConfigStored;
 		}
 
 		res.setMessage("No se pudo guardar la configuración");
