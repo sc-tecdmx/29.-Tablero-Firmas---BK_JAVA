@@ -399,6 +399,13 @@ public class ServiceDocumento {
 	public DTOResponse altaDocumentoFirmarAhora(PayloadAltaDocumento payload, DTOResponse res,
 			DTOResponseUserInfo userInfo) {
 		CertificateUtils utils = new CertificateUtils();
+		
+		for (DTOConfiguracion config : payload.getConfiguraciones()) {
+			if (config.getAtributo().equals("FIRM")) {
+				payload.setEnOrden(config.isConfig());
+				break;
+			}
+		}
 		Optional<InstEmpleado> empleado = instEmpleadoRepository.findById(userInfo.getData().getIdEmpleado());
 		if (!empleado.isPresent()) {
 			res.setMessage("No se puede encontrar el empleado");
@@ -656,6 +663,14 @@ public class ServiceDocumento {
 
 	public DTOResponse altaDocumento(PayloadAltaDocumento payload, DTOResponse res, DTOResponseUserInfo userInfo) {
 		CertificateUtils utils = new CertificateUtils();
+		
+		for (DTOConfiguracion config : payload.getConfiguraciones()) {
+			if (config.getAtributo().equals("FIRM")) {
+				payload.setEnOrden(config.isConfig());
+				break;
+			}
+		}
+		
 		Optional<SegOrgUsuarios> usuario = segOrgUsuariosRepository.findById(userInfo.getData().getIdUsuario());
 		if (!usuario.isPresent()) {
 			res.setMessage("No se puede encontrar el usuario");

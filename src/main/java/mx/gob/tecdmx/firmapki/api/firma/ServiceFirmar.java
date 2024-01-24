@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.google.gson.Gson;
+
 import mx.gob.tecdmx.firmapki.DTOResponseUserInfo;
 import mx.gob.tecdmx.firmapki.entity.inst.InstEmpleado;
 import mx.gob.tecdmx.firmapki.entity.pki.HashDocumentoIdUsuarioIdTransaccionID;
@@ -41,7 +43,9 @@ import mx.gob.tecdmx.firmapki.repository.tab.TabDocumentoWorkflowRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabDocumentosAdjuntosRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabDocumentosRepository;
 import mx.gob.tecdmx.firmapki.utils.CertificateUtils;
+import mx.gob.tecdmx.firmapki.utils.DTOPayloadNotificacionesEmail;
 import mx.gob.tecdmx.firmapki.utils.DTOResponse;
+import mx.gob.tecdmx.firmapki.utils.RestClient;
 
 @Service
 public class ServiceFirmar {
@@ -84,6 +88,9 @@ public class ServiceFirmar {
 
 	@Value("${firma.document.pdf.path}")
 	private String documentPath;
+	
+	@Value("${firma.url.notificacion}")
+	private String sendNotificacionUrl;
 
 	CertificateUtils utils = null;
 
@@ -180,6 +187,28 @@ public class ServiceFirmar {
 			return true;
 		}
 		return false;
+	}
+	
+	public boolean enviarNotificacionFirmante(InstEmpleado empleado) {
+		RestClient restClient = new RestClient();
+		DTOPayloadNotificacionesEmail notificaciones = null;
+		
+		notificaciones = new DTOPayloadNotificacionesEmail();
+		if (empleado.getEmailInst() != null) {
+			notificaciones.setEmailDestino(empleado.getEmailInst());
+
+		} else if (empleado.getEmailPers() != null) {
+			notificaciones.setEmailDestino(empleado.getEmailPers());
+		}
+		notificaciones.setAsunto("Nuevo documento para firmar");
+		notificaciones.setTexto("Haz recibido un nuevo documento para firmar, favor de revisar tu perfil en Tablero de Firmas Electrónicas");
+
+		Gson gson = new Gson();
+		String json = gson.toJson(notificaciones);
+		String respPost = restClient.sendPostRequestForNotificacionesEmail(sendNotificacionUrl, json);
+
+		return true;
+		
 	}
 
 	public TabDocumentosAdjuntos storeDocumento(String escritorio, TabDocumentos documentoStored, String docBase64,

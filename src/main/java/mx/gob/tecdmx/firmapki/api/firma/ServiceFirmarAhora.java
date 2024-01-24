@@ -9,7 +9,10 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import com.google.gson.Gson;
 
 import mx.gob.tecdmx.firmapki.DTOResponseUserInfo;
 import mx.gob.tecdmx.firmapki.api.documento.DTOConfiguracion;
@@ -53,7 +56,9 @@ import mx.gob.tecdmx.firmapki.repository.tab.TabDocumentoWorkflowRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabDocumentosAdjuntosRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabDocumentosRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabExpedientesRepository;
+import mx.gob.tecdmx.firmapki.utils.DTOPayloadNotificacionesEmail;
 import mx.gob.tecdmx.firmapki.utils.DTOResponse;
+import mx.gob.tecdmx.firmapki.utils.RestClient;
 import mx.gob.tecdmx.firmapki.utils.enums.EnumPkiCatFirmaAplicada;
 import mx.gob.tecdmx.firmapki.utils.enums.EnumPkiCatTipoFirma;
 import mx.gob.tecdmx.firmapki.utils.enums.EnumTabCatEtapaDocumento;
@@ -108,12 +113,15 @@ public class ServiceFirmarAhora {
 
 	@Autowired
 	TabDocDestinatariosRepository tabDocDestinatariosRepository;
-	
+
 	@Autowired
-	TabDocumentoWorkflowRepository  tabDocumentoWorkflowRepository;
+	TabDocumentoWorkflowRepository tabDocumentoWorkflowRepository;
 
 	@Autowired
 	ServiceFirmar serviceFirmar;
+
+	@Value("${firma.url.notificacion}")
+	private String sendNotificacionUrl;
 
 	public TabCatEtapaDocumento findEtapaDocumento(String etapa, DTOResponse res) {
 		Optional<TabCatEtapaDocumento> etapaDoc = tabCatEtapaDocumentoRepository.findByDescetapa(etapa);
@@ -310,6 +318,7 @@ public class ServiceFirmarAhora {
 
 	public boolean validateOrdenAndSecuenciaFirmantesModoCaptura(PayloadAltaDocumento payload,
 			DAOAltaDocumento documentoAlta, DTOResponseUserInfo userInfo, DTOResponse res) {
+
 		if (payload.isEnOrden()) {
 			// Ordenamos la lista conforme a la secuencia dada por el usuario
 			Collections.sort(payload.getFirmantes(), (o1, o2) -> Integer.compare(o1.getSecuencia(), o2.getSecuencia()));
@@ -579,9 +588,13 @@ public class ServiceFirmarAhora {
 	public boolean storePkiDocumentoFirmantes(List<TabDocumentosAdjuntos> documentosAdjuntos,
 			TabDocumentos documentoStored, PkiCatTipoFirma tipoFirma, List<TabDocsFirmantes> firmantes,
 			DTOResponse res) {
+		Optional<InstEmpleado> empleado = null;
+		RestClient restClient = new RestClient();
+		DTOPayloadNotificacionesEmail notificaciones = null;
+
 		for (TabDocumentosAdjuntos docAdjunto : documentosAdjuntos) {
 			for (TabDocsFirmantes currentFirmante : firmantes) {
-				Optional<InstEmpleado> empleado = instEmpleadoRepository.findById(currentFirmante.getIdNumEmpleado());
+				empleado = instEmpleadoRepository.findById(currentFirmante.getIdNumEmpleado());
 				SegOrgUsuarios usuario = empleado.get().getIdUsuario();
 				int idUsuario = usuario.getnIdUsuario();
 				if (!serviceFirmar.firmanteExistInPKIDocumentoFirmantes(docAdjunto.getDocumentoHash(),
@@ -597,15 +610,19 @@ public class ServiceFirmarAhora {
 			}
 
 		}
+		serviceFirmar.enviarNotificacionFirmante(empleado.get());
+
 		return true;
 	}
 
 	public boolean storePkiDocumentoFirmantes(List<TabDocumentosAdjuntos> documentosAdjuntos,
 			TabDocumentos documentoStored, PkiCatTipoFirma tipoFirma, TabDocsFirmantes currentFirmante,
 			DTOResponse res) {
+		Optional<InstEmpleado> empleado = null;
+
 		for (TabDocumentosAdjuntos docAdjunto : documentosAdjuntos) {
 
-			Optional<InstEmpleado> empleado = instEmpleadoRepository.findById(currentFirmante.getIdNumEmpleado());
+			empleado = instEmpleadoRepository.findById(currentFirmante.getIdNumEmpleado());
 
 			PkiDocumentoFirmantes documentoFirmantesStored = serviceFirmar.createPKIDocumentoFirmantes(
 					docAdjunto.getDocumentoHash(), empleado.get().getIdUsuario(), empleado.get(),
@@ -690,7 +707,14 @@ public class ServiceFirmarAhora {
 
 	public boolean altaDocumentoModoCaptura(PayloadAltaDocumento payload, DAOAltaDocumento documentoAlta,
 			DTOResponse res, DTOResponseUserInfo userInfo) {
-
+		
+		for (DTOConfiguracion config : payload.getConfiguraciones()) {
+			if (config.getAtributo().equals("FIRM")) {
+				payload.setEnOrden(config.isConfig());
+				break;
+			}
+		}
+		
 		// Le asignamos los datos básicos
 		documentoAlta = new DAOAltaDocumento(payload.getFolioEspecial(), payload.getAsunto(), payload.getNotas(),
 				payload.getContenido(), payload.getFechaLimiteFirma(), payload.isEnOrden());
@@ -886,7 +910,7 @@ public class ServiceFirmarAhora {
 	}
 
 	public boolean enviarDocumento(int idTabDocumento, DTOResponseUserInfo userInfo, DTOResponse res) {
-
+		
 		TabDocumentos documentoStored = serviceFirmar.findTabDocumento(idTabDocumento, res);
 		if (documentoStored == null) {
 			return false;
@@ -947,6 +971,12 @@ public class ServiceFirmarAhora {
 						tipoFirma, currentFirmante, res);
 				if (!documentoFirmantesStored) {
 					return false;
+				}else{
+					///aqui va el envío de la notificacion
+					Optional <InstEmpleado> empleado = instEmpleadoRepository.findById(currentFirmante.getIdNumEmpleado());
+
+					serviceFirmar.enviarNotificacionFirmante(empleado.get());
+					
 				}
 
 				TabCatEtapaDocumento etapaDoc_enviado = findEtapaDocumento(EnumTabCatEtapaDocumento.ENVIADO.getOpcion(),
@@ -992,6 +1022,12 @@ public class ServiceFirmarAhora {
 						tipoFirma, currentFirmante, res);
 				if (!documentoFirmantesStored) {
 					return false;
+				}else{
+					///aqui va el envío de la notificacion
+					Optional <InstEmpleado> empleado = instEmpleadoRepository.findById(currentFirmante.getIdNumEmpleado());
+
+					serviceFirmar.enviarNotificacionFirmante(empleado.get());
+					
 				}
 
 				TabCatEtapaDocumento etapaDoc_enviado = findEtapaDocumento(EnumTabCatEtapaDocumento.ENVIADO.getOpcion(),
@@ -1263,6 +1299,13 @@ public class ServiceFirmarAhora {
 	public boolean altaDocAndfirmarAhora(PayloadAltaDocumento payload, DAOAltaDocumento documentoAlta, DTOResponse res,
 			DTOResponseUserInfo userInfo) {
 
+		for (DTOConfiguracion config : payload.getConfiguraciones()) {
+			if (config.getAtributo().equals("FIRM")) {
+				payload.setEnOrden(config.isConfig());
+				break;
+			}
+		}
+		
 		// Le asignamos los datos básicos
 		documentoAlta = new DAOAltaDocumento(payload.getFolioEspecial(), payload.getAsunto(), payload.getNotas(),
 				payload.getContenido(), payload.getFechaLimiteFirma(), payload.isEnOrden());
@@ -1385,7 +1428,14 @@ public class ServiceFirmarAhora {
 
 	public boolean editarDocumento(int idDocumento, PayloadAltaDocumento payload, DAOAltaDocumento documentoAlta,
 			DTOResponse res, DTOResponseUserInfo userInfo) {
-
+		
+		for (DTOConfiguracion config : payload.getConfiguraciones()) {
+			if (config.getAtributo().equals("FIRM")) {
+				payload.setEnOrden(config.isConfig());
+				break;
+			}
+		}
+		
 		// busca el documento a editar
 		Optional<TabDocumentos> documentExist = tabDocumentoRepository.findById(idDocumento);
 
@@ -1423,15 +1473,19 @@ public class ServiceFirmarAhora {
 		documentoAlta = new DAOAltaDocumento(payload.getFolioEspecial(), payload.getAsunto(), payload.getNotas(),
 				payload.getContenido(), payload.getFechaLimiteFirma(), payload.isEnOrden());
 
-		List<TabDocumentoWorkflow> docWorkflowList = tabDocumentoWorkflowRepository.findByIdDocumentOrderByWorkflowFecha(documentExist.get());
-		if(docWorkflowList.get(0).getIdEtapaDocumento().getDescetapa().equals(EnumTabCatEtapaDocumento.CREADO.getOpcion())) {
-			// Elimina primero los docs adjuntos existentes solo para cuando se encuentre en etapa creado// esto no lo hace para docs cargados en app de escritorio
-			List<TabDocumentosAdjuntos> docsExistentes = tabDocumentosAdjuntosRepository.findByIdDocument(documentExist.get());
+		List<TabDocumentoWorkflow> docWorkflowList = tabDocumentoWorkflowRepository
+				.findByIdDocumentOrderByWorkflowFecha(documentExist.get());
+		if (docWorkflowList.get(0).getIdEtapaDocumento().getDescetapa()
+				.equals(EnumTabCatEtapaDocumento.CREADO.getOpcion())) {
+			// Elimina primero los docs adjuntos existentes solo para cuando se encuentre en
+			// etapa creado// esto no lo hace para docs cargados en app de escritorio
+			List<TabDocumentosAdjuntos> docsExistentes = tabDocumentosAdjuntosRepository
+					.findByIdDocument(documentExist.get());
 			for (TabDocumentosAdjuntos docAdjunto : docsExistentes) {
 				tabDocumentosAdjuntosRepository.delete(docAdjunto);
 			}
 		}
-		
+
 		// valida los datos que sean correctos
 		boolean dataValid = validateDataModoCaptura(payload, documentoAlta, userInfo, res);
 		if (!dataValid) {
@@ -1447,15 +1501,16 @@ public class ServiceFirmarAhora {
 		if (documentoEdited == null) {
 			return false;
 		}
-		//esto no lo hace para docs cargados en app de escritorio
-		if(docWorkflowList.get(0).getIdEtapaDocumento().getDescetapa().equals(EnumTabCatEtapaDocumento.CREADO.getOpcion())) {
+		// esto no lo hace para docs cargados en app de escritorio
+		if (docWorkflowList.get(0).getIdEtapaDocumento().getDescetapa()
+				.equals(EnumTabCatEtapaDocumento.CREADO.getOpcion())) {
 			boolean isDocAdjuntosStored = storeDocumentosAdjuntos(payload.getDocumentosAdjuntos(), documentoEdited, res,
 					userInfo);
 			if (!isDocAdjuntosStored) {
 				return false;
 			}
 		}
-		
+
 		boolean isfirmantesStored = editedFirmantes(documentoEdited, documentoAlta, res);
 		if (!isfirmantesStored) {
 			return false;
@@ -1487,29 +1542,31 @@ public class ServiceFirmarAhora {
 
 	public DTOResponse eliminarDocumento(int idDocumento, DTOResponse res, DTOResponseUserInfo userInfo) {
 		// busca el documento a eliminar
-				Optional<TabDocumentos> documentExist = tabDocumentoRepository.findById(idDocumento);
-				if(userInfo.getData().getIdEmpleado()==(documentExist.get().getIdNumEmpleadoCreador().getId())) {
-					List<TabDocumentoWorkflow> docWorkflowList = tabDocumentoWorkflowRepository.findByIdDocumentOrderByWorkflowFecha(documentExist.get());
-					//verifica la etapa del documento 00''||
-					if(docWorkflowList.get(0).getIdEtapaDocumento().getDescetapa().equals(EnumTabCatEtapaDocumento.CREADO.getOpcion())) {
-						if	(documentExist.isPresent()) {
-							documentExist.get().setVisible(false);
-							tabDocumentoRepository.save(documentExist.get());
-							res.setMessage("Se ha eliminado el documento");
-							res.setStatus("Success");
-							return res;
-						}
-						res.setMessage("No se pudo realizar la operación");
-						res.setStatus("fail");
-						return res;
-						
-					}
-					
+		Optional<TabDocumentos> documentExist = tabDocumentoRepository.findById(idDocumento);
+		if (userInfo.getData().getIdEmpleado() == (documentExist.get().getIdNumEmpleadoCreador().getId())) {
+			List<TabDocumentoWorkflow> docWorkflowList = tabDocumentoWorkflowRepository
+					.findByIdDocumentOrderByWorkflowFecha(documentExist.get());
+			// verifica la etapa del documento 00''||
+			if (docWorkflowList.get(0).getIdEtapaDocumento().getDescetapa()
+					.equals(EnumTabCatEtapaDocumento.CREADO.getOpcion())) {
+				if (documentExist.isPresent()) {
+					documentExist.get().setVisible(false);
+					tabDocumentoRepository.save(documentExist.get());
+					res.setMessage("Se ha eliminado el documento");
+					res.setStatus("Success");
+					return res;
 				}
-				res.setMessage("No cuentas con permisos para realizar la operación");
+				res.setMessage("No se pudo realizar la operación");
 				res.setStatus("fail");
 				return res;
-		
+
+			}
+
+		}
+		res.setMessage("No cuentas con permisos para realizar la operación");
+		res.setStatus("fail");
+		return res;
+
 	}
 
 }
