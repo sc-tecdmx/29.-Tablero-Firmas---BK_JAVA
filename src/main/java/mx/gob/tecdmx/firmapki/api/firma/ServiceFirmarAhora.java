@@ -728,7 +728,7 @@ public class ServiceFirmarAhora {
 				documentoAlta.getTipoDoc(), documentoAlta.getPrioridad(), documentoAlta.getFolioEspecial(),
 				documentoAlta.getExpediente(), documentoAlta.getAsunto(), documentoAlta.getNotas(),
 				documentoAlta.getContenido(), documentoAlta.getFechaLimiteFirma(), documentoAlta.isEnOrden(), userInfo,
-				res);
+				res, payload.getConfiguraciones());
 
 		if (documentoStored == null) {
 			return false;
@@ -1208,7 +1208,7 @@ public class ServiceFirmarAhora {
 				documentoAlta.getTipoDoc(), documentoAlta.getPrioridad(), documentoAlta.getFolioEspecial(),
 				documentoAlta.getExpediente(), documentoAlta.getAsunto(), documentoAlta.getNotas(),
 				documentoAlta.getContenido(), documentoAlta.getFechaLimiteFirma(), documentoAlta.isEnOrden(), userInfo,
-				res);
+				res, payload.getConfiguraciones());
 
 		if (documentoStored == null) {
 			return false;
@@ -1319,7 +1319,7 @@ public class ServiceFirmarAhora {
 				documentoAlta.getTipoDoc(), documentoAlta.getPrioridad(), documentoAlta.getFolioEspecial(),
 				documentoAlta.getExpediente(), documentoAlta.getAsunto(), documentoAlta.getNotas(),
 				documentoAlta.getContenido(), documentoAlta.getFechaLimiteFirma(), documentoAlta.isEnOrden(), userInfo,
-				res);
+				res, payload.getConfiguraciones());
 
 		if (documentoStored == null) {
 			return false;

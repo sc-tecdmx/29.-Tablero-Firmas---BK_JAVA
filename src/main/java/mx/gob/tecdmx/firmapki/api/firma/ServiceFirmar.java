@@ -45,6 +45,7 @@ import mx.gob.tecdmx.firmapki.repository.tab.TabDocumentosRepository;
 import mx.gob.tecdmx.firmapki.utils.CertificateUtils;
 import mx.gob.tecdmx.firmapki.utils.DTOPayloadNotificacionesEmail;
 import mx.gob.tecdmx.firmapki.utils.DTOResponse;
+import mx.gob.tecdmx.firmapki.utils.GenerateNumOficioRandomUtils;
 import mx.gob.tecdmx.firmapki.utils.RestClient;
 
 @Service
@@ -484,8 +485,17 @@ public class ServiceFirmar {
 
 	public TabDocumentos storeTabDocumento(TabCatDestinoDocumento tipoDestino, TabCatTipoDocumento tipoDocumento,
 			TabCatPrioridad prioridad, String folioEspecial, TabExpedientes numExpediente, String asunto, String notas,
-			String contenido, Date fechaLimiteFirma, boolean isEnOrden, DTOResponseUserInfo userInfo, DTOResponse res) {
-
+			String contenido, Date fechaLimiteFirma, boolean isEnOrden, DTOResponseUserInfo userInfo, DTOResponse res, 
+			List<mx.gob.tecdmx.firmapki.api.documento.DTOConfiguracion> lisConfig) {
+		
+		GenerateNumOficioRandomUtils methodRandomUtils = new GenerateNumOficioRandomUtils();
+		for(mx.gob.tecdmx.firmapki.api.documento.DTOConfiguracion config : lisConfig) {
+			if (config.getAtributo().equals("GNUMOF")) {
+				folioEspecial= methodRandomUtils.generateRandomString();
+				break;
+			}
+		}
+		
 		try {
 			TabDocumentos documento = new TabDocumentos();
 
