@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import mx.gob.tecdmx.firmapki.DTOResponseUserInfo;
+import mx.gob.tecdmx.firmapki.api.Metodos.ServiceValidationsMethods;
 import mx.gob.tecdmx.firmapki.api.documento2.DTOConfiguracion;
 import mx.gob.tecdmx.firmapki.api.documento2.DTODocAdjunto;
 import mx.gob.tecdmx.firmapki.api.documento2.DTOFirmanteDestinatario;
@@ -118,6 +119,9 @@ public class ServiceFirmarAhora {
 
 	@Autowired
 	ServiceFirmar serviceFirmar;
+
+	@Autowired
+	ServiceValidationsMethods serviceValidationsMethods;
 
 	@Value("${firma.url.notificacion}")
 	private String sendNotificacionUrl;
@@ -253,7 +257,6 @@ public class ServiceFirmarAhora {
 		}
 		return true;
 	}
-
 
 	public boolean validateFirmantesExist(PayloadAltaDocumento payload, DAOAltaDocumento documentoAlta,
 			DTOResponse res) {
@@ -418,17 +421,23 @@ public class ServiceFirmarAhora {
 			if (!firmantesExist) {
 				return false;
 			}
+			res = serviceValidationsMethods.verificaFirmanteDestinatarioIsUsuario(payload.getFirmantes(), res);
 
-			boolean ordenAndSecuenciaValid = validateOrdenAndSecuenciaFirmantesModoCaptura(payload, documentoAlta,
-					userInfo, res);
-			if (!ordenAndSecuenciaValid) {
+			if (!res.getStatus().equals("Success")) {
 				return false;
 			}
 		}
 
 		if (payload.getDestinatarios() != null) {
+
 			boolean destinatariosExist = validateDestinatariosExist(payload, documentoAlta, res);
 			if (!destinatariosExist) {
+				return false;
+			}
+
+			res = serviceValidationsMethods.verificaFirmanteDestinatarioIsUsuario(payload.getDestinatarios(), res);
+
+			if (!res.getStatus().equals("Success")) {
 				return false;
 			}
 		}
@@ -469,9 +478,21 @@ public class ServiceFirmarAhora {
 		if (!firmantesExist) {
 			return false;
 		}
+		
+		res = serviceValidationsMethods.verificaFirmanteDestinatarioIsUsuario(payload.getFirmantes(), res);
+
+		if (!res.getStatus().equals("Success")) {
+			return false;
+		}
 
 		boolean destinatariosExist = validateDestinatariosExist(payload, documentoAlta, res);
 		if (!destinatariosExist) {
+			return false;
+		}
+		
+		res = serviceValidationsMethods.verificaFirmanteDestinatarioIsUsuario(payload.getDestinatarios(), res);
+
+		if (!res.getStatus().equals("Success")) {
 			return false;
 		}
 
@@ -494,7 +515,6 @@ public class ServiceFirmarAhora {
 		return true;
 
 	}
-
 
 	public boolean storeDocumentosAdjuntos(List<DTODocAdjunto> documentosAdjuntos, TabDocumentos documentoStored,
 			DTOResponse res, DTOResponseUserInfo userInfo) {
@@ -575,9 +595,9 @@ public class ServiceFirmarAhora {
 		}
 		return true;
 	}
-	
-	public boolean storePkiDocumentoDestinatarios(List<TabDocumentosAdjuntos> documentosAdjuntos, List<TabDocDestinatarios> destinatarios,
-			DTOResponse res) {
+
+	public boolean storePkiDocumentoDestinatarios(List<TabDocumentosAdjuntos> documentosAdjuntos,
+			List<TabDocDestinatarios> destinatarios, DTOResponse res) {
 		Optional<InstEmpleado> empleado = null;
 		RestClient restClient = new RestClient();
 		DTOPayloadNotificacionesEmail notificaciones = null;
@@ -585,14 +605,19 @@ public class ServiceFirmarAhora {
 		for (TabDocumentosAdjuntos docAdjunto : documentosAdjuntos) {
 			for (TabDocDestinatarios currentDestinatario : destinatarios) {
 				empleado = instEmpleadoRepository.findById(currentDestinatario.getIdNumEmpleado());
-				SegOrgUsuarios usuario = empleado.get().getIdUsuario();
-				int idUsuario = usuario.getnIdUsuario();
-				PkiDocumentoDestino documentoDestinoStored = serviceFirmar.createPKIDocumentoDestinatario(
-						docAdjunto.getDocumentoHash(), empleado.get().getIdUsuario(), empleado.get(), res);
+				if (empleado.get().getIdUsuario() != null) {
+					SegOrgUsuarios usuario = empleado.get().getIdUsuario();
+					int idUsuario = usuario.getnIdUsuario();
+					PkiDocumentoDestino documentoDestinoStored = serviceFirmar.createPKIDocumentoDestinatario(
+							docAdjunto.getDocumentoHash(), empleado.get().getIdUsuario(), empleado.get(), res);
 
-				if (documentoDestinoStored == null) {
+					if (documentoDestinoStored == null) {
+						return false;
+					}
+				} else {
 					return false;
 				}
+
 			}
 
 		}
@@ -673,14 +698,14 @@ public class ServiceFirmarAhora {
 
 	public boolean altaDocumentoModoCaptura(PayloadAltaDocumento payload, DAOAltaDocumento documentoAlta,
 			DTOResponse res, DTOResponseUserInfo userInfo) {
-		
+
 		for (DTOConfiguracion config : payload.getConfiguraciones()) {
 			if (config.getAtributo().equals("FIRM")) {
 				payload.setEnOrden(config.isConfig());
 				break;
 			}
 		}
-		
+
 		// Le asignamos los datos básicos
 		documentoAlta = new DAOAltaDocumento(payload.getFolioEspecial(), payload.getAsunto(), payload.getNotas(),
 				payload.getContenido(), payload.getFechaLimiteFirma(), payload.isEnOrden());
@@ -700,8 +725,8 @@ public class ServiceFirmarAhora {
 			return false;
 		}
 
-		TabDocConfig configStored = serviceFirmar.storeTabDocConfig(payload.getConfiguraciones(), documentoStored, res);
-		if (configStored == null) {
+		boolean configStored = serviceFirmar.storeTabDocConfig(payload.getConfiguraciones(), documentoStored, res);
+		if (!configStored) {
 			return false;
 		}
 
@@ -876,7 +901,7 @@ public class ServiceFirmarAhora {
 	}
 
 	public boolean enviarDocumento(int idTabDocumento, DTOResponseUserInfo userInfo, DTOResponse res) {
-		
+
 		TabDocumentos documentoStored = serviceFirmar.findTabDocumento(idTabDocumento, res);
 		if (documentoStored == null) {
 			return false;
@@ -938,12 +963,13 @@ public class ServiceFirmarAhora {
 						tipoFirma, currentFirmante, res);
 				if (!documentoFirmantesStored) {
 					return false;
-				}else{
-					///aqui va el envío de la notificacion
-					Optional <InstEmpleado> empleado = instEmpleadoRepository.findById(currentFirmante.getIdNumEmpleado());
+				} else {
+					/// aqui va el envío de la notificacion
+					Optional<InstEmpleado> empleado = instEmpleadoRepository
+							.findById(currentFirmante.getIdNumEmpleado());
 
 					serviceFirmar.enviarNotificacion(empleado.get());
-					
+
 				}
 
 				TabCatEtapaDocumento etapaDoc_enviado = findEtapaDocumento(EnumTabCatEtapaDocumento.ENVIADO.getOpcion(),
@@ -989,12 +1015,13 @@ public class ServiceFirmarAhora {
 						tipoFirma, currentFirmante, res);
 				if (!documentoFirmantesStored) {
 					return false;
-				}else{
-					///aqui va el envío de la notificacion
-					Optional <InstEmpleado> empleado = instEmpleadoRepository.findById(currentFirmante.getIdNumEmpleado());
+				} else {
+					/// aqui va el envío de la notificacion
+					Optional<InstEmpleado> empleado = instEmpleadoRepository
+							.findById(currentFirmante.getIdNumEmpleado());
 
 					serviceFirmar.enviarNotificacion(empleado.get());
-					
+
 				}
 
 				TabCatEtapaDocumento etapaDoc_enviado = findEtapaDocumento(EnumTabCatEtapaDocumento.ENVIADO.getOpcion(),
@@ -1033,7 +1060,7 @@ public class ServiceFirmarAhora {
 				if (!documentoFirmantesStored) {
 					return false;
 				}
-				
+
 				TabCatEtapaDocumento etapaDoc_enviado = findEtapaDocumento(EnumTabCatEtapaDocumento.ENVIADO.getOpcion(),
 						res);
 				if (etapaDoc_enviado == null) {
@@ -1093,10 +1120,10 @@ public class ServiceFirmarAhora {
 	public boolean gotoFirmar(int idTabDocumento, DTOResponseUserInfo userInfo, DTOResponse res) {
 
 //		
-		
+
 		List<TabDocsFirmantes> firmantes = serviceFirmar.getTabDocsFirmantes(idTabDocumento);
 		List<TabDocDestinatarios> destinatarios = serviceFirmar.getTabDocsDestinatarios(idTabDocumento);
-				
+
 		TabDocsFirmantes currentFirmante = getCurrentFirmanteInList(firmantes, userInfo.getData().getEmpleado(), res);
 		if (currentFirmante == null) {
 			return false;
@@ -1171,7 +1198,7 @@ public class ServiceFirmarAhora {
 				break;
 			}
 		}
-		
+
 		// Le asignamos los datos básicos
 		documentoAlta = new DAOAltaDocumento(payload.getFolioEspecial(), payload.getAsunto(), payload.getNotas(),
 				payload.getContenido(), payload.getFechaLimiteFirma(), payload.isEnOrden());
@@ -1191,8 +1218,8 @@ public class ServiceFirmarAhora {
 			return false;
 		}
 
-		TabDocConfig configStored = serviceFirmar.storeTabDocConfig(payload.getConfiguraciones(), documentoStored, res);
-		if (configStored == null) {
+		boolean configStored = serviceFirmar.storeTabDocConfig(payload.getConfiguraciones(), documentoStored, res);
+		if (!configStored) {
 			return false;
 		}
 
@@ -1294,14 +1321,14 @@ public class ServiceFirmarAhora {
 
 	public boolean editarDocumento(int idDocumento, PayloadAltaDocumento payload, DAOAltaDocumento documentoAlta,
 			DTOResponse res, DTOResponseUserInfo userInfo) {
-		
+
 		for (DTOConfiguracion config : payload.getConfiguraciones()) {
 			if (config.getAtributo().equals("FIRM")) {
 				payload.setEnOrden(config.isConfig());
 				break;
 			}
 		}
-		
+
 		// busca el documento a editar
 		Optional<TabDocumentos> documentExist = tabDocumentoRepository.findById(idDocumento);
 

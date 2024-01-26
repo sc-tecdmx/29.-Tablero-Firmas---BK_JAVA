@@ -123,7 +123,7 @@ public class ServiceFirmar {
 	}
 
 	public PkiDocumento getDocumentoPKIByHash(String hashDocumento, DTOResponse res) {
-		Optional<PkiDocumento> documento = pkiDocumentoRepository.findById(hashDocumento);
+		Optional<PkiDocumento> documento = pkiDocumentoRepository.findByHashDocumento(hashDocumento);
 		if (!documento.isPresent()) {
 			res.setMessage("No se encontró en la base de datos pki el archivo que intentas firmar");
 			res.setStatus("fail");
@@ -386,7 +386,7 @@ public class ServiceFirmar {
 		}
 	}
 
-	public TabDocConfig storeTabDocConfig(List<mx.gob.tecdmx.firmapki.api.documento2.DTOConfiguracion> list,
+	public boolean storeTabDocConfig(List<mx.gob.tecdmx.firmapki.api.documento2.DTOConfiguracion> list,
 			TabDocumentos documentoStored, DTOResponse res) {
 		TabDocConfig docConfig = new TabDocConfig();
 		TabDocConfig docConfigStored = null;
@@ -405,12 +405,12 @@ public class ServiceFirmar {
 					}
 				}
 			}
-			return docConfigStored;
+			return true;
 		}
 
 		res.setMessage("No se pudo guardar la configuración");
 		res.setStatus("fail");
-		return null;
+		return false;
 	}
 	
 

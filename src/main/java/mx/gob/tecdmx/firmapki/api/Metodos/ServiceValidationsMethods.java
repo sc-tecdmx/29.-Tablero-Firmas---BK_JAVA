@@ -20,31 +20,37 @@ import mx.gob.tecdmx.firmapki.entity.pki.PkiDocumentoFirmantes;
 import mx.gob.tecdmx.firmapki.entity.tab.TabCatEtapaDocumento;
 import mx.gob.tecdmx.firmapki.entity.tab.TabCatInstFirmantes;
 import mx.gob.tecdmx.firmapki.entity.tab.TabCatPrioridad;
+import mx.gob.tecdmx.firmapki.entity.tab.TabDocDestinatarios;
 import mx.gob.tecdmx.firmapki.entity.tab.TabDocsFirmantes;
 import mx.gob.tecdmx.firmapki.entity.tab.TabDocumentosAdjuntos;
+import mx.gob.tecdmx.firmapki.repository.inst.InstEmpleadoRepository;
 import mx.gob.tecdmx.firmapki.repository.pki.PkiCatFirmaAplicadaRepository;
 import mx.gob.tecdmx.firmapki.repository.pki.PkiDocumentoDestinoRepository;
 import mx.gob.tecdmx.firmapki.repository.pki.PkiDocumentoFirmantesRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabCatEtapaDocumentoRepository;
 import mx.gob.tecdmx.firmapki.utils.DTOResponse;
+
 @Service
 public class ServiceValidationsMethods {
-	
+
 	@Autowired
 	private TabCatEtapaDocumentoRepository tabCatEtapaDocumentoRepository;
-	
+
 	@Autowired
 	PkiCatFirmaAplicadaRepository pkiCatFirmaAplicadaRepository;
-	
+
 	@Autowired
 	PkiDocumentoFirmantesRepository pkiDocumentoFirmantesRepository;
 
 	@Autowired
 	PkiDocumentoDestinoRepository pkiDocumentoDestRepository;
-	
+
+	@Autowired
+	InstEmpleadoRepository instEmpleadoRepository;
+
 	@Autowired
 	ServiceConsultaMethods serviceConsultaMethods;
-	
+
 	public boolean verificaDocumentoIsTerminadoFirmantes(List<TabDocumentosAdjuntos> docsAdjuntos) {
 		boolean terminado = false;
 		for (TabDocumentosAdjuntos tabDocAd : docsAdjuntos) {
@@ -65,7 +71,7 @@ public class ServiceValidationsMethods {
 		return true;
 
 	}
-	
+
 	public boolean verificaDocumentoIsTerminadoDestinatarios(List<TabDocumentosAdjuntos> docsAdjuntos) {
 		boolean terminado = false;
 		for (TabDocumentosAdjuntos tabDocAd : docsAdjuntos) {
@@ -86,7 +92,7 @@ public class ServiceValidationsMethods {
 		return false;
 
 	}
-	
+
 	public boolean validateCatalogosEscritorio(String tipoPrioridadInp, DAOAltaDocumento documentoAlta,
 			DTOResponse res) {
 		TabCatPrioridad tipoPrioridad = serviceConsultaMethods.findTipoPrioridad(tipoPrioridadInp, documentoAlta, res);
@@ -95,7 +101,7 @@ public class ServiceValidationsMethods {
 		}
 		return true;
 	}
-	
+
 	public boolean validateFirmantesExist(PayloadAltaDocumento payload, DAOAltaDocumento documentoAlta,
 			DTOResponse res) {
 		// Validamos que los datos de los firmantes existan
@@ -111,7 +117,8 @@ public class ServiceValidationsMethods {
 			}
 			firmante.setEmpleado(empleadoFirmante);
 
-			TabCatInstFirmantes instruccionFirmante = serviceConsultaMethods.findInstruccionFirmante(firmantes.getInstruccion(), res);
+			TabCatInstFirmantes instruccionFirmante = serviceConsultaMethods
+					.findInstruccionFirmante(firmantes.getInstruccion(), res);
 			if (instruccionFirmante == null) {
 				return false;
 			}
@@ -121,7 +128,7 @@ public class ServiceValidationsMethods {
 		}
 		return true;
 	}
-	
+
 	public boolean validarArchivosUnicos(List<DTODocAdjunto> documentosAdjuntos, DTOResponse res) {
 		Set<String> documentosUnicos = new HashSet<>();
 
@@ -134,11 +141,12 @@ public class ServiceValidationsMethods {
 		}
 		return true; // Todos los documentos son únicos
 	}
-	
+
 	public boolean validateArchivoNuevoInDataBase(List<DTODocAdjunto> documentosAdjuntos, DTOResponse res) {
 		int pos = 1;
 		for (DTODocAdjunto docAdjuntoPayload : documentosAdjuntos) {
-			boolean archivoExist = serviceConsultaMethods.documentNotExistInDataBase(docAdjuntoPayload.getDocBase64(), pos, res);
+			boolean archivoExist = serviceConsultaMethods.documentNotExistInDataBase(docAdjuntoPayload.getDocBase64(),
+					pos, res);
 			if (!archivoExist) {
 				return false;
 			}
@@ -146,7 +154,7 @@ public class ServiceValidationsMethods {
 		}
 		return true;
 	}
-	
+
 	public TabDocsFirmantes getCurrentFirmanteInList(List<TabDocsFirmantes> firmantes, InstEmpleado empleado,
 			DTOResponse res) {
 		if (firmantes == null) {
@@ -169,4 +177,27 @@ public class ServiceValidationsMethods {
 		}
 		return currentFirmante;
 	}
+
+	public DTOResponse verificaFirmanteDestinatarioIsUsuario(List<DTOFirmanteDestinatario> list, DTOResponse res) {
+		for (DTOFirmanteDestinatario firmanteDest : list) {
+			Optional<InstEmpleado> empleadoExist = instEmpleadoRepository.findById(firmanteDest.getIdEmpleado());
+			if (empleadoExist.isPresent()) {
+				if (empleadoExist.get().getIdUsuario() != null) {
+				
+				} else {
+					res.setStatus("fail");
+					res.setMessage("La persona con nombre: <strong>" + empleadoExist.get().getNombre() + "</strong> "
+						    + "<strong>" + empleadoExist.get().getApellido1() + "</strong> " + "<strong>" + empleadoExist.get().getApellido2()
+						    + "</strong>, no cuenta con un registro en el sistema, por lo tanto no tiene permisos para realizar acciones sobre los documentos");
+					return res;
+				}
+
+			}
+		}
+		res.setStatus("Success");
+		return res;
+
+	}
+
+
 }
