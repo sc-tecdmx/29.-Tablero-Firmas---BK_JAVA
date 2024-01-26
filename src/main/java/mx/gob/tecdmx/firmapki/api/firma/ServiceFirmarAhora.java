@@ -1366,6 +1366,12 @@ public class ServiceFirmarAhora {
 		documentoAlta = new DAOAltaDocumento(payload.getFolioEspecial(), payload.getAsunto(), payload.getNotas(),
 				payload.getContenido(), payload.getFechaLimiteFirma(), payload.isEnOrden());
 
+		// valida los datos que sean correctos
+		boolean dataValid = validateDataModoCaptura(payload, documentoAlta, userInfo, res);
+		if (!dataValid) {
+			return false;
+		}
+		
 		List<TabDocumentoWorkflow> docWorkflowList = tabDocumentoWorkflowRepository
 				.findByIdDocumentOrderByWorkflowFecha(documentExist.get());
 		if (docWorkflowList.get(0).getIdEtapaDocumento().getDescetapa()
@@ -1378,12 +1384,7 @@ public class ServiceFirmarAhora {
 				tabDocumentosAdjuntosRepository.delete(docAdjunto);
 			}
 		}
-
-		// valida los datos que sean correctos
-		boolean dataValid = validateDataModoCaptura(payload, documentoAlta, userInfo, res);
-		if (!dataValid) {
-			return false;
-		}
+		
 		// almacena en tab los nuevos datos del documento
 		TabDocumentos documentoEdited = serviceFirmar.editTabDocumento(documentExist.get(),
 				documentoAlta.getDestinoDoc(), documentoAlta.getTipoDoc(), documentoAlta.getPrioridad(),
