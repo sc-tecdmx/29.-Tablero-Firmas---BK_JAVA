@@ -1,4 +1,4 @@
-package mx.gob.tecdmx.firmapki.api.documento;
+package mx.gob.tecdmx.firmapki.api.documento2;
 
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
@@ -50,34 +50,6 @@ public class ServiceFirma {
     @Autowired
     TabDocumentosAdjuntosRepository tabDocumentosAdjuntosRepository;
 
-    public void firmaEscritorio(String hashDocumento, byte[] documentoFirmadoBase64, String filePath) {
-        CertificateUtils utils = new CertificateUtils();
-        try {
-            try {
-
-                Optional<TabDocumentosAdjuntos> doc = tabDocumentosAdjuntosRepository
-                        .findByDocumentoHash(hashDocumento);
-                if (doc.isPresent()) {
-                    doc.get().setDocumentoBase64(Base64.getEncoder().encodeToString(documentoFirmadoBase64));
-                    tabDocumentosAdjuntosRepository.save(doc.get());
-                    System.out.println("se actualizó el base64 del doc firmado.");
-                }
-                boolean storeInFolder = false;
-                if (storeInFolder) {
-                    utils.writePdfFile(documentoFirmadoBase64, filePath);
-                }
-
-                System.out.println("PDF firmado guardado con éxito.");
-            } catch (IOException e) {
-                System.err.println("Error al guardar el PDF firmado:");
-                e.printStackTrace();
-            }
-
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } // Implementa esta lógica
-    }
 
     public void firma(String hashDocumento, byte[] documento, byte[] signature, byte[] certificate, String filePath,
             DTOResponseUserInfo userInfo) {

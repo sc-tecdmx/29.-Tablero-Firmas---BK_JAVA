@@ -14,8 +14,10 @@ import mx.gob.tecdmx.firmapki.DTOResponseUserInfo;
 import mx.gob.tecdmx.firmapki.entity.inst.InstEmpleado;
 import mx.gob.tecdmx.firmapki.entity.pki.HashDocumentoIdUsuarioIdTransaccionID;
 import mx.gob.tecdmx.firmapki.entity.pki.PkiCatFirmaAplicada;
+import mx.gob.tecdmx.firmapki.entity.pki.PkiCatInstruccionDoc;
 import mx.gob.tecdmx.firmapki.entity.pki.PkiCatTipoFirma;
 import mx.gob.tecdmx.firmapki.entity.pki.PkiDocumento;
+import mx.gob.tecdmx.firmapki.entity.pki.PkiDocumentoDestino;
 import mx.gob.tecdmx.firmapki.entity.pki.PkiDocumentoFirmantes;
 import mx.gob.tecdmx.firmapki.entity.seg.SegOrgUsuarios;
 import mx.gob.tecdmx.firmapki.entity.tab.IddocumentoIddocconfigID;
@@ -33,6 +35,7 @@ import mx.gob.tecdmx.firmapki.entity.tab.TabDocumentoWorkflow;
 import mx.gob.tecdmx.firmapki.entity.tab.TabDocumentos;
 import mx.gob.tecdmx.firmapki.entity.tab.TabDocumentosAdjuntos;
 import mx.gob.tecdmx.firmapki.entity.tab.TabExpedientes;
+import mx.gob.tecdmx.firmapki.repository.pki.PkiDocumentoDestinoRepository;
 import mx.gob.tecdmx.firmapki.repository.pki.PkiDocumentoFirmantesRepository;
 import mx.gob.tecdmx.firmapki.repository.pki.PkiDocumentoRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabCatDocConfigRepository;
@@ -83,6 +86,9 @@ public class ServiceFirmar {
 
 	@Autowired
 	PkiDocumentoFirmantesRepository pkiDocumentoFirmantesRepository;
+	
+	@Autowired
+	PkiDocumentoDestinoRepository pkiDocumentoDestinoRepository;
 
 	@Value("${firma.document.encryption}")
 	private String encryptionAlgorithm;
@@ -190,7 +196,7 @@ public class ServiceFirmar {
 		return false;
 	}
 	
-	public boolean enviarNotificacionFirmante(InstEmpleado empleado) {
+	public boolean enviarNotificacion(InstEmpleado empleado) {
 		RestClient restClient = new RestClient();
 		DTOPayloadNotificacionesEmail notificaciones = null;
 		
@@ -201,8 +207,8 @@ public class ServiceFirmar {
 		} else if (empleado.getEmailPers() != null) {
 			notificaciones.setEmailDestino(empleado.getEmailPers());
 		}
-		notificaciones.setAsunto("Nuevo documento para firmar");
-		notificaciones.setTexto("Haz recibido un nuevo documento para firmar, favor de revisar tu perfil en Tablero de Firmas Electrónicas");
+		notificaciones.setAsunto("Nuevo documento");
+		notificaciones.setTexto("Haz recibido un nuevo documento, favor de revisar tu perfil en Tablero de Firmas Electrónicas y atender la notificación");
 
 		Gson gson = new Gson();
 		String json = gson.toJson(notificaciones);
@@ -211,6 +217,7 @@ public class ServiceFirmar {
 		return true;
 		
 	}
+	
 
 	public TabDocumentosAdjuntos storeDocumento(String escritorio, TabDocumentos documentoStored, String docBase64,
 			String fileType,
@@ -339,6 +346,12 @@ public class ServiceFirmar {
 		InstEmpleado empleado = listTabDocFirmantes.get(0).getIntEmpleado();
 		return listTabDocFirmantes;
 	}
+	
+	public List<TabDocDestinatarios> getTabDocsDestinatarios(int idTabDocumento) {
+		List<TabDocDestinatarios> listTabDocDestinatarios = tabDocDestinatariosRepository.findByIdDocumento(idTabDocumento);
+		InstEmpleado empleado = listTabDocDestinatarios.get(0).getEmpleado();
+		return listTabDocDestinatarios;
+	}
 
 	public TabDocsFirmantes storeFirmante(TabDocumentos documentoStored, InstEmpleado empleadoFirmante,
 			TabCatInstFirmantes instruccionFirmante, int secuencia, DTOResponse res) {
@@ -373,12 +386,12 @@ public class ServiceFirmar {
 		}
 	}
 
-	public TabDocConfig storeTabDocConfig(List<mx.gob.tecdmx.firmapki.api.documento.DTOConfiguracion> list,
+	public TabDocConfig storeTabDocConfig(List<mx.gob.tecdmx.firmapki.api.documento2.DTOConfiguracion> list,
 			TabDocumentos documentoStored, DTOResponse res) {
 		TabDocConfig docConfig = new TabDocConfig();
 		TabDocConfig docConfigStored = null;
 		if (list.size() > 0) {
-			for (mx.gob.tecdmx.firmapki.api.documento.DTOConfiguracion configIndex : list) {
+			for (mx.gob.tecdmx.firmapki.api.documento2.DTOConfiguracion configIndex : list) {
 				if (configIndex.isConfig()) {
 					Optional<TabCatDocConfig> configExist = tabCatConfigDocumentoRepository
 							.findByAtributo(configIndex.getAtributo());
@@ -472,6 +485,31 @@ public class ServiceFirmar {
 			return null;
 		}
 	}
+	
+	public PkiDocumentoDestino createPKIDocumentoDestinatario(String sha256, SegOrgUsuarios usuarioFirmante,
+			InstEmpleado empleadoFirmante, DTOResponse res) {
+
+		try {
+			utils = new CertificateUtils();
+
+			HashDocumentoIdUsuarioIdTransaccionID idCompuesta = new HashDocumentoIdUsuarioIdTransaccionID();
+			idCompuesta.setHashDocumento(sha256);
+			idCompuesta.setIdUsuario(usuarioFirmante.getnIdUsuario());
+
+			PkiDocumentoDestino destinatarios = new PkiDocumentoDestino();
+			destinatarios.setHashDocumento(sha256);
+			destinatarios.setIdUsuario(usuarioFirmante.getnIdUsuario());
+			destinatarios.setIdNumEmpleado(empleadoFirmante);
+			destinatarios.setFechaNotificacion(new Date());
+			pkiDocumentoDestinoRepository.save(destinatarios);
+			
+			return destinatarios;
+		} catch (Exception e) {
+			res.setMessage(e.toString());
+			res.setStatus("fail");
+			return null;
+		}
+	}
 
 	public TabDocumentos findTabDocumento(int idDocumento, DTOResponse res) {
 		Optional<TabDocumentos> documento = tabDocumentosRepository.findById(idDocumento);
@@ -486,10 +524,10 @@ public class ServiceFirmar {
 	public TabDocumentos storeTabDocumento(TabCatDestinoDocumento tipoDestino, TabCatTipoDocumento tipoDocumento,
 			TabCatPrioridad prioridad, String folioEspecial, TabExpedientes numExpediente, String asunto, String notas,
 			String contenido, Date fechaLimiteFirma, boolean isEnOrden, DTOResponseUserInfo userInfo, DTOResponse res, 
-			List<mx.gob.tecdmx.firmapki.api.documento.DTOConfiguracion> lisConfig) {
+			List<mx.gob.tecdmx.firmapki.api.documento2.DTOConfiguracion> lisConfig) {
 		
 		GenerateNumOficioRandomUtils methodRandomUtils = new GenerateNumOficioRandomUtils();
-		for(mx.gob.tecdmx.firmapki.api.documento.DTOConfiguracion config : lisConfig) {
+		for(mx.gob.tecdmx.firmapki.api.documento2.DTOConfiguracion config : lisConfig) {
 			if (config.getAtributo().equals("GNUMOF")) {
 				folioEspecial= methodRandomUtils.generateRandomString();
 				break;

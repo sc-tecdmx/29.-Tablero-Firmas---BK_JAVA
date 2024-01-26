@@ -1,11 +1,10 @@
-package mx.gob.tecdmx.firmapki.api.documento;
+package mx.gob.tecdmx.firmapki.api.documento2;
 
 import java.util.Date;
 import java.util.List;
 
-public class PayloadAltaDocumento {
+public class PayloadEditarDocumento {
 	
-	int folio;
 	String folioEspecial;
 	String numExpediente;
 	String tipoDestino;
@@ -71,12 +70,6 @@ public class PayloadAltaDocumento {
 	}
 	public void setFechaLimiteFirma(Date fechaLimiteFirma) {
 		this.fechaLimiteFirma = fechaLimiteFirma;
-	}
-	public int getFolio() {
-		return folio;
-	}
-	public void setFolio(int folio) {
-		this.folio = folio;
 	}
 	
 	public List<DTOConfiguracion> getConfiguraciones() {

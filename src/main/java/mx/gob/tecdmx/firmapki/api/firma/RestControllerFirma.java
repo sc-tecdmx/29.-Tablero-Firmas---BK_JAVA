@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import mx.gob.tecdmx.firmapki.DTOResponseUserInfo;
-import mx.gob.tecdmx.firmapki.api.documento.PayloadAltaDocumento;
-import mx.gob.tecdmx.firmapki.api.documento.PayloadEnviarDocumento;
+import mx.gob.tecdmx.firmapki.api.documento2.PayloadAltaDocumento;
+import mx.gob.tecdmx.firmapki.api.documento2.PayloadEnviarDocumento;
 import mx.gob.tecdmx.firmapki.security.ServiceSecurity;
 import mx.gob.tecdmx.firmapki.utils.DTOResponse;
 
@@ -40,24 +40,6 @@ public class RestControllerFirma {
 		}
 		DAOAltaDocumento documentoAlta = null;
 		boolean docAltafirmado = serviceFirmarAhora.altaDocAndfirmarAhora(payload, documentoAlta, res, userInfo);
-		if (docAltafirmado) {
-			res.setData(payload);
-		}
-		return ResponseEntity.ok().header(null).body(res);
-	}
-
-	@CrossOrigin()
-	@RequestMapping(method = RequestMethod.POST, path = "/alta-documento-modo-firmar-escritorio", produces = "application/json")
-	public ResponseEntity<DTOResponse> createDocumentoFirmarAhoraEscritorio(@RequestBody PayloadAltaDocumento payload,
-			HttpServletRequest request) {
-		DTOResponse res = new DTOResponse();
-		DTOResponseUserInfo userInfo = serviceSecurity.getUserInfo(request, res);
-		if (userInfo == null) {
-			return ResponseEntity.ok().header(null).body(res);
-		}
-		DAOAltaDocumento documentoAlta = null;
-		boolean docAltafirmado = serviceFirmarAhora.altaDocAndfirmarAhoraEscritorio(payload, documentoAlta, res,
-				userInfo);
 		if (docAltafirmado) {
 			res.setData(payload);
 		}

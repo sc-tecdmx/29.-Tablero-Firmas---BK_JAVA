@@ -14,7 +14,7 @@ import mx.gob.tecdmx.firmapki.entity.pki.PkiDocumentoFirmantes;
 
 @Repository
 public interface PkiDocumentoFirmantesRepository extends CrudRepository<PkiDocumentoFirmantes, HashDocumentoIdUsuarioIdTransaccionID> {
-	Optional<PkiDocumentoFirmantes> findByHashDocumento(String hashDOcumento);
+	List<PkiDocumentoFirmantes> findByHashDocumento(String hashDOcumento);
 	List<PkiDocumentoFirmantes> findByHashDocumentoAndFechaFirmaAndIdFirmaAplicada(String hashDOcumento, Date fechaFirma, PkiCatFirmaAplicada  idTipoFirma);
 	List<PkiDocumentoFirmantes> findByIdNumEmpleadoAndIdFirmaAplicada(InstEmpleado idNumEmpleado, PkiCatFirmaAplicada  idTipoFirma);
 	Optional<PkiDocumentoFirmantes> findByHashDocumentoAndIdNumEmpleadoAndIdFirmaAplicada(String hashDOcumento, InstEmpleado idNumEmpleado, PkiCatFirmaAplicada  idTipoFirma);

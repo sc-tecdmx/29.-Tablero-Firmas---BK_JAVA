@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import mx.gob.tecdmx.firmapki.api.documento.DTOConfiguracion;
-import mx.gob.tecdmx.firmapki.api.documento.DTODocAdjunto;
+import mx.gob.tecdmx.firmapki.api.documento2.DTOConfiguracion;
+import mx.gob.tecdmx.firmapki.api.documento2.DTODocAdjunto;
 import mx.gob.tecdmx.firmapki.entity.tab.TabCatDestinoDocumento;
 import mx.gob.tecdmx.firmapki.entity.tab.TabCatPrioridad;
 import mx.gob.tecdmx.firmapki.entity.tab.TabCatTipoDocumento;
