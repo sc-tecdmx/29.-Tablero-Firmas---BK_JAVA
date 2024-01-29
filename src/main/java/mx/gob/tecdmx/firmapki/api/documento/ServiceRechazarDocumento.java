@@ -35,9 +35,9 @@ import mx.gob.tecdmx.firmapki.repository.tab.TabDocsFirmantesRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabDocumentoWorkflowRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabDocumentosAdjuntosRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabDocumentosRepository;
-import mx.gob.tecdmx.firmapki.utils.DTOPayloadNotificacionesEmail;
-import mx.gob.tecdmx.firmapki.utils.DTOResponse;
 import mx.gob.tecdmx.firmapki.utils.RestClient;
+import mx.gob.tecdmx.firmapki.utils.dto.DTOPayloadNotificacionesEmail;
+import mx.gob.tecdmx.firmapki.utils.dto.DTOResponse;
 import mx.gob.tecdmx.firmapki.utils.enums.EnumPkiCatFirmaAplicada;
 import mx.gob.tecdmx.firmapki.utils.enums.EnumTabCatEtapaDocumento;
 

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import mx.gob.tecdmx.firmapki.DTOResponseUserInfo;
 import mx.gob.tecdmx.firmapki.security.ServiceSecurity;
-import mx.gob.tecdmx.firmapki.utils.DTOResponse;
+import mx.gob.tecdmx.firmapki.utils.dto.DTOResponse;
 
 @RestController
 @RequestMapping(path = "/api/firma/transaccion")

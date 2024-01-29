@@ -12,22 +12,33 @@ import mx.gob.tecdmx.firmapki.entity.pki.PkiCatFirmaAplicada;
 import mx.gob.tecdmx.firmapki.entity.pki.PkiCatTipoFirma;
 import mx.gob.tecdmx.firmapki.entity.pki.PkiDocumento;
 import mx.gob.tecdmx.firmapki.entity.tab.TabCatEtapaDocumento;
+import mx.gob.tecdmx.firmapki.entity.tab.TabCatInstDest;
 import mx.gob.tecdmx.firmapki.entity.tab.TabCatInstFirmantes;
 import mx.gob.tecdmx.firmapki.entity.tab.TabCatPrioridad;
+import mx.gob.tecdmx.firmapki.entity.tab.TabCatTipoDocumento;
+import mx.gob.tecdmx.firmapki.entity.tab.TabDocDestinatarios;
 import mx.gob.tecdmx.firmapki.entity.tab.TabDocsFirmantes;
+import mx.gob.tecdmx.firmapki.entity.tab.TabDocumentoWorkflow;
 import mx.gob.tecdmx.firmapki.entity.tab.TabDocumentos;
 import mx.gob.tecdmx.firmapki.entity.tab.TabDocumentosAdjuntos;
+import mx.gob.tecdmx.firmapki.entity.tab.TabExpedientes;
 import mx.gob.tecdmx.firmapki.repository.inst.InstEmpleadoRepository;
 import mx.gob.tecdmx.firmapki.repository.pki.PkiCatFirmaAplicadaRepository;
 import mx.gob.tecdmx.firmapki.repository.pki.PkiCatTipoFirmaRepository;
 import mx.gob.tecdmx.firmapki.repository.pki.PkiDocumentoRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabCatEtapaDocumentoRepository;
+import mx.gob.tecdmx.firmapki.repository.tab.TabCatInstDestRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabCatInstFirmantesRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabCatPrioridadRepository;
+import mx.gob.tecdmx.firmapki.repository.tab.TabCatTipoDocumentoRepository;
+import mx.gob.tecdmx.firmapki.repository.tab.TabDocDestinatariosRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabDocsFirmantesRepository;
+import mx.gob.tecdmx.firmapki.repository.tab.TabDocumentoWorkflowRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabDocumentosAdjuntosRepository;
+import mx.gob.tecdmx.firmapki.repository.tab.TabDocumentosRepository;
+import mx.gob.tecdmx.firmapki.repository.tab.TabExpedientesRepository;
 import mx.gob.tecdmx.firmapki.utils.CertificateUtils;
-import mx.gob.tecdmx.firmapki.utils.DTOResponse;
+import mx.gob.tecdmx.firmapki.utils.dto.DTOResponse;
 
 @Service
 public class ServiceConsultaMethods {
@@ -36,13 +47,31 @@ public class ServiceConsultaMethods {
 	TabDocumentosAdjuntosRepository tabDocumentosAdjuntosRepository;
 	
 	@Autowired
+	TabExpedientesRepository tabExpedientesRepository;
+	
+	@Autowired
+	TabCatTipoDocumentoRepository tabCatTipoDocumentoRepository;
+	
+	@Autowired
 	TabCatEtapaDocumentoRepository tabCatEtapaDocumentoRepository;
 	
 	@Autowired
 	TabCatPrioridadRepository tabCatPrioridadRepository;
+	
+	@Autowired
+	TabCatInstDestRepository tabCatInstDestRepository;
 
 	@Autowired
 	TabDocsFirmantesRepository tabDocsFirmantesRepository;
+	
+	@Autowired
+	TabDocDestinatariosRepository tabDocDestinatariosRepository;
+	
+	@Autowired
+	TabDocumentosRepository tabDocumentosRepository;
+	
+	@Autowired
+	TabDocumentoWorkflowRepository tabDocumentoWorkflowRepository;
 	
 	@Autowired
 	TabCatInstFirmantesRepository tabCatInstFirmantesRepository;
@@ -104,6 +133,16 @@ public class ServiceConsultaMethods {
 		return null;
 	}
 	
+	public TabCatInstDest findInstruccionDestinatario(String instruccion, DTOResponse res) {
+		Optional<TabCatInstDest> instruccionDestinatario = tabCatInstDestRepository.findByDescInsDest(instruccion);
+		if (instruccionDestinatario.isPresent()) {
+			return instruccionDestinatario.get();
+		}
+		res.setMessage("No se encontró la instrucción del destinatario: " + instruccion);
+		res.setStatus("fail");
+		return null;
+	}
+	
 	public TabDocumentosAdjuntos getTabDocumentoAdjuntoByHash(String hashDocumento, DTOResponse res) {
 		Optional<TabDocumentosAdjuntos> docTabDocumentoAdjunto = tabDocumentosAdjuntosRepository
 				.findByDocumentoHash(hashDocumento);
@@ -124,6 +163,12 @@ public class ServiceConsultaMethods {
 		List<TabDocsFirmantes> listTabDocFirmantes = tabDocsFirmantesRepository.findByIdDocumento(idTabDocumento);
 		InstEmpleado empleado = listTabDocFirmantes.get(0).getIntEmpleado();
 		return listTabDocFirmantes;
+	}
+	
+	public List<TabDocDestinatarios> getTabDocsDestinatarios(int idTabDocumento) {
+		List<TabDocDestinatarios> listTabDocDestinatarios = tabDocDestinatariosRepository.findByIdDocumento(idTabDocumento);
+		InstEmpleado empleado = listTabDocDestinatarios.get(0).getEmpleado();
+		return listTabDocDestinatarios;
 	}
 	
 	public PkiDocumento getDocumentoPKIByHash(String hashDocumento, DTOResponse res) {
@@ -179,5 +224,80 @@ public class ServiceConsultaMethods {
 			return false;
 		}
 	}
+	
+	public TabDocumentos findTabDocumento(int idDocumento, DTOResponse res) {
+		Optional<TabDocumentos> documento = tabDocumentosRepository.findById(idDocumento);
+		if (!documento.isPresent()) {
+			res.setMessage("El documento con id: " + idDocumento + " no existe en la BD");
+			res.setStatus("fail");
+			return null;
+		}
+		return documento.get();
+	}
+	
+	public String getSequenceWorkflow(TabDocumentos documento, DTOResponse res) {
+		List<TabDocumentoWorkflow> listWorkflow = tabDocumentoWorkflowRepository
+				.findByIdDocumentOrderByWorkflowFecha(documento);
+		String etapaSequence = "";
+		for (TabDocumentoWorkflow workflow : listWorkflow) {
+			etapaSequence += "-" + workflow.getIdEtapaDocumento().getDescetapa();
+		}
+		etapaSequence = etapaSequence.replaceFirst("-", "");
+
+		return etapaSequence;
+	}
+	
+	public TabDocsFirmantes getCurrentFirmanteInList(List<TabDocsFirmantes> firmantes, InstEmpleado empleado,
+			DTOResponse res) {
+		if (firmantes == null) {
+			res.setMessage("La lista de firmantes no puede estar vacía");
+			res.setStatus("fail");
+			return null;
+		}
+
+		TabDocsFirmantes currentFirmante = null;
+		for (TabDocsFirmantes firmante : firmantes) {
+			if (firmante.getIdNumEmpleado() == empleado.getId()) {
+				currentFirmante = firmante;
+				break;
+			}
+		}
+		if (currentFirmante == null) {
+			res.setMessage("El firmante a firmar no se encuentra dentro de la lista de firmantes");
+			res.setStatus("fail");
+			return null;
+		}
+		return currentFirmante;
+	}
+	
+	public TabExpedientes findNumExpediente(String numExpediente, DAOAltaDocumento documentoAlta, DTOResponse res) {
+		if (numExpediente != null) {
+			Optional<TabExpedientes> numExpedienteOpt = tabExpedientesRepository.findByNumExpediente(numExpediente);
+			if (numExpedienteOpt.isPresent()) {
+				documentoAlta.setExpediente(numExpedienteOpt.get());
+				return numExpedienteOpt.get();
+			}
+		}
+		res.setMessage("No se encontró el número de expediente " + numExpediente);
+		res.setStatus("fail");
+		return null;
+	}
+
+	public TabCatTipoDocumento findTipoDocumento(Integer tipoDoc, DAOAltaDocumento documentoAlta, DTOResponse res) {
+		if (tipoDoc > 0) {
+			
+			Optional<TabCatTipoDocumento> tipoDocOpt = tabCatTipoDocumentoRepository.findById(tipoDoc);
+
+			if (tipoDocOpt.isPresent()) {
+				documentoAlta.setTipoDoc(tipoDocOpt.get());
+				return tipoDocOpt.get();
+			}
+		}
+		res.setMessage("No se encontró el tipo de documento " + tipoDoc);
+		res.setStatus("fail");
+		return null;
+	}
+	
+	
 
 }

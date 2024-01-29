@@ -46,10 +46,11 @@ import mx.gob.tecdmx.firmapki.repository.tab.TabDocumentoWorkflowRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabDocumentosAdjuntosRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabDocumentosRepository;
 import mx.gob.tecdmx.firmapki.utils.CertificateUtils;
-import mx.gob.tecdmx.firmapki.utils.DTOPayloadNotificacionesEmail;
-import mx.gob.tecdmx.firmapki.utils.DTOResponse;
 import mx.gob.tecdmx.firmapki.utils.GenerateNumOficioRandomUtils;
 import mx.gob.tecdmx.firmapki.utils.RestClient;
+import mx.gob.tecdmx.firmapki.utils.dto.DTOConfiguracion;
+import mx.gob.tecdmx.firmapki.utils.dto.DTOPayloadNotificacionesEmail;
+import mx.gob.tecdmx.firmapki.utils.dto.DTOResponse;
 
 @Service
 public class ServiceFirmar {
@@ -153,22 +154,6 @@ public class ServiceFirmar {
 		return docTabDocumentoAdjunto.get();
 	}
 
-	public boolean updateDataEnviadoInPkiDocumentosAdjuntos(List<TabDocumentosAdjuntos> documentosAdjuntos,
-			Date fechaEnvio, InstEmpleado empleadoEnvio, DTOResponse res) {
-		for (TabDocumentosAdjuntos docAdjunto : documentosAdjuntos) {
-			Optional<PkiDocumento> documentoPki = pkiDocumentoRepository
-					.findByHashDocumento(docAdjunto.getDocumentoHash());
-			if (documentoPki.isPresent()) {
-				documentoPki.get().setFechaEnvio(fechaEnvio);
-				documentoPki.get().setIdNumEmpleadoEnvio(empleadoEnvio);
-				pkiDocumentoRepository.save(documentoPki.get());
-			}
-		}
-		// res.setMessage("Hay inconsistencia entre los archivos adjuntos de la sección
-		// de tablero con la sección pki (datos faltantes)");
-		// res.setStatus("fail");
-		return true;
-	}
 
 	public int getNumFirmantesPendientesDeFirmarUnArchivoAdjunto(String hashDocumento) {
 		List<PkiDocumentoFirmantes> faltantesFirmarArchivo = pkiDocumentoFirmantesRepository
@@ -186,15 +171,6 @@ public class ServiceFirmar {
 		return false;
 	}
 	
-	public boolean validateFirmanteHaFirmado2(String hashDoc, InstEmpleado empleado, PkiCatFirmaAplicada firmaAplicada) {
-		Optional<PkiDocumentoFirmantes> faltantesFirmarArchivo = pkiDocumentoFirmantesRepository
-				.findByHashDocumentoAndIdNumEmpleadoAndIdFirmaAplicada(hashDoc,
-						empleado, firmaAplicada);
-		if (faltantesFirmarArchivo.isPresent()) {
-			return true;
-		}
-		return false;
-	}
 	
 	public boolean enviarNotificacion(InstEmpleado empleado) {
 		RestClient restClient = new RestClient();
@@ -273,32 +249,7 @@ public class ServiceFirmar {
 		}
 
 	}
-	public TabDocumentosAdjuntos editedDocumento(int idDocumento, TabDocumentos documentoStored, String docBase64, String fileType,
-			Integer numDocumento, DTOResponse res) {
-		utils = new CertificateUtils();
 
-		String fecha = utils.formatDate(new Date());
-		String fileName = buildFileName(fecha, documentoStored.getIdTipoDocumento().getDescTipoDocumento(),
-				documentoStored.getId(), numDocumento);
-
-		try {
-			TabDocumentosAdjuntos docAdjunto = new TabDocumentosAdjuntos();
-			docAdjunto.setIdDocument(documentoStored);
-			docAdjunto.setDocumentoPath(documentPath + "/" + fileName);
-			docAdjunto.setDocumentoHash(utils.calcularSHA256(new String(docBase64)));
-			docAdjunto.setDocumentoFiletype(fileType);
-			docAdjunto.setFechaCarga(new Date());
-			docAdjunto.setDocumentoBase64(docBase64);
-
-			TabDocumentosAdjuntos docAdjuntoStored = tabDocumentosAdjuntosRepository.save(docAdjunto);
-			return docAdjuntoStored;
-		} catch (Exception e) {
-			res.setMessage(e.toString());
-			res.setStatus("fail");
-			return null;
-		}
-
-	}
 
 	public String getSequenceWorkflow(TabDocumentos documento, DTOResponse res) {
 		List<TabDocumentoWorkflow> listWorkflow = tabDocumentoWorkflowRepository
@@ -386,12 +337,12 @@ public class ServiceFirmar {
 		}
 	}
 
-	public boolean storeTabDocConfig(List<mx.gob.tecdmx.firmapki.api.documento2.DTOConfiguracion> list,
+	public boolean storeTabDocConfig(List<DTOConfiguracion> list,
 			TabDocumentos documentoStored, DTOResponse res) {
 		TabDocConfig docConfig = new TabDocConfig();
 		TabDocConfig docConfigStored = null;
 		if (list.size() > 0) {
-			for (mx.gob.tecdmx.firmapki.api.documento2.DTOConfiguracion configIndex : list) {
+			for (DTOConfiguracion configIndex : list) {
 				if (configIndex.isConfig()) {
 					Optional<TabCatDocConfig> configExist = tabCatConfigDocumentoRepository
 							.findByAtributo(configIndex.getAtributo());
@@ -524,10 +475,10 @@ public class ServiceFirmar {
 	public TabDocumentos storeTabDocumento(TabCatDestinoDocumento tipoDestino, TabCatTipoDocumento tipoDocumento,
 			TabCatPrioridad prioridad, String folioEspecial, TabExpedientes numExpediente, String asunto, String notas,
 			String contenido, Date fechaLimiteFirma, boolean isEnOrden, DTOResponseUserInfo userInfo, DTOResponse res, 
-			List<mx.gob.tecdmx.firmapki.api.documento2.DTOConfiguracion> lisConfig) {
+			List<DTOConfiguracion> lisConfig) {
 		
 		GenerateNumOficioRandomUtils methodRandomUtils = new GenerateNumOficioRandomUtils();
-		for(mx.gob.tecdmx.firmapki.api.documento2.DTOConfiguracion config : lisConfig) {
+		for(DTOConfiguracion config : lisConfig) {
 			if (config.getAtributo().equals("GNUMOF")) {
 				folioEspecial= methodRandomUtils.generateRandomString();
 				break;
@@ -575,34 +526,6 @@ public class ServiceFirmar {
 
 	}
 	
-	public TabDocumentos editTabDocumento(TabDocumentos documento, TabCatDestinoDocumento tipoDestino, TabCatTipoDocumento tipoDocumento,
-			TabCatPrioridad prioridad, String folioEspecial, TabExpedientes numExpediente, String asunto, String notas,
-			String contenido, Date fechaLimiteFirma, boolean isEnOrden, DTOResponseUserInfo userInfo, DTOResponse res) {
-
-		try {
-			documento.setIdTipoDestino(tipoDestino);
-			documento.setIdTipoDocumento(tipoDocumento);
-			documento.setIdPrioridad(prioridad);
-
-			documento.setFolioEspecial(folioEspecial);
-			documento.setNumExpediente(numExpediente);
-			documento.setEnOrden(isEnOrden ? 1 : 0);
-			documento.setAsunto(asunto);
-			documento.setNotas(notas);
-			documento.setContenido(contenido);
-			documento.setFechaLimiteFirma(fechaLimiteFirma);
-			documento.setHashDocumento(null);// Quitar de la base de datos este campo
-
-			TabDocumentos documentoEdited = tabDocumentosRepository.save(documento);
-			
-			return documentoEdited;
-		} catch (Exception e) {
-			res.setMessage("" + e);
-			res.setStatus("fail");
-			return null;
-		}
-
-	}
-
+	
 
 }

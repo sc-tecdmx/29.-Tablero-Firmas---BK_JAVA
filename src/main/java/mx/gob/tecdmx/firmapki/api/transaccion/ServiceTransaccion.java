@@ -18,7 +18,7 @@ import mx.gob.tecdmx.firmapki.entity.pki.PkiX509Registrados;
 import mx.gob.tecdmx.firmapki.repository.pki.PkiDocumentoFirmantesRepository;
 import mx.gob.tecdmx.firmapki.repository.pki.PkiTransaccionRepository;
 import mx.gob.tecdmx.firmapki.repository.pki.PkiX509RegistradosRepository;
-import mx.gob.tecdmx.firmapki.utils.DTOResponse;
+import mx.gob.tecdmx.firmapki.utils.dto.DTOResponse;
 
 @Service
 public class ServiceTransaccion {

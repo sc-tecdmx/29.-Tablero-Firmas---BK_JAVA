@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import mx.gob.tecdmx.firmapki.api.documento2.DTOConfiguracion;
-import mx.gob.tecdmx.firmapki.api.documento2.DTODocAdjunto;
 import mx.gob.tecdmx.firmapki.entity.tab.TabCatDestinoDocumento;
 import mx.gob.tecdmx.firmapki.entity.tab.TabCatPrioridad;
 import mx.gob.tecdmx.firmapki.entity.tab.TabCatTipoDocumento;
 import mx.gob.tecdmx.firmapki.entity.tab.TabExpedientes;
+import mx.gob.tecdmx.firmapki.utils.dto.DTOConfiguracion;
+import mx.gob.tecdmx.firmapki.utils.dto.DTODocAdjunto;
 
 public class DAOAltaDocumento {
 
@@ -22,12 +22,12 @@ public class DAOAltaDocumento {
 	String notas;
 	String contenido;
 	Date fechaLimiteFirma;
-	List<DTOConfiguracion> configuraciones;
+	List<mx.gob.tecdmx.firmapki.utils.dto.DTOConfiguracion> configuraciones;
 	List<String> notificaciones;
 	boolean  enOrden;
 	List<DAOFirmanteDestinatario> firmantes = new ArrayList<DAOFirmanteDestinatario>();
 	List<DAOFirmanteDestinatario> destinatarios = new ArrayList<DAOFirmanteDestinatario>();
-	List<DTODocAdjunto> documentosAdjuntos;
+	List<mx.gob.tecdmx.firmapki.utils.dto.DTODocAdjunto> documentosAdjuntos;
 	
 	public DAOAltaDocumento(String folioEspecial, String asunto, String notas, String contenido,
 			Date fechaLimiteFirma, boolean enOrden) {

@@ -28,6 +28,7 @@ import mx.gob.tecdmx.firmapki.api.populate.DTOIssuerSubjectData;
 import mx.gob.tecdmx.firmapki.entity.pki.PkiUsuariosCert;
 import mx.gob.tecdmx.firmapki.entity.pki.PkiX509AcAutorizadas;
 import mx.gob.tecdmx.firmapki.entity.pki.PkiX509Registrados;
+import mx.gob.tecdmx.firmapki.utils.dto.DTOResponse;
 
 
 

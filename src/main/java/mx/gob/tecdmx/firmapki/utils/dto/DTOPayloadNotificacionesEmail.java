@@ -1,4 +1,4 @@
-package mx.gob.tecdmx.firmapki.utils;
+package mx.gob.tecdmx.firmapki.utils.dto;
 
 public class DTOPayloadNotificacionesEmail {
 	String emailDestino;

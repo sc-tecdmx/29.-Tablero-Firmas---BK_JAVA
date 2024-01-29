@@ -21,7 +21,7 @@ import mx.gob.tecdmx.firmapki.repository.tab.TabCatPrioridadRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabCatTipoDocumentoRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabDocumentosRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabExpedientesRepository;
-import mx.gob.tecdmx.firmapki.utils.DTOResponse;
+import mx.gob.tecdmx.firmapki.utils.dto.DTOResponse;
 
 @Service
 public class ServiceFindDataAndCatalogos {

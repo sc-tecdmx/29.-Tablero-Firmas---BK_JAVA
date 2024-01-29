@@ -10,7 +10,6 @@ import mx.gob.tecdmx.firmapki.DTOResponseUserInfo;
 import mx.gob.tecdmx.firmapki.api.Metodos.ServiceAlmacenarMethods;
 import mx.gob.tecdmx.firmapki.api.Metodos.ServiceConsultaMethods;
 import mx.gob.tecdmx.firmapki.api.Metodos.ServiceValidationsMethods;
-import mx.gob.tecdmx.firmapki.api.documento2.PayloadAltaDocumento;
 import mx.gob.tecdmx.firmapki.api.firma.DAOAltaDocumento;
 import mx.gob.tecdmx.firmapki.entity.pki.PkiCatTipoFirma;
 import mx.gob.tecdmx.firmapki.entity.tab.TabCatEtapaDocumento;
@@ -18,7 +17,8 @@ import mx.gob.tecdmx.firmapki.entity.tab.TabDocsFirmantes;
 import mx.gob.tecdmx.firmapki.entity.tab.TabDocumentoWorkflow;
 import mx.gob.tecdmx.firmapki.entity.tab.TabDocumentos;
 import mx.gob.tecdmx.firmapki.entity.tab.TabDocumentosAdjuntos;
-import mx.gob.tecdmx.firmapki.utils.DTOResponse;
+import mx.gob.tecdmx.firmapki.utils.dto.DTOResponse;
+import mx.gob.tecdmx.firmapki.utils.dto.PayloadAltaDocumento;
 import mx.gob.tecdmx.firmapki.utils.enums.EnumPkiCatTipoFirma;
 import mx.gob.tecdmx.firmapki.utils.enums.EnumTabCatEtapaDocumento;
 

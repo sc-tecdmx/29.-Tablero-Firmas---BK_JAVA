@@ -11,10 +11,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import mx.gob.tecdmx.firmapki.DTOResponseUserInfo;
-import mx.gob.tecdmx.firmapki.api.documento2.PayloadAltaDocumento;
-import mx.gob.tecdmx.firmapki.api.documento2.PayloadEnviarDocumento;
 import mx.gob.tecdmx.firmapki.security.ServiceSecurity;
-import mx.gob.tecdmx.firmapki.utils.DTOResponse;
+import mx.gob.tecdmx.firmapki.utils.dto.DTOResponse;
+import mx.gob.tecdmx.firmapki.utils.dto.PayloadAltaDocumento;
 
 @RestController
 @RequestMapping(path = "/api/firma")
@@ -22,9 +21,6 @@ public class RestControllerFirma {
 
 	@Autowired
 	ServiceSecurity serviceSecurity;
-
-	// @Autowired
-	// ServiceFirma serviceFirma;
 
 	@Autowired
 	ServiceFirmarAhora serviceFirmarAhora;
@@ -47,23 +43,6 @@ public class RestControllerFirma {
 	}
 
 	@CrossOrigin()
-	@RequestMapping(method = RequestMethod.POST, path = "/alta-documento-modo-captura", produces = "application/json")
-	public ResponseEntity<DTOResponse> createDocumentoCaptura(@RequestBody PayloadAltaDocumento payload,
-			HttpServletRequest request) {
-		DTOResponse res = new DTOResponse();
-		DTOResponseUserInfo userInfo = serviceSecurity.getUserInfo(request, res);
-		if (userInfo == null) {
-			return ResponseEntity.ok().header(null).body(res);
-		}
-		DAOAltaDocumento documentoAlta = null;
-		boolean docAlta = serviceFirmarAhora.altaDocumentoModoCaptura(payload, documentoAlta, res, userInfo);
-		if (docAlta) {
-			res.setData(payload);
-		}
-		return ResponseEntity.ok().header(null).body(res);
-	}
-
-	@CrossOrigin()
 	@RequestMapping(method = RequestMethod.POST, path = "/go-to-firmar", produces = "application/json")
 	public ResponseEntity<DTOResponse> createDocumentoCaptura(@RequestBody PayloadFirmar payload,
 			HttpServletRequest request) {
@@ -79,17 +58,5 @@ public class RestControllerFirma {
 		return ResponseEntity.ok().header(null).body(res);
 	}
 
-	@CrossOrigin()
-	@RequestMapping(method = RequestMethod.POST, path = "/enviar-documento", produces = "application/json")
-	public ResponseEntity<DTOResponse> enviarDocumento(@RequestBody PayloadEnviarDocumento payload,
-			HttpServletRequest request) {
-		DTOResponse res = new DTOResponse();
-		DTOResponseUserInfo userInfo = serviceSecurity.getUserInfo(request, res);
-		boolean enviado = serviceFirmarAhora.enviarDocumento(payload.getIdDocumento(), userInfo, res);
-		if (!enviado) {
-			return ResponseEntity.ok().header(null).body(res);
-		}
-		return ResponseEntity.ok().header(null).body(res);
-	}
 	
 }

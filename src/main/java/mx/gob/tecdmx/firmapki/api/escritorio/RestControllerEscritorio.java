@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import mx.gob.tecdmx.firmapki.DTOResponseUserInfo;
-import mx.gob.tecdmx.firmapki.api.documento2.PayloadAltaDocumento;
 import mx.gob.tecdmx.firmapki.api.documento2.PayloadFirma;
 import mx.gob.tecdmx.firmapki.api.firma.DAOAltaDocumento;
 import mx.gob.tecdmx.firmapki.security.ServiceSecurity;
-import mx.gob.tecdmx.firmapki.utils.DTOResponse;
+import mx.gob.tecdmx.firmapki.utils.dto.DTOResponse;
+import mx.gob.tecdmx.firmapki.utils.dto.PayloadAltaDocumento;
 
 @RestController
 @RequestMapping(path = "/api/escritorio")

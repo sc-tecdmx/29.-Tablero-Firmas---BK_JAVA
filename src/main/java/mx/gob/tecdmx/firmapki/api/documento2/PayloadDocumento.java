@@ -3,6 +3,8 @@ package mx.gob.tecdmx.firmapki.api.documento2;
 import java.util.Date;
 import java.util.List;
 
+import mx.gob.tecdmx.firmapki.utils.dto.DTOFirmanteDestinatario;
+
 public class PayloadDocumento {
 	
 	String hashDocumento;

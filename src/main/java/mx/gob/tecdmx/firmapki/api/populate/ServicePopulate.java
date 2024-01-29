@@ -20,7 +20,7 @@ import mx.gob.tecdmx.firmapki.repository.pki.PkiUsuariosCertRepository;
 import mx.gob.tecdmx.firmapki.repository.pki.PkiX509AcAutorizadasRepository;
 import mx.gob.tecdmx.firmapki.repository.pki.PkiX509RegistradosRepository;
 import mx.gob.tecdmx.firmapki.utils.CertificateUtils;
-import mx.gob.tecdmx.firmapki.utils.DTOResponse;
+import mx.gob.tecdmx.firmapki.utils.dto.DTOResponse;
 import mx.gob.tecdmx.firmapki.utils.enums.EnumTipoCerificado;
 
 @Service

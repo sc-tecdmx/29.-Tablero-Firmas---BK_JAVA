@@ -11,7 +11,7 @@ import mx.gob.tecdmx.firmapki.entity.pki.PkiX509Tsp;
 import mx.gob.tecdmx.firmapki.repository.pki.PkiTransaccionRepository;
 import mx.gob.tecdmx.firmapki.repository.pki.PkiX509TspRepository;
 import mx.gob.tecdmx.firmapki.utils.CertificateUtils;
-import mx.gob.tecdmx.firmapki.utils.DTOResponse;
+import mx.gob.tecdmx.firmapki.utils.dto.DTOResponse;
 
 @Service
 public class ServiceTSP {

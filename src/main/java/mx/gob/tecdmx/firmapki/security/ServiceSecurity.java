@@ -15,7 +15,7 @@ import mx.gob.tecdmx.firmapki.entity.inst.InstEmpleado;
 import mx.gob.tecdmx.firmapki.entity.seg.SegOrgUsuarios;
 import mx.gob.tecdmx.firmapki.repository.inst.InstEmpleadoRepository;
 import mx.gob.tecdmx.firmapki.repository.seg.SegOrgUsuariosRepository;
-import mx.gob.tecdmx.firmapki.utils.DTOResponse;
+import mx.gob.tecdmx.firmapki.utils.dto.DTOResponse;
 
 @Service
 public class ServiceSecurity {
