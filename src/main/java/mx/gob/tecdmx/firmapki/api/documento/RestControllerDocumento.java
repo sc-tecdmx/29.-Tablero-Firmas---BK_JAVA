@@ -39,6 +39,10 @@ public class RestControllerDocumento {
 	@Autowired
 	ServiceModoCapturaDocumento serviceModoCapturaDocumento;
 	
+	@Autowired
+	ServiceDocumentoByUsuario serviceDocumentoByUsuario;
+
+	
 	@CrossOrigin()
 	@RequestMapping(method = RequestMethod.POST, path = "/rechazar-documento", produces = "application/json")
 	public ResponseEntity<DTOResponse> rechazarDocumento(@RequestBody PayloadRechazarDocumento payload,
@@ -106,6 +110,24 @@ public class RestControllerDocumento {
 		if (docAlta) {
 			res.setData(payload);
 		}
+		return ResponseEntity.ok().header(null).body(res);
+	}
+	
+	@CrossOrigin()
+	@RequestMapping(method = RequestMethod.GET, path = "/documentos-usuario", produces = "application/json")
+	public ResponseEntity<DTOResponse> documentosUsuario(HttpServletRequest request) {
+		DTOResponse res = new DTOResponse();
+		DTOResponseUserInfo userInfo = serviceSecurity.getUserInfo(request, res);
+		serviceDocumentoByUsuario.getDocumentosByUsuario(res, userInfo);
+		return ResponseEntity.ok().header(null).body(res);
+	}
+	
+	@CrossOrigin()
+	@RequestMapping(method = RequestMethod.GET, path = "/numero-serie", produces = "application/json")
+	public ResponseEntity<DTOResponse> getNumeroSerieUser(HttpServletRequest request) {
+		DTOResponse res = new DTOResponse();
+		DTOResponseUserInfo userInfo = serviceSecurity.getUserInfo(request, res);
+		serviceDocumentoByUsuario.getUserSerial(userInfo, res);
 		return ResponseEntity.ok().header(null).body(res);
 	}
 }

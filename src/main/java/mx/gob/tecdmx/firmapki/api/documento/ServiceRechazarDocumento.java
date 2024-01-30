@@ -14,8 +14,6 @@ import mx.gob.tecdmx.firmapki.DTOResponseUserInfo;
 import mx.gob.tecdmx.firmapki.api.Metodos.ServiceAlmacenarMethods;
 import mx.gob.tecdmx.firmapki.api.Metodos.ServiceConsultaMethods;
 import mx.gob.tecdmx.firmapki.api.Metodos.ServiceValidationsMethods;
-import mx.gob.tecdmx.firmapki.api.firma.ServiceFirmar;
-import mx.gob.tecdmx.firmapki.api.firma.ServiceFirmarAhora;
 import mx.gob.tecdmx.firmapki.entity.inst.InstEmpleado;
 import mx.gob.tecdmx.firmapki.entity.pki.HashDocumentoIdUsuarioIdTransaccionID;
 import mx.gob.tecdmx.firmapki.entity.pki.PkiCatFirmaAplicada;

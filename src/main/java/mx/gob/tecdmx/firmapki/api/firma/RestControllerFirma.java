@@ -14,6 +14,7 @@ import mx.gob.tecdmx.firmapki.DTOResponseUserInfo;
 import mx.gob.tecdmx.firmapki.security.ServiceSecurity;
 import mx.gob.tecdmx.firmapki.utils.dto.DTOResponse;
 import mx.gob.tecdmx.firmapki.utils.dto.PayloadAltaDocumento;
+import mx.gob.tecdmx.firmapki.utils.dto.PayloadFirma;
 
 @RestController
 @RequestMapping(path = "/api/firma")
@@ -24,6 +25,12 @@ public class RestControllerFirma {
 
 	@Autowired
 	ServiceFirmarAhora serviceFirmarAhora;
+	
+	@Autowired
+	ServiceGoToFirmar serviceGoToFirmar;
+	
+	@Autowired
+	ServiceFirmarDocumento serviceFirmarDocumento;
 
 	@CrossOrigin()
 	@RequestMapping(method = RequestMethod.POST, path = "/alta-documento-modo-firmar-ahora", produces = "application/json")
@@ -51,10 +58,19 @@ public class RestControllerFirma {
 		if (userInfo == null) {
 			return ResponseEntity.ok().header(null).body(res);
 		}
-		boolean docFirmado = serviceFirmarAhora.gotoFirmar(payload.getIdDocumento(), userInfo, res);
+		boolean docFirmado = serviceGoToFirmar.gotoFirmar(payload.getIdDocumento(), userInfo, res);
 		if (docFirmado) {
 			res.setData(payload);
 		}
+		return ResponseEntity.ok().header(null).body(res);
+	}
+	
+	@CrossOrigin()
+	@RequestMapping(method = RequestMethod.POST, path = "/firmar-documento", produces = "application/json")
+	public ResponseEntity<DTOResponse> firmarDocumento(@RequestBody PayloadFirma payload, HttpServletRequest request) {
+		DTOResponse res = new DTOResponse();
+		DTOResponseUserInfo userInfo = serviceSecurity.getUserInfo(request, res);
+		serviceFirmarDocumento.firmar(payload, res, userInfo);
 		return ResponseEntity.ok().header(null).body(res);
 	}
 

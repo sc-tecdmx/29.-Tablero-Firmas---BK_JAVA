@@ -1,7 +1,5 @@
-package mx.gob.tecdmx.firmapki.api.escritorio;
+package mx.gob.tecdmx.firmapki.api.firma;
 
-import java.io.IOException;
-import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -13,92 +11,52 @@ import org.springframework.stereotype.Service;
 import mx.gob.tecdmx.firmapki.DTOResponseUserInfo;
 import mx.gob.tecdmx.firmapki.api.Metodos.ServiceAlmacenarMethods;
 import mx.gob.tecdmx.firmapki.api.Metodos.ServiceConsultaMethods;
-import mx.gob.tecdmx.firmapki.api.Metodos.ServiceValidationsMethods;
-import mx.gob.tecdmx.firmapki.api.firma.ResponseBodyFirma;
 import mx.gob.tecdmx.firmapki.entity.pki.HashDocumentoIdUsuarioIdTransaccionID;
 import mx.gob.tecdmx.firmapki.entity.pki.PkiCatFirmaAplicada;
 import mx.gob.tecdmx.firmapki.entity.pki.PkiDocumento;
 import mx.gob.tecdmx.firmapki.entity.pki.PkiDocumentoFirmantes;
 import mx.gob.tecdmx.firmapki.entity.tab.TabCatEtapaDocumento;
+import mx.gob.tecdmx.firmapki.entity.tab.TabDocDestinatarios;
 import mx.gob.tecdmx.firmapki.entity.tab.TabDocsFirmantes;
 import mx.gob.tecdmx.firmapki.entity.tab.TabDocumentoWorkflow;
 import mx.gob.tecdmx.firmapki.entity.tab.TabDocumentosAdjuntos;
-import mx.gob.tecdmx.firmapki.repository.pki.PkiDocumentoDestinoRepository;
 import mx.gob.tecdmx.firmapki.repository.pki.PkiDocumentoFirmantesRepository;
 import mx.gob.tecdmx.firmapki.repository.pki.PkiDocumentoRepository;
-import mx.gob.tecdmx.firmapki.repository.pki.PkiTransaccionRepository;
-import mx.gob.tecdmx.firmapki.repository.tab.TabDocumentosAdjuntosRepository;
-import mx.gob.tecdmx.firmapki.utils.CertificateUtils;
 import mx.gob.tecdmx.firmapki.utils.dto.DTOResponse;
 import mx.gob.tecdmx.firmapki.utils.dto.PayloadFirma;
 import mx.gob.tecdmx.firmapki.utils.enums.EnumPkiCatFirmaAplicada;
 import mx.gob.tecdmx.firmapki.utils.enums.EnumTabCatEtapaDocumento;
 
 @Service
-public class ServiceFirmarEscritorio {
-
-	@Autowired
-	PkiDocumentoRepository pkiDocumentoRepository;
-
+public class ServiceFirmarDocumento {
+	
 	@Autowired
 	PkiDocumentoFirmantesRepository pkiDocumentoFirmantesRepository;
-
+	
 	@Autowired
-	PkiDocumentoDestinoRepository pkiDocumentoDestRepository;
-
-	@Autowired
-	PkiTransaccionRepository pkiTransaccionRepository;
-
-	@Autowired
-	TabDocumentosAdjuntosRepository tabDocumentosAdjuntosRepository;
-
-	@Autowired
-	ServiceValidationsMethods serviceValidacionesMetodos;
-
-	@Autowired
-	ServiceConsultaMethods serviceConsultaMethods;
-
+	PkiDocumentoRepository pkiDocumentoRepository;
+	
 	@Autowired
 	ServiceAlmacenarMethods serviceAlmacenarMethods;
-
-	@Value("${firma.document.encryption}")
-	private String encryptionAlgorithm;
+	
+	@Autowired
+	ServiceConsultaMethods serviceConsultaMethods;
+	
+	@Autowired
+	ServiceFirma serviceFirma;
+	
+	@Value("${firma.document.pdf.path}")
+	private String documentPath;
 
 	@Value("${firma.document.pdf.firmados.path}")
 	private String documentFirmadosPath;
 
-	public void firmaEscritorio(String hashDocumento, byte[] documentoFirmadoBase64, String filePath) {
-		CertificateUtils utils = new CertificateUtils();
-		try {
-			try {
-
-				Optional<TabDocumentosAdjuntos> doc = tabDocumentosAdjuntosRepository
-						.findByDocumentoHash(hashDocumento);
-				if (doc.isPresent()) {
-					doc.get().setDocumentoBase64(Base64.getEncoder().encodeToString(documentoFirmadoBase64));
-					tabDocumentosAdjuntosRepository.save(doc.get());
-					System.out.println("se actualizó el base64 del doc firmado.");
-				}
-				boolean storeInFolder = false;
-				if (storeInFolder) {
-					utils.writePdfFile(documentoFirmadoBase64, filePath);
-				}
-
-				System.out.println("PDF firmado guardado con éxito.");
-			} catch (IOException e) {
-				System.err.println("Error al guardar el PDF firmado:");
-				e.printStackTrace();
-			}
-
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} // Implementa esta lógica
-	}
-
-	public boolean firmarDocumentoEscritorio(PayloadFirma payload, DTOResponse res, DTOResponseUserInfo userInfo) {
+	@Value("${firma.document.encryption}")
+	private String encryptionAlgorithm;
+	
+	public boolean firmar(PayloadFirma payload, DTOResponse res, DTOResponseUserInfo userInfo) {
 		ResponseBodyFirma responde = new ResponseBodyFirma();
-
+		List<TabDocDestinatarios> listaDestinatariosTab = null;
 		// Sección de actualización de PKI documentos_firmantes
 		HashDocumentoIdUsuarioIdTransaccionID idDocumentoFirmantes = new HashDocumentoIdUsuarioIdTransaccionID();
 		idDocumentoFirmantes.setHashDocumento(payload.getHashDocumento());
@@ -108,7 +66,7 @@ public class ServiceFirmarEscritorio {
 				.findById(idDocumentoFirmantes);
 		if (!docFirmantesPki.isPresent()) {
 			res.setData(null);
-			res.setStatus("Fail");
+			res.setStatus("fail");
 			res.setMessage("No puedes firmar este documento, ya que no te fue asignado para firmar");
 			return false;
 		}
@@ -136,7 +94,9 @@ public class ServiceFirmarEscritorio {
 		String fileName = documentFirmadosPath + "/" + payload.getHashDocumento() + "_"
 				+ userInfo.getData().getIdUsuario() + ".pdf";
 
-		firmaEscritorio(payload.getHashDocumento(), payload.getDocumento(), fileName);
+		serviceFirma.firma(payload.getHashDocumento(), payload.getDocumento(), payload.getCadenaFirma(),
+				payload.getCertificado(), fileName,
+				userInfo);
 
 		try {
 			// sección para actualizar documento PKI
@@ -154,6 +114,8 @@ public class ServiceFirmarEscritorio {
 					.getTabDocumentosAdjuntos(documentoAdjuntoTab.getIdDocument());
 			List<TabDocsFirmantes> listaFirmantesTab = serviceConsultaMethods
 					.getTabDocsFirmantes(documentoAdjuntoTab.getIdDocument().getId());
+			
+			listaDestinatariosTab = serviceConsultaMethods.getTabDocsDestinatarios(documentoAdjuntoTab.getIdDocument().getId());
 
 			for (TabDocumentosAdjuntos docAdjuntoTab : listaDocAdjuntosTab) {
 				boolean archivoCompleted = true;
@@ -201,6 +163,8 @@ public class ServiceFirmarEscritorio {
 		}
 
 		if (allDocsFirmados) {
+			boolean documentoDestinatariosStored = serviceAlmacenarMethods.storePkiDocumentoDestinatarios(documentosAdjuntosTabList,listaDestinatariosTab,res);
+			
 			TabCatEtapaDocumento etapaDoc_terminado = serviceConsultaMethods
 					.findEtapaDocumentoEnum(EnumTabCatEtapaDocumento.TERMINADO.getOpcion(), res);
 			if (etapaDoc_terminado == null) {
@@ -208,7 +172,8 @@ public class ServiceFirmarEscritorio {
 			}
 
 			TabDocumentoWorkflow workflowStored_Terminado = serviceAlmacenarMethods.storeWorkFlow(
-					documentoAdjuntoTab.getIdDocument(), etapaDoc_terminado, userInfo.getData().getEmpleado(), res);
+					documentoAdjuntoTab.getIdDocument(), etapaDoc_terminado,
+					userInfo.getData().getEmpleado(), res);
 			if (workflowStored_Terminado == null) {
 				return false;
 			}

@@ -11,6 +11,7 @@ import mx.gob.tecdmx.firmapki.entity.inst.InstEmpleado;
 import mx.gob.tecdmx.firmapki.entity.pki.PkiCatFirmaAplicada;
 import mx.gob.tecdmx.firmapki.entity.pki.PkiCatTipoFirma;
 import mx.gob.tecdmx.firmapki.entity.pki.PkiDocumento;
+import mx.gob.tecdmx.firmapki.entity.pki.PkiDocumentoFirmantes;
 import mx.gob.tecdmx.firmapki.entity.tab.TabCatEtapaDocumento;
 import mx.gob.tecdmx.firmapki.entity.tab.TabCatInstDest;
 import mx.gob.tecdmx.firmapki.entity.tab.TabCatInstFirmantes;
@@ -25,6 +26,7 @@ import mx.gob.tecdmx.firmapki.entity.tab.TabExpedientes;
 import mx.gob.tecdmx.firmapki.repository.inst.InstEmpleadoRepository;
 import mx.gob.tecdmx.firmapki.repository.pki.PkiCatFirmaAplicadaRepository;
 import mx.gob.tecdmx.firmapki.repository.pki.PkiCatTipoFirmaRepository;
+import mx.gob.tecdmx.firmapki.repository.pki.PkiDocumentoFirmantesRepository;
 import mx.gob.tecdmx.firmapki.repository.pki.PkiDocumentoRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabCatEtapaDocumentoRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabCatInstDestRepository;
@@ -84,6 +86,9 @@ public class ServiceConsultaMethods {
 	
 	@Autowired
 	PkiCatTipoFirmaRepository pkiCatTipoFirmaRepository;
+	
+	@Autowired
+	PkiDocumentoFirmantesRepository pkiDocumentoFirmantesRepository;
 	
 	@Autowired
 	InstEmpleadoRepository instEmpleadoRepository;
@@ -296,6 +301,12 @@ public class ServiceConsultaMethods {
 		res.setMessage("No se encontró el tipo de documento " + tipoDoc);
 		res.setStatus("fail");
 		return null;
+	}
+	
+	public int getNumFirmantesPendientesDeFirmarUnArchivoAdjunto(String hashDocumento) {
+		List<PkiDocumentoFirmantes> faltantesFirmarArchivo = pkiDocumentoFirmantesRepository
+				.findByHashDocumentoAndFechaFirmaAndIdFirmaAplicada(hashDocumento, null, null);
+		return faltantesFirmarArchivo.size();
 	}
 	
 	

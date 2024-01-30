@@ -1,4 +1,4 @@
-package mx.gob.tecdmx.firmapki.api.documento2;
+package mx.gob.tecdmx.firmapki.api.firma;
 
 import java.util.Date;
 

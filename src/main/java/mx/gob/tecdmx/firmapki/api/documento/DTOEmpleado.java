@@ -1,4 +1,4 @@
-package mx.gob.tecdmx.firmapki.api.documento2;
+package mx.gob.tecdmx.firmapki.api.documento;
 
 public class DTOEmpleado {
 	int idEmpleado;
