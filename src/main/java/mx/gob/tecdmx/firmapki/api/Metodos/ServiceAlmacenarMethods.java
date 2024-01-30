@@ -123,10 +123,13 @@ public class ServiceAlmacenarMethods {
 			String contenido, Date fechaLimiteFirma, boolean isEnOrden, DTOResponseUserInfo userInfo, DTOResponse res, 
 			List<DTOConfiguracion> lisConfig) {
 		
+		String numOficio = null;
 		GenerateNumOficioRandomUtils methodRandomUtils = new GenerateNumOficioRandomUtils();
 		for(DTOConfiguracion config : lisConfig) {
 			if (config.getAtributo().equals("GNUMOF")) {
-				folioEspecial= methodRandomUtils.generateRandomString();
+				if(config.isConfig()) {
+					numOficio= methodRandomUtils.generateRandomString();	
+				}
 				break;
 			}
 		}
@@ -139,6 +142,7 @@ public class ServiceAlmacenarMethods {
 			documento.setIdPrioridad(prioridad);
 
 			documento.setFolioEspecial(folioEspecial);
+			documento.setNumOficio(numOficio);
 			documento.setCreacionDocumentoFecha(new Date());
 			documento.setIdNumEmpleadoCreador(userInfo.getData().getEmpleado());
 			documento.setIdUsuarioCreador(userInfo.getData().getUser());

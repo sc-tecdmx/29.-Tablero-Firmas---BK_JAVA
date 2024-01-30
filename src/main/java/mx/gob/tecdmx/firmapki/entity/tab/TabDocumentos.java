@@ -43,6 +43,9 @@ public class TabDocumentos {
   
 	@Column(name = "folio_especial")
 	String  folioEspecial;
+	
+	@Column(name = "s_num_oficio")
+	String  numOficio;
   
 	@Column(name = "visible")
 	boolean  visible;
@@ -229,7 +232,13 @@ public class TabDocumentos {
 		this.visible = visible;
 	}
 
+	public String getNumOficio() {
+		return numOficio;
+	}
 
+	public void setNumOficio(String numOficio) {
+		this.numOficio = numOficio;
+	}
 
 	
 }

@@ -175,7 +175,13 @@ public class ServiceRechazarDocumento {
 			
 			List<TabDocsFirmantes> firmantes = tabDocsFirmantesRepository.findByIdDocumento(documentoExist.get().getId());
 			boolean notificacionRechazo = notificacionRechazoDocumento(firmantes);
+			
+			res.setData(null);
+			res.setStatus("Success");
+			res.setMessage("El documento ha sido Rechazado");
 
+			return res;
+			
 		} else if (docRechazadoByDestinatario) {
 			boolean isTerminado = serviceValidacionesMetodos.verificaDocumentoIsTerminadoDestinatarios(docsAdjuntos);
 			if (isTerminado) {
@@ -185,12 +191,18 @@ public class ServiceRechazarDocumento {
 				TabDocumentoWorkflow workflowStored_Creado = serviceAlmacenarMethods.storeWorkFlow(documentoExist.get(),
 						etapaDoc_Terminado, userInfo.getData().getEmpleado(), res);
 			}
+			
+			res.setData(null);
+			res.setStatus("Succes");
+			res.setMessage("El documento ha sido Rechazado");
+
+			return res;
 
 		}
 
 		res.setData(null);
-		res.setStatus("Succes");
-		res.setMessage("El documento ha sido Rechazado");
+		res.setStatus("fail");
+		res.setMessage("El documento aun se encuentra en captura, no pudo ser rechazado");
 
 		return res;
 
