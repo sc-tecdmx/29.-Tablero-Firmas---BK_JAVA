@@ -1061,7 +1061,7 @@ CREATE TABLE `seg_org_log_sesion` (
   `n_id_usuario` int DEFAULT NULL,
   `d_fecha_inicio` timestamp NULL DEFAULT NULL,
   `d_fecha_fin` timestamp NULL DEFAULT NULL COMMENT 'El usuario realizo un logout',
-  `n_end_sesion` int DEFAULT NULL COMMENT 'Fin de la sesión en milisegundos',
+  `n_end_sesion` bigint DEFAULT NULL COMMENT 'Fin de la sesión en milisegundos',
   `chain_n_session_id` int DEFAULT NULL,
   PRIMARY KEY (`n_session_id`),
   KEY `n_id_usuario` (`n_id_usuario`),

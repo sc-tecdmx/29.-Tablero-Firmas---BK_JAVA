@@ -413,7 +413,7 @@ CREATE TABLE `seg_org_log_sesion` (
   `n_id_usuario` int,
   `d_fecha_inicio` timestamp,
   `d_fecha_fin` timestamp COMMENT 'El usuario realizo un logout',
-  `n_end_sesion` int COMMENT 'Fin de la sesión en milisegundos',
+  `n_end_sesion` bigint COMMENT 'Fin de la sesión en milisegundos',
   `chain_n_session_id` int
 );
 

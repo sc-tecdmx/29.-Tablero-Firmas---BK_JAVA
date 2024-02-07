@@ -19,6 +19,7 @@ import mx.gob.tecdmx.firmapki.entity.pki.HashDocumentoIdUsuarioIdTransaccionID;
 import mx.gob.tecdmx.firmapki.entity.pki.PkiCatFirmaAplicada;
 import mx.gob.tecdmx.firmapki.entity.pki.PkiDocumento;
 import mx.gob.tecdmx.firmapki.entity.pki.PkiDocumentoFirmantes;
+import mx.gob.tecdmx.firmapki.entity.seg.SegOrgLogSesion;
 import mx.gob.tecdmx.firmapki.entity.tab.TabCatEtapaDocumento;
 import mx.gob.tecdmx.firmapki.entity.tab.TabDocsFirmantes;
 import mx.gob.tecdmx.firmapki.entity.tab.TabDocumentoWorkflow;
@@ -27,6 +28,7 @@ import mx.gob.tecdmx.firmapki.repository.pki.PkiDocumentoDestinoRepository;
 import mx.gob.tecdmx.firmapki.repository.pki.PkiDocumentoFirmantesRepository;
 import mx.gob.tecdmx.firmapki.repository.pki.PkiDocumentoRepository;
 import mx.gob.tecdmx.firmapki.repository.pki.PkiTransaccionRepository;
+import mx.gob.tecdmx.firmapki.repository.seg.SegOrgLogSesionRepository;
 import mx.gob.tecdmx.firmapki.repository.tab.TabDocumentosAdjuntosRepository;
 import mx.gob.tecdmx.firmapki.utils.CertificateUtils;
 import mx.gob.tecdmx.firmapki.utils.dto.DTOResponse;
@@ -48,6 +50,9 @@ public class ServiceFirmarEscritorio {
 
 	@Autowired
 	PkiTransaccionRepository pkiTransaccionRepository;
+	
+	@Autowired
+	SegOrgLogSesionRepository segOrgLogSesionRepository;
 
 	@Autowired
 	TabDocumentosAdjuntosRepository tabDocumentosAdjuntosRepository;
@@ -214,6 +219,17 @@ public class ServiceFirmarEscritorio {
 			}
 		}
 
+		Optional<SegOrgLogSesion> sesionExist =segOrgLogSesionRepository.findById(Integer.parseInt(userInfo.getData().getIdSession()));
+		if(sesionExist.isPresent()) {
+			
+			 long tiempoTerminacion = System.currentTimeMillis();
+			//almacena el Log de la sesión finalizada
+			sesionExist.get().setD_fecha_fin(new Date());
+			sesionExist.get().setN_end_sesion(tiempoTerminacion);
+			segOrgLogSesionRepository.save(sesionExist.get());
+			
+		}
+		
 		responde.setAlgortimo(encryptionAlgorithm);
 
 		res.setData(responde);

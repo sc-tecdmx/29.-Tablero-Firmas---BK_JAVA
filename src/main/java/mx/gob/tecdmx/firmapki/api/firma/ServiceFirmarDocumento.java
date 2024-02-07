@@ -134,6 +134,7 @@ public class ServiceFirmarDocumento {
 			}
 
 			pkiDocumentoRepository.save(documentoPki);
+			
 
 		} catch (Exception e) {
 			res.setMessage("No se pudo actualizar la información en la tabla documento PKI");
@@ -163,6 +164,8 @@ public class ServiceFirmarDocumento {
 		}
 
 		if (allDocsFirmados) {
+			
+			// como el documento tiene todas la firmas ya se puede enviar a destinatarios
 			boolean documentoDestinatariosStored = serviceAlmacenarMethods.storePkiDocumentoDestinatarios(documentosAdjuntosTabList,listaDestinatariosTab,res);
 			
 			TabCatEtapaDocumento etapaDoc_terminado = serviceConsultaMethods

@@ -15,6 +15,7 @@ public class DTOUserInfo {
 	InstEmpleado empleado;
 	String rol;
 	ResponseBodyMenu menu;
+	String idSession;
 	
 	public String getEmail() {
 		return email;
@@ -82,6 +83,11 @@ public class DTOUserInfo {
 	public void setEmpleado(InstEmpleado empleado) {
 		this.empleado = empleado;
 	}
-	
+	public String getIdSession() {
+		return idSession;
+	}
+	public void setIdSession(String idSession) {
+		this.idSession = idSession;
+	}
 	
 }

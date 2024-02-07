@@ -188,8 +188,8 @@ public class ServiceRechazarDocumento {
 				TabCatEtapaDocumento etapaDoc_Terminado = serviceConsultaMethods
 						.findEtapaDocumentoEnum(EnumTabCatEtapaDocumento.TERMINADO.getOpcion(), res);
 
-				TabDocumentoWorkflow workflowStored_Creado = serviceAlmacenarMethods.storeWorkFlow(documentoExist.get(),
-						etapaDoc_Terminado, userInfo.getData().getEmpleado(), res);
+//				TabDocumentoWorkflow workflowStored_Creado = serviceAlmacenarMethods.storeWorkFlow(documentoExist.get(),
+//						etapaDoc_Terminado, userInfo.getData().getEmpleado(), res);
 			}
 			
 			res.setData(null);

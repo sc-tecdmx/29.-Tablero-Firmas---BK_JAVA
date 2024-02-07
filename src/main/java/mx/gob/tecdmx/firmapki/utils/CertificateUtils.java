@@ -25,6 +25,7 @@ import org.bouncycastle.asn1.x500.style.BCStyle;
 import com.google.gson.Gson;
 
 import mx.gob.tecdmx.firmapki.api.populate.DTOIssuerSubjectData;
+import mx.gob.tecdmx.firmapki.entity.pki.PkiLogUsuariosCert;
 import mx.gob.tecdmx.firmapki.entity.pki.PkiUsuariosCert;
 import mx.gob.tecdmx.firmapki.entity.pki.PkiX509AcAutorizadas;
 import mx.gob.tecdmx.firmapki.entity.pki.PkiX509Registrados;
@@ -46,6 +47,12 @@ public class CertificateUtils {
 	}
 	
 	public String objectToJson(PkiUsuariosCert objeto) {
+		Gson gson = new Gson();
+		String json = gson.toJson(objeto);
+		return json;
+	}
+	
+	public String objectToJsonLog(PkiLogUsuariosCert objeto) {
 		Gson gson = new Gson();
 		String json = gson.toJson(objeto);
 		return json;
