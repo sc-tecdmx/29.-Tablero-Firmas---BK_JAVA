@@ -271,48 +271,30 @@ CREATE TABLE `pki_x509_jel_autorizacion` (
   `s_token_vigencia` varchar(64)
 );
 
-CREATE TABLE `inst_cat_sexo` (
-  `id_sexo` int PRIMARY KEY AUTO_INCREMENT,
-  `sexo` varchar(1),
-  `sexo_desc` varchar(20)
-);
-
-CREATE TABLE `inst_u_adscripcion` (
-  `n_id_u_adscripcion` int PRIMARY KEY AUTO_INCREMENT,
+CREATE TABLE `inst_u_adscripcion_detalle` (
+  `n_id_u_adscripcion_detalle` int PRIMARY KEY AUTO_INCREMENT,
   `s_desc_unidad` varchar(255),
   `s_abrev_unidad` varchar(15)
 );
 
 CREATE TABLE `inst_cat_areas` (
   `n_id_cat_area` int PRIMARY KEY AUTO_INCREMENT,
-  `n_id_u_adscripcion` int,
+  `n_id_u_adscripcion_detalle` int,
   `s_desc_area` varchar(100),
   `s_abrev_area` varchar(15) UNIQUE,
   `n_id_cat_area_padre` int
 );
 
+CREATE TABLE `inst_cat_sexo` (
+  `id_sexo` int PRIMARY KEY AUTO_INCREMENT,
+  `sexo` varchar(1),
+  `sexo_desc` varchar(20)
+);
+
 CREATE TABLE `inst_cat_puestos` (
-  `n_id_puesto` int PRIMARY KEY AUTO_INCREMENT,
+  `n_id_cat_puesto` int PRIMARY KEY AUTO_INCREMENT,
   `s_desc_nombramiento` varchar(100),
   `n_tipo_usuario` varchar(1) COMMENT 'J - Jurisdiccional, A - Administrativo'
-);
-
-CREATE TABLE `inst_titular_u_adscripcion` (
-  `n_id_titular_area` int PRIMARY KEY AUTO_INCREMENT,
-  `n_id_u_adscripcion` int,
-  `n_id_empleado_puesto` int,
-  `fecha_inicio` date,
-  `fecha_conclusion` date
-);
-
-CREATE TABLE `inst_empleado_puesto` (
-  `n_id_empleado_puesto` int PRIMARY KEY AUTO_INCREMENT,
-  `n_id_num_empleado` int,
-  `n_id_cat_area` int,
-  `n_id_puesto` int,
-  `fecha_alta` date,
-  `fecha_conclusion` date,
-  `activo` tinyint(1) NOT NULL DEFAULT '1',
 );
 
 CREATE TABLE `inst_empleado` (
@@ -329,7 +311,26 @@ CREATE TABLE `inst_empleado` (
   `rfc` varchar(13),
   `path_fotografia` varchar(256),
   `n_id_usuario` int,
-  `activo` tinyint(1) NOT NULL DEFAULT '1',
+  `activo` tinyint(1) NOT NULL DEFAULT '1'
+);
+
+CREATE TABLE `inst_empleado_puesto_area` (
+  `n_id_empleado_puesto_area` int PRIMARY KEY AUTO_INCREMENT,
+  `n_id_num_empleado` int,
+  `n_id_cat_area` int,
+  `n_id_cat_puesto` int,
+  `fecha_alta` date,
+  `fecha_conclusion` date,
+  `n_tipo_estructura` varchar(1) COMMENT 'O - Orgánica, F - Funcional, si es orgánica es porque así aparece en el directorio, funcional es cuando sus funciones son otras',
+  `activo` tinyint(1) NOT NULL DEFAULT '1'
+);
+
+CREATE TABLE `inst_titular_u_adscripcion` (
+  `n_id_titular_area` int PRIMARY KEY AUTO_INCREMENT,
+  `n_id_u_adscripcion_detalle` int,
+  `n_id_empleado_puesto_area` int,
+  `fecha_inicio` date,
+  `fecha_conclusion` date
 );
 
 CREATE TABLE `inst_log_empleado` (
@@ -372,7 +373,8 @@ CREATE TABLE `seg_org_roles_usuarios` (
   `n_id_rol_usuario` int PRIMARY KEY AUTO_INCREMENT,
   `n_id_rol` int,
   `n_id_usuario` int,
-  `n_id_u_adscripcion` int,
+  `n_id_empleado_puesto_area` int,
+  `n_id_u_adscripcion_detalle` int,
   `n_session_id` int
 );
 
@@ -615,19 +617,21 @@ ALTER TABLE `pki_x509_documento_certificado` ADD FOREIGN KEY (`n_id_certificado_
 
 ALTER TABLE `pki_x509_jel_autorizacion` ADD FOREIGN KEY (`n_id_certificado_x509`) REFERENCES `pki_x509_registrados` (`s_x509_serial_number`);
 
-ALTER TABLE `inst_cat_areas` ADD FOREIGN KEY (`n_id_u_adscripcion`) REFERENCES `inst_u_adscripcion` (`n_id_u_adscripcion`);
+ALTER TABLE `inst_cat_areas` ADD FOREIGN KEY (`n_id_u_adscripcion_detalle`) REFERENCES `inst_u_adscripcion_detalle` (`n_id_u_adscripcion_detalle`);
 
 ALTER TABLE `inst_cat_areas` ADD FOREIGN KEY (`n_id_cat_area_padre`) REFERENCES `inst_cat_areas` (`n_id_cat_area`);
 
-ALTER TABLE `inst_titular_u_adscripcion` ADD FOREIGN KEY (`n_id_u_adscripcion`) REFERENCES `inst_u_adscripcion` (`n_id_u_adscripcion`);
+ALTER TABLE `inst_titular_u_adscripcion` ADD FOREIGN KEY (`n_id_u_adscripcion_detalle`) REFERENCES `inst_u_adscripcion_detalle` (`n_id_u_adscripcion_detalle`);
 
-ALTER TABLE `inst_titular_u_adscripcion` ADD FOREIGN KEY (`n_id_empleado_puesto`) REFERENCES `inst_empleado_puesto` (`n_id_empleado_puesto`);
+ALTER TABLE `inst_titular_u_adscripcion` ADD FOREIGN KEY (`n_id_empleado_puesto_area`) REFERENCES `inst_empleado_puesto_area` (`n_id_empleado_puesto_area`);
 
-ALTER TABLE `inst_empleado_puesto` ADD FOREIGN KEY (`n_id_num_empleado`) REFERENCES `inst_empleado` (`n_id_num_empleado`);
+ALTER TABLE `seg_org_roles_usuarios` ADD FOREIGN KEY (`n_id_empleado_puesto_area`) REFERENCES `inst_empleado_puesto_area` (`n_id_empleado_puesto_area`);
 
-ALTER TABLE `inst_empleado_puesto` ADD FOREIGN KEY (`n_id_cat_area`) REFERENCES `inst_cat_areas` (`n_id_cat_area`);
+ALTER TABLE `inst_empleado_puesto_area` ADD FOREIGN KEY (`n_id_num_empleado`) REFERENCES `inst_empleado` (`n_id_num_empleado`);
 
-ALTER TABLE `inst_empleado_puesto` ADD FOREIGN KEY (`n_id_puesto`) REFERENCES `inst_cat_puestos` (`n_id_puesto`);
+ALTER TABLE `inst_empleado_puesto_area` ADD FOREIGN KEY (`n_id_cat_area`) REFERENCES `inst_cat_areas` (`n_id_cat_area`);
+
+ALTER TABLE `inst_empleado_puesto_area` ADD FOREIGN KEY (`n_id_cat_puesto`) REFERENCES `inst_cat_puestos` (`n_id_cat_puesto`);
 
 ALTER TABLE `inst_empleado` ADD FOREIGN KEY (`id_sexo`) REFERENCES `inst_cat_sexo` (`id_sexo`);
 
@@ -649,7 +653,7 @@ ALTER TABLE `seg_org_roles_usuarios` ADD FOREIGN KEY (`n_id_rol`) REFERENCES `se
 
 ALTER TABLE `seg_org_roles_usuarios` ADD FOREIGN KEY (`n_id_usuario`) REFERENCES `seg_org_usuarios` (`n_id_usuario`);
 
-ALTER TABLE `seg_org_roles_usuarios` ADD FOREIGN KEY (`n_id_u_adscripcion`) REFERENCES `inst_u_adscripcion` (`n_id_u_adscripcion`);
+ALTER TABLE `seg_org_roles_usuarios` ADD FOREIGN KEY (`n_id_u_adscripcion_detalle`) REFERENCES `inst_u_adscripcion_detalle` (`n_id_u_adscripcion_detalle`);
 
 ALTER TABLE `seg_org_roles_usuarios` ADD FOREIGN KEY (`n_session_id`) REFERENCES `seg_org_log_sesion` (`n_session_id`);
 

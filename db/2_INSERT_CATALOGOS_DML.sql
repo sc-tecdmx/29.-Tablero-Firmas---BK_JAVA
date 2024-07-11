@@ -1,4 +1,4 @@
-INSERT INTO inst_cat_puestos(n_id_puesto, s_desc_nombramiento, n_tipo_usuario) VALUES
+INSERT INTO inst_cat_puestos(n_id_cat_puesto, s_desc_nombramiento, n_tipo_usuario) VALUES
 (1, 'Abogada/o', 'J'),
 (2,'Actuaria/o A','J'),
 (3,'Actuaria/o B','J'),
