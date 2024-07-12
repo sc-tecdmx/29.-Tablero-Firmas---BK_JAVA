@@ -46,22 +46,17 @@ DROP TABLE inst_log_empleado;
 
 DROP TABLE seg_cat_estado_usuario;
 DROP TABLE seg_cat_nivel_modulo;
-DROP TABLE seg_org_usuario_estado_usuario;
-DROP TABLE seg_org_usuarios;
-DROP TABLE seg_org_roles_usuarios;
-DROP TABLE seg_org_roles;
-DROP TABLE seg_org_roles_modulos;
-DROP TABLE seg_org_modulos;
-DROP TABLE seg_org_log_sesion;
+DROP TABLE seg_usuario_estado_usuario;
+DROP TABLE seg_usuarios;
+DROP TABLE seg_roles_usuarios;
+DROP TABLE seg_roles;
+DROP TABLE seg_usuarios_roles_modulos;
+DROP TABLE seg_modulos;
+DROP TABLE seg_log_sesion;
 DROP TABLE seg_log_sistema;
 DROP TABLE seg_log_usuario;
 
 
 DROP TABLE jel_renapo_curps;
 DROP TABLE jel_persona_jel;
-DROP TABLE jel_seg_usuarios;
-DROP TABLE jel_seg_roles_usuarios;
-DROP TABLE jel_seg_roles;
-DROP TABLE jel_seg_roles_modulos;
-DROP TABLE jel_seg_modulos;
 SET FOREIGN_KEY_CHECKS=1;

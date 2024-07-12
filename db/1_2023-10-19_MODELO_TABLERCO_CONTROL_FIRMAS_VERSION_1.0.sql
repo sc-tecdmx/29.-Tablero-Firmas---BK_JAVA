@@ -350,7 +350,7 @@ CREATE TABLE `seg_cat_nivel_modulo` (
   `desc_nivel` varchar(20)
 );
 
-CREATE TABLE `seg_org_usuario_estado_usuario` (
+CREATE TABLE `seg_usuario_estado_usuario` (
   `n_id_usuario_status` int PRIMARY KEY AUTO_INCREMENT,
   `n_id_usuario` int,
   `n_id_estado_usuario` int,
@@ -359,7 +359,7 @@ CREATE TABLE `seg_org_usuario_estado_usuario` (
   `n_session_id` int
 );
 
-CREATE TABLE `seg_org_usuarios` (
+CREATE TABLE `seg_usuarios` (
   `n_id_usuario` int PRIMARY KEY AUTO_INCREMENT,
   `s_usuario` varchar(20),
   `s_contrasenia` varchar(255),
@@ -369,16 +369,15 @@ CREATE TABLE `seg_org_usuarios` (
   `s_token` varchar(255)
 );
 
-CREATE TABLE `seg_org_roles_usuarios` (
+CREATE TABLE `seg_roles_usuarios` (
   `n_id_rol_usuario` int PRIMARY KEY AUTO_INCREMENT,
   `n_id_rol` int,
   `n_id_usuario` int,
   `n_id_empleado_puesto_area` int,
-  `n_id_u_adscripcion_detalle` int,
   `n_session_id` int
 );
 
-CREATE TABLE `seg_org_roles` (
+CREATE TABLE `seg_roles` (
   `n_id_rol` int PRIMARY KEY AUTO_INCREMENT,
   `s_etiqueta_rol` varchar(15) UNIQUE,
   `s_descripcion` varchar(40),
@@ -387,7 +386,8 @@ CREATE TABLE `seg_org_roles` (
   `n_session_id` int
 );
 
-CREATE TABLE `seg_org_roles_modulos` (
+CREATE TABLE `seg_usuarios_roles_modulos` (
+  `n_id_usuario` int,
   `n_id_rol` int,
   `n_id_modulo` int,
   `crear` varchar(1) COMMENT 'S- Si, N-No, Null-No',
@@ -399,7 +399,7 @@ CREATE TABLE `seg_org_roles_modulos` (
   PRIMARY KEY (`n_id_rol`, `n_id_modulo`)
 );
 
-CREATE TABLE `seg_org_modulos` (
+CREATE TABLE `seg_modulos` (
   `n_id_modulo` int PRIMARY KEY AUTO_INCREMENT,
   `n_id_nivel` int(2),
   `desc_modulo` varchar(100),
@@ -410,72 +410,13 @@ CREATE TABLE `seg_org_modulos` (
   `menu_pos` int(3) COMMENT 'Sirve para presentar la posición del menú'
 );
 
-CREATE TABLE `seg_org_log_sesion` (
+CREATE TABLE `seg_log_sesion` (
   `n_session_id` int PRIMARY KEY AUTO_INCREMENT,
   `n_id_usuario` int,
   `d_fecha_inicio` timestamp,
   `d_fecha_fin` timestamp COMMENT 'El usuario realizo un logout',
   `n_end_sesion` bigint COMMENT 'Fin de la sesión en milisegundos',
   `chain_n_session_id` int
-);
-
-CREATE TABLE `jel_persona_jel` (
-  `s_curp` varchar(20) PRIMARY KEY,
-  `id_persona_jel` int,
-  `nombre` varchar(40),
-  `apellido1` varchar(40),
-  `apellido2` varchar(40),
-  `s_rfc` varchar(12),
-  `genero` varchar(14),
-  `fecha_nacimiento` date,
-  `tipo_identificacion` int(2)
-);
-
-CREATE TABLE `jel_seg_usuarios` (
-  `n_id_usuario` int PRIMARY KEY AUTO_INCREMENT,
-  `s_usuario` varchar(20),
-  `s_contrasenia` varchar(255),
-  `s_desc_usuario` varchar(100),
-  `s_email` varchar(256),
-  `n_id_estado_usuario` int,
-  `s_token` varchar(255)
-);
-
-CREATE TABLE `jel_seg_roles_usuarios` (
-  `n_id_rol` int,
-  `n_id_usuario` int,
-  PRIMARY KEY (`n_id_rol`, `n_id_usuario`)
-);
-
-CREATE TABLE `jel_seg_roles` (
-  `n_id_rol` int PRIMARY KEY AUTO_INCREMENT,
-  `s_etiqueta_rol` varchar(15),
-  `s_descripcion` varchar(40),
-  `n_id_rol_padre` int,
-  `n_rec_activo` int(1),
-  `n_session_id_borrado` int COMMENT 'TODO. Vincularlo a la tabla de sesiones'
-);
-
-CREATE TABLE `jel_seg_roles_modulos` (
-  `n_id_rol` int,
-  `n_id_modulo` int,
-  `create` varchar(1) COMMENT 'S- Si, N-No, Null-No',
-  `read` varchar(1),
-  `update` varchar(1),
-  `delete` varchar(1),
-  `n_session_id` int COMMENT 'Guardar la sesión que modificó el registro',
-  PRIMARY KEY (`n_id_rol`, `n_id_modulo`)
-);
-
-CREATE TABLE `jel_seg_modulos` (
-  `n_id_modulo` int PRIMARY KEY AUTO_INCREMENT,
-  `n_id_nivel` int(2),
-  `desc_modulo` varchar(20),
-  `n_id_modulo_padre` int,
-  `menu` varchar(1) COMMENT 'S- Si, forma parte del menú',
-  `menu_desc` varchar(20),
-  `menu_url` varchar(40),
-  `menu_pos` int(3) COMMENT 'Sirve para presentar la posición del menú'
 );
 
 CREATE TABLE `seg_log_sistema` (
@@ -492,6 +433,18 @@ CREATE TABLE `seg_log_usuario` (
   `d_sistema` datetime,
   `n_session_id` int COMMENT 'Guardar la sesión que modificó el registro',
   `bitacora` varchar(1024)
+);
+
+CREATE TABLE `jel_persona_jel` (
+  `s_curp` varchar(20) PRIMARY KEY,
+  `id_persona_jel` int,
+  `nombre` varchar(40),
+  `apellido1` varchar(40),
+  `apellido2` varchar(40),
+  `s_rfc` varchar(12),
+  `genero` varchar(14),
+  `fecha_nacimiento` date,
+  `tipo_identificacion` int(2)
 );
 
 /*Actualización 5/dic-2023*/
@@ -517,7 +470,7 @@ ALTER TABLE `tab_notificaciones` ADD FOREIGN KEY (`id_document`) REFERENCES `tab
 
 ALTER TABLE `tab_notificaciones` ADD FOREIGN KEY (`n_id_tipo_notif`) REFERENCES `tab_cat_tipo_notificacion` (`n_id_tipo_notif`);
 
-ALTER TABLE `tab_expedientes` ADD FOREIGN KEY (`n_id_usuario_creador`) REFERENCES `seg_org_usuarios` (`n_id_usuario`);
+ALTER TABLE `tab_expedientes` ADD FOREIGN KEY (`n_id_usuario_creador`) REFERENCES `seg_usuarios` (`n_id_usuario`);
 
 ALTER TABLE `tab_documentos` ADD FOREIGN KEY (`chain_id_document`) REFERENCES `tab_documentos` (`n_id_documento`);
 
@@ -527,7 +480,7 @@ ALTER TABLE `tab_documentos` ADD FOREIGN KEY (`n_id_tipo_documento`) REFERENCES 
 
 ALTER TABLE `tab_documentos` ADD FOREIGN KEY (`n_id_num_empleado_creador`) REFERENCES `inst_empleado` (`n_id_num_empleado`);
 
-ALTER TABLE `tab_documentos` ADD FOREIGN KEY (`n_id_usuario_creador`) REFERENCES `seg_org_usuarios` (`n_id_usuario`);
+ALTER TABLE `tab_documentos` ADD FOREIGN KEY (`n_id_usuario_creador`) REFERENCES `seg_usuarios` (`n_id_usuario`);
 
 ALTER TABLE `tab_documentos` ADD FOREIGN KEY (`n_num_expediente`) REFERENCES `tab_expedientes` (`n_num_expediente`);
 
@@ -563,7 +516,7 @@ ALTER TABLE `pki_x509_ac_autorizadas` ADD FOREIGN KEY (`s_x509_emisor_serial_par
 
 ALTER TABLE `pki_x509_registrados` ADD FOREIGN KEY (`s_x509_emisor_serial`) REFERENCES `pki_x509_ac_autorizadas` (`s_x509_emisor_serial`);
 
-ALTER TABLE `pki_usuarios_cert` ADD FOREIGN KEY (`n_id_usuario_firma`) REFERENCES `seg_org_usuarios` (`n_id_usuario`);
+ALTER TABLE `pki_usuarios_cert` ADD FOREIGN KEY (`n_id_usuario_firma`) REFERENCES `seg_usuarios` (`n_id_usuario`);
 
 ALTER TABLE `pki_usuarios_cert` ADD FOREIGN KEY (`s_x509_serial_number`) REFERENCES `pki_x509_registrados` (`s_x509_serial_number`);
 
@@ -583,7 +536,7 @@ ALTER TABLE `pki_documento` ADD FOREIGN KEY (`n_id_num_empleado_envio`) REFERENC
 
 ALTER TABLE `pki_documento_firmantes` ADD FOREIGN KEY (`s_hash_documento`) REFERENCES `pki_documento` (`s_hash_documento`);
 
-ALTER TABLE `pki_documento_firmantes` ADD FOREIGN KEY (`n_id_usuario`) REFERENCES `seg_org_usuarios` (`n_id_usuario`);
+ALTER TABLE `pki_documento_firmantes` ADD FOREIGN KEY (`n_id_usuario`) REFERENCES `seg_usuarios` (`n_id_usuario`);
 
 ALTER TABLE `pki_documento_firmantes` ADD FOREIGN KEY (`n_id_transaccion`) REFERENCES `pki_transaccion` (`n_id_transaccion`);
 
@@ -595,7 +548,7 @@ ALTER TABLE `pki_documento_firmantes` ADD FOREIGN KEY (`id_firma_aplicada`) REFE
 
 ALTER TABLE `pki_documento_destinos` ADD FOREIGN KEY (`s_hash_documento`) REFERENCES `pki_documento` (`s_hash_documento`);
 
-ALTER TABLE `pki_documento_destinos` ADD FOREIGN KEY (`n_id_usuario`) REFERENCES `seg_org_usuarios` (`n_id_usuario`);
+ALTER TABLE `pki_documento_destinos` ADD FOREIGN KEY (`n_id_usuario`) REFERENCES `seg_usuarios` (`n_id_usuario`);
 
 ALTER TABLE `pki_documento_destinos` ADD FOREIGN KEY (`n_id_transaccion`) REFERENCES `pki_transaccion` (`n_id_transaccion`);
 
@@ -625,7 +578,7 @@ ALTER TABLE `inst_titular_u_adscripcion` ADD FOREIGN KEY (`n_id_u_adscripcion_de
 
 ALTER TABLE `inst_titular_u_adscripcion` ADD FOREIGN KEY (`n_id_empleado_puesto_area`) REFERENCES `inst_empleado_puesto_area` (`n_id_empleado_puesto_area`);
 
-ALTER TABLE `seg_org_roles_usuarios` ADD FOREIGN KEY (`n_id_empleado_puesto_area`) REFERENCES `inst_empleado_puesto_area` (`n_id_empleado_puesto_area`);
+ALTER TABLE `seg_roles_usuarios` ADD FOREIGN KEY (`n_id_empleado_puesto_area`) REFERENCES `inst_empleado_puesto_area` (`n_id_empleado_puesto_area`);
 
 ALTER TABLE `inst_empleado_puesto_area` ADD FOREIGN KEY (`n_id_num_empleado`) REFERENCES `inst_empleado` (`n_id_num_empleado`);
 
@@ -635,67 +588,49 @@ ALTER TABLE `inst_empleado_puesto_area` ADD FOREIGN KEY (`n_id_cat_puesto`) REFE
 
 ALTER TABLE `inst_empleado` ADD FOREIGN KEY (`id_sexo`) REFERENCES `inst_cat_sexo` (`id_sexo`);
 
-ALTER TABLE `inst_empleado` ADD FOREIGN KEY (`n_id_usuario`) REFERENCES `seg_org_usuarios` (`n_id_usuario`);
+ALTER TABLE `inst_empleado` ADD FOREIGN KEY (`n_id_usuario`) REFERENCES `seg_usuarios` (`n_id_usuario`);
 
 ALTER TABLE `inst_log_empleado` ADD FOREIGN KEY (`n_id_num_empleado`) REFERENCES `inst_empleado` (`n_id_num_empleado`);
 
-ALTER TABLE `inst_log_empleado` ADD FOREIGN KEY (`n_session_id`) REFERENCES `seg_org_log_sesion` (`n_session_id`);
+ALTER TABLE `inst_log_empleado` ADD FOREIGN KEY (`n_session_id`) REFERENCES `seg_log_sesion` (`n_session_id`);
 
-ALTER TABLE `seg_org_usuario_estado_usuario` ADD FOREIGN KEY (`n_id_usuario`) REFERENCES `seg_org_usuarios` (`n_id_usuario`);
+ALTER TABLE `seg_usuario_estado_usuario` ADD FOREIGN KEY (`n_id_usuario`) REFERENCES `seg_usuarios` (`n_id_usuario`);
 
-ALTER TABLE `seg_org_usuario_estado_usuario` ADD FOREIGN KEY (`n_id_estado_usuario`) REFERENCES `seg_cat_estado_usuario` (`n_id_estado_usuario`);
+ALTER TABLE `seg_usuario_estado_usuario` ADD FOREIGN KEY (`n_id_estado_usuario`) REFERENCES `seg_cat_estado_usuario` (`n_id_estado_usuario`);
 
-ALTER TABLE `seg_org_usuario_estado_usuario` ADD FOREIGN KEY (`n_session_id`) REFERENCES `seg_org_log_sesion` (`n_session_id`);
+ALTER TABLE `seg_usuario_estado_usuario` ADD FOREIGN KEY (`n_session_id`) REFERENCES `seg_log_sesion` (`n_session_id`);
 
-ALTER TABLE `seg_org_usuarios` ADD FOREIGN KEY (`n_id_estado_usuario`) REFERENCES `seg_cat_estado_usuario` (`n_id_estado_usuario`);
+ALTER TABLE `seg_usuarios` ADD FOREIGN KEY (`n_id_estado_usuario`) REFERENCES `seg_cat_estado_usuario` (`n_id_estado_usuario`);
 
-ALTER TABLE `seg_org_roles_usuarios` ADD FOREIGN KEY (`n_id_rol`) REFERENCES `seg_org_roles` (`n_id_rol`);
+ALTER TABLE `seg_roles_usuarios` ADD FOREIGN KEY (`n_id_rol`) REFERENCES `seg_roles` (`n_id_rol`);
 
-ALTER TABLE `seg_org_roles_usuarios` ADD FOREIGN KEY (`n_id_usuario`) REFERENCES `seg_org_usuarios` (`n_id_usuario`);
+ALTER TABLE `seg_roles_usuarios` ADD FOREIGN KEY (`n_id_usuario`) REFERENCES `seg_usuarios` (`n_id_usuario`);
 
-ALTER TABLE `seg_org_roles_usuarios` ADD FOREIGN KEY (`n_id_u_adscripcion_detalle`) REFERENCES `inst_u_adscripcion_detalle` (`n_id_u_adscripcion_detalle`);
+ALTER TABLE `seg_roles_usuarios` ADD FOREIGN KEY (`n_session_id`) REFERENCES `seg_log_sesion` (`n_session_id`);
 
-ALTER TABLE `seg_org_roles_usuarios` ADD FOREIGN KEY (`n_session_id`) REFERENCES `seg_org_log_sesion` (`n_session_id`);
+ALTER TABLE `seg_roles` ADD FOREIGN KEY (`n_id_rol_padre`) REFERENCES `seg_roles` (`n_id_rol`);
 
-ALTER TABLE `seg_org_roles` ADD FOREIGN KEY (`n_id_rol_padre`) REFERENCES `seg_org_roles` (`n_id_rol`);
+ALTER TABLE `seg_roles` ADD FOREIGN KEY (`n_session_id`) REFERENCES `seg_log_sesion` (`n_session_id`);
 
-ALTER TABLE `seg_org_roles` ADD FOREIGN KEY (`n_session_id`) REFERENCES `seg_org_log_sesion` (`n_session_id`);
+ALTER TABLE `seg_usuarios_roles_modulos` ADD FOREIGN KEY (`n_id_usuario`) REFERENCES `seg_usuarios` (`n_id_usuario`);
 
-ALTER TABLE `seg_org_roles_modulos` ADD FOREIGN KEY (`n_id_rol`) REFERENCES `seg_org_roles` (`n_id_rol`);
+ALTER TABLE `seg_usuarios_roles_modulos` ADD FOREIGN KEY (`n_id_rol`) REFERENCES `seg_roles` (`n_id_rol`);
 
-ALTER TABLE `seg_org_roles_modulos` ADD FOREIGN KEY (`n_id_modulo`) REFERENCES `seg_org_modulos` (`n_id_modulo`);
+ALTER TABLE `seg_usuarios_roles_modulos` ADD FOREIGN KEY (`n_id_modulo`) REFERENCES `seg_modulos` (`n_id_modulo`);
 
-ALTER TABLE `seg_org_modulos` ADD FOREIGN KEY (`n_id_nivel`) REFERENCES `seg_cat_nivel_modulo` (`n_id_nivel`);
+ALTER TABLE `seg_modulos` ADD FOREIGN KEY (`n_id_nivel`) REFERENCES `seg_cat_nivel_modulo` (`n_id_nivel`);
 
-ALTER TABLE `seg_org_modulos` ADD FOREIGN KEY (`n_id_modulo_padre`) REFERENCES `seg_org_modulos` (`n_id_modulo`);
+ALTER TABLE `seg_modulos` ADD FOREIGN KEY (`n_id_modulo_padre`) REFERENCES `seg_modulos` (`n_id_modulo`);
 
-ALTER TABLE `seg_org_log_sesion` ADD FOREIGN KEY (`n_id_usuario`) REFERENCES `seg_org_usuarios` (`n_id_usuario`);
+ALTER TABLE `seg_log_sesion` ADD FOREIGN KEY (`n_id_usuario`) REFERENCES `seg_usuarios` (`n_id_usuario`);
 
-ALTER TABLE `seg_org_log_sesion` ADD FOREIGN KEY (`chain_n_session_id`) REFERENCES `seg_org_log_sesion` (`n_session_id`);
+ALTER TABLE `seg_log_sesion` ADD FOREIGN KEY (`chain_n_session_id`) REFERENCES `seg_log_sesion` (`n_session_id`);
 
-ALTER TABLE `jel_persona_jel` ADD FOREIGN KEY (`id_persona_jel`) REFERENCES `seg_org_usuarios` (`n_id_usuario`);
+ALTER TABLE `jel_persona_jel` ADD FOREIGN KEY (`id_persona_jel`) REFERENCES `seg_usuarios` (`n_id_usuario`);
 
-ALTER TABLE `jel_seg_usuarios` ADD FOREIGN KEY (`n_id_estado_usuario`) REFERENCES `seg_cat_estado_usuario` (`n_id_estado_usuario`);
+ALTER TABLE `seg_log_sistema` ADD FOREIGN KEY (`n_id_usuario_org`) REFERENCES `seg_usuarios` (`n_id_usuario`);
 
-ALTER TABLE `jel_seg_roles_usuarios` ADD FOREIGN KEY (`n_id_rol`) REFERENCES `jel_seg_roles` (`n_id_rol`);
-
-ALTER TABLE `jel_seg_roles_usuarios` ADD FOREIGN KEY (`n_id_usuario`) REFERENCES `jel_seg_usuarios` (`n_id_usuario`);
-
-ALTER TABLE `jel_seg_roles` ADD FOREIGN KEY (`n_id_rol_padre`) REFERENCES `jel_seg_roles` (`n_id_rol`);
-
-ALTER TABLE `jel_seg_roles_modulos` ADD FOREIGN KEY (`n_id_rol`) REFERENCES `jel_seg_roles` (`n_id_rol`);
-
-ALTER TABLE `jel_seg_roles_modulos` ADD FOREIGN KEY (`n_id_modulo`) REFERENCES `jel_seg_modulos` (`n_id_modulo`);
-
-ALTER TABLE `jel_seg_modulos` ADD FOREIGN KEY (`n_id_nivel`) REFERENCES `seg_cat_nivel_modulo` (`n_id_nivel`);
-
-ALTER TABLE `jel_seg_modulos` ADD FOREIGN KEY (`n_id_modulo_padre`) REFERENCES `jel_seg_modulos` (`n_id_modulo`);
-
-ALTER TABLE `seg_log_sistema` ADD FOREIGN KEY (`n_id_usuario_org`) REFERENCES `seg_org_usuarios` (`n_id_usuario`);
-
-ALTER TABLE `seg_log_sistema` ADD FOREIGN KEY (`n_id_usuario_jel`) REFERENCES `jel_seg_usuarios` (`n_id_usuario`);
-
-ALTER TABLE `seg_log_usuario` ADD FOREIGN KEY (`n_id_usuario`) REFERENCES `seg_org_usuarios` (`n_id_usuario`);
+ALTER TABLE `seg_log_usuario` ADD FOREIGN KEY (`n_id_usuario`) REFERENCES `seg_usuarios` (`n_id_usuario`);
 /*Actualización 5/dic-2023*/
 ALTER TABLE `tab_doc_grupos_firmas` ADD FOREIGN KEY (`n_id_cat_area`) REFERENCES `inst_cat_areas` (`n_id_cat_area`);
 

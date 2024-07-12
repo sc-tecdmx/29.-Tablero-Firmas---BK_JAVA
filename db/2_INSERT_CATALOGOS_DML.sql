@@ -215,6 +215,6 @@ INSERT INTO seg_org_modulos
 VALUES
 (-1, 1, 'No parent', NULL, 'N', NULL, NULL, 0);
 
-INSERT INTO db_mappings.pki_x509_ac_autorizadas
+INSERT INTO pki_x509_ac_autorizadas
 (s_x509_emisor_serial, s_x509_ac_der_b64, s_x509_emisor_autoridad, s_tipo_certificado, s_url, s_x509_emisor_serial_parent)
 VALUES('11111', NULL, NULL, NULL, NULL, '11111');
