@@ -183,7 +183,7 @@ INSERT INTO seg_cat_estado_usuario (n_id_estado_usuario, s_descripcion) VALUES
 (7, 'Eliminada'),
 (8, 'Revocada');
 
-INSERT INTO seg_org_roles (n_id_rol, s_etiqueta_rol,s_descripcion,n_id_rol_padre,n_rec_activo,n_session_id) VALUES
+INSERT INTO seg_roles (n_id_rol, s_etiqueta_rol,s_descripcion,n_id_rol_padre,n_rec_activo,n_session_id) VALUES
 (1,'SA','Super administrador',1,1,NULL),
 (2,'AG','Administrador General',1,1,NULL),
 (3,'USID','USI Directorio',1,1,NULL),
@@ -210,7 +210,7 @@ VALUES
 (2, 'Rubricar'),
 (3, 'Visto bueno');
 
-INSERT INTO seg_org_modulos
+INSERT INTO seg_modulos
 (n_id_modulo, n_id_nivel, desc_modulo, n_id_modulo_padre, menu, menu_desc, menu_url, menu_pos)
 VALUES
 (-1, 1, 'No parent', NULL, 'N', NULL, NULL, 0);

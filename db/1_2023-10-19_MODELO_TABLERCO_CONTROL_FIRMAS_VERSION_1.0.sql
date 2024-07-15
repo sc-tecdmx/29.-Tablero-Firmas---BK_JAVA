@@ -386,8 +386,7 @@ CREATE TABLE `seg_roles` (
   `n_session_id` int
 );
 
-CREATE TABLE `seg_usuarios_roles_modulos` (
-  `n_id_usuario` int,
+CREATE TABLE `seg_roles_modulos` (
   `n_id_rol` int,
   `n_id_modulo` int,
   `crear` varchar(1) COMMENT 'S- Si, N-No, Null-No',
@@ -397,6 +396,16 @@ CREATE TABLE `seg_usuarios_roles_modulos` (
   `publico` varchar(1) COMMENT 'S- Si, se mostrará al publico sin autenticar',
   `n_session_id` int COMMENT 'Guardar la sesión que modificó el registro',
   PRIMARY KEY (`n_id_rol`, `n_id_modulo`)
+);
+
+CREATE TABLE `seg_usuarios_modulos` (
+  `n_id_usuario` int,
+  `n_id_modulo` int,
+  `d_fecha_alta` datetime,
+  `d_fecha_baja` datetime,
+  `status` varchar(20),
+  `n_session_id` int COMMENT 'Guardar la sesión que modificó el registro',
+  PRIMARY KEY (`n_id_usuario`, `n_id_modulo`)
 );
 
 CREATE TABLE `seg_modulos` (
@@ -612,11 +621,13 @@ ALTER TABLE `seg_roles` ADD FOREIGN KEY (`n_id_rol_padre`) REFERENCES `seg_roles
 
 ALTER TABLE `seg_roles` ADD FOREIGN KEY (`n_session_id`) REFERENCES `seg_log_sesion` (`n_session_id`);
 
-ALTER TABLE `seg_usuarios_roles_modulos` ADD FOREIGN KEY (`n_id_usuario`) REFERENCES `seg_usuarios` (`n_id_usuario`);
+ALTER TABLE `seg_roles_modulos` ADD FOREIGN KEY (`n_id_rol`) REFERENCES `seg_roles` (`n_id_rol`);
 
-ALTER TABLE `seg_usuarios_roles_modulos` ADD FOREIGN KEY (`n_id_rol`) REFERENCES `seg_roles` (`n_id_rol`);
+ALTER TABLE `seg_roles_modulos` ADD FOREIGN KEY (`n_id_modulo`) REFERENCES `seg_modulos` (`n_id_modulo`);
 
-ALTER TABLE `seg_usuarios_roles_modulos` ADD FOREIGN KEY (`n_id_modulo`) REFERENCES `seg_modulos` (`n_id_modulo`);
+ALTER TABLE `seg_usuarios_modulos` ADD FOREIGN KEY (`n_id_usuario`) REFERENCES `seg_roles` (`n_id_rol`);
+
+ALTER TABLE `seg_usuarios_modulos` ADD FOREIGN KEY (`n_id_modulo`) REFERENCES `seg_modulos` (`n_id_modulo`);
 
 ALTER TABLE `seg_modulos` ADD FOREIGN KEY (`n_id_nivel`) REFERENCES `seg_cat_nivel_modulo` (`n_id_nivel`);
 
