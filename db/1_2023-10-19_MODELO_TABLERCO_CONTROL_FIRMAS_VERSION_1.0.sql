@@ -625,7 +625,7 @@ ALTER TABLE `seg_roles_modulos` ADD FOREIGN KEY (`n_id_rol`) REFERENCES `seg_rol
 
 ALTER TABLE `seg_roles_modulos` ADD FOREIGN KEY (`n_id_modulo`) REFERENCES `seg_modulos` (`n_id_modulo`);
 
-ALTER TABLE `seg_usuarios_modulos` ADD FOREIGN KEY (`n_id_usuario`) REFERENCES `seg_roles` (`n_id_rol`);
+ALTER TABLE `seg_usuarios_modulos` ADD FOREIGN KEY (`n_id_usuario`) REFERENCES `seg_usuarios` (`n_id_usuario`);
 
 ALTER TABLE `seg_usuarios_modulos` ADD FOREIGN KEY (`n_id_modulo`) REFERENCES `seg_modulos` (`n_id_modulo`);
 
